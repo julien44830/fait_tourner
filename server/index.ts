@@ -18,5 +18,5 @@ app.get("/", (req, res) => {
 // Définition du port (depuis .env ou valeur par défaut)
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
-  console.log(`✅ Serveur démarré sur http://localhost:${PORT}`);
+  console.log(`  ➜  Serveur: http://localhost:${PORT} ✅`);
 });
