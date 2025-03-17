@@ -3,9 +3,6 @@
         "dev": "concurrently \"npm run dev --prefix client\" \"npm run dev --prefix server\""
     },
     "devDependencies": {
-        "@types/cors": "^2.8.17",
-        "@types/express": "^5.0.0",
-        "@types/node": "^22.13.10",
         "concurrently": "^9.1.2"
     }
 }
