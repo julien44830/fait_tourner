@@ -29,6 +29,6 @@ INSERT INTO tag (name) VALUES
 
 -- Association des tags aux images
 INSERT INTO picture_tag (picture_id, tag_id) VALUES
-(1, 1), -- "bapteme_photo1.jpg" reçoit le tag "Famille"
-(1, 2), -- "bapteme_photo1.jpg" reçoit le tag "Cérémonie"
-(3, 3); -- "voyage_photo1.jpg" reçoit le tag "Voyage"
+(10, 1), -- "bapteme_photo1.jpg" reçoit le tag "Famille"
+(11, 2), -- "bapteme_photo1.jpg" reçoit le tag "Cérémonie"
+(12, 3); -- "voyage_photo1.jpg" reçoit le tag "Voyage"
