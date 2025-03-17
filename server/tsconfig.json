@@ -5,6 +5,8 @@
         "module": "CommonJS",
         "target": "ES6",
         "strict": true,
-        "esModuleInterop": true
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "skipLibCheck": true
     }
 }
