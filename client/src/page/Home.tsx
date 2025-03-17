@@ -19,8 +19,6 @@ export default function Home() {
             );
     }, []);
 
-    console.log("%c⧭", "color: #ff0000", book);
-
     if (!book) return <h1>Chargement...</h1>;
 
     return (
