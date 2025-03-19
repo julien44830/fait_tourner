@@ -1,4 +1,5 @@
-import React from "react"; // Assure-toi d'importer React
+import React from "react";
+import { NavLink } from "react-router-dom"; // Assure-toi d'importer React
 
 interface Book {
     id: number;
@@ -11,9 +12,11 @@ interface BookHomeProps {
 
 const BookHome: React.FC<BookHomeProps> = ({ book }) => {
     return (
-        <button>
-            <p>{book[0].name}</p>
-        </button>
+        <NavLink to={`/book/${book[0].id}`}>
+            <button>
+                <p>{book[0].name}</p>
+            </button>
+        </NavLink>
     );
 };
 

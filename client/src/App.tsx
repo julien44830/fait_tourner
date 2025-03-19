@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./page/Home";
 import Login from "./page/Login";
 import Registration from "./page/Registration";
+import Book from "./page/Book";
 function App() {
     return (
         <Router>
@@ -17,6 +18,10 @@ function App() {
                 <Route
                     path="/inscription"
                     element={<Registration />}
+                />
+                <Route
+                    path="/book/:id"
+                    element={<Book />}
                 />
             </Routes>
         </Router>

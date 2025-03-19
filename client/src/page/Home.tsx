@@ -11,7 +11,7 @@ export default function Home() {
     const [book, setBook] = useState<Book | null>(null);
 
     useEffect(() => {
-        fetch(`http://localhost:4000/api/books/1`) // Appel API Backend
+        fetch(`http://localhost:4000/api/books`) // Appel API Backend
             .then((response) => response.json())
             .then((data) => setBook(data))
             .catch((error) =>
