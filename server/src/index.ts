@@ -1,7 +1,8 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import bookRoutes from "./routes/book"; // ✅ Assure-toi que le chemin est correct
+import bookRoutes from "./routes/book";
+import authRoutes from "./routes/auth";
 
 dotenv.config(); // Charge les variables d'environnement
 
@@ -12,7 +13,10 @@ app.use(cors()); // Autorise CORS
 app.use(express.json()); // Analyse JSON
 
 // Routes
-app.use("/api", bookRoutes); // ✅ Charge les routes définies dans book.ts
+app.use("/api", bookRoutes);
+app.use("/api", authRoutes);
+console.log("✅ Routes d'authentification chargées !");
+
 
 // Définition du port
 const PORT = process.env.PORT || 4000;

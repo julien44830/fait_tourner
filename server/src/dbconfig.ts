@@ -1,11 +1,14 @@
+import dotenv from "dotenv";
 import mysql from "mysql2/promise";
+
+dotenv.config();
 
 // 🔧 Configuration de la connexion MySQL
 const dbConfig = {
-    host: "localhost",
-    user: "root",
-    password: "0000",
-    database: "fait_tourner_db",
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
 };
 
 // Fonction pour obtenir une connexion MySQL
