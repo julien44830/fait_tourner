@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { jwtDecode } from "jwt-decode"; // Assure-toi d'installer jwt-decode
+import { jwtDecode } from "jwt-decode"; // Assure-toi d'installer jwt-decode via `npm install jwt-decode`
 
 export default function Registration() {
     const [formData, setFormData] = useState({
@@ -11,29 +11,36 @@ export default function Registration() {
         confirmPassword: "",
     });
 
-    const [error, setError] = useState("");
-    const [success] = useState("");
-
+    const [token, setToken] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
-    const location = useLocation(); // Permet d'accéder à l'URL et ses paramètres
+    const location = useLocation(); // 🔥 Récupère l'URL actuelle
 
-    // 📌 Récupérer le token depuis l'URL et pré-remplir l'email
+    // ✅ Récupérer et décoder le token s'il est présent dans l'URL
     useEffect(() => {
         const params = new URLSearchParams(location.search);
-        const token = params.get("token");
+        const tokenFromUrl = params.get("token");
 
-        if (token) {
+        if (tokenFromUrl) {
+            console.log("🔗 Token récupéré depuis l'URL :", tokenFromUrl);
+            setToken(tokenFromUrl);
+
             try {
-                const decoded: any = jwtDecode(token);
-                setFormData((prevData) => ({
-                    ...prevData,
-                    email: decoded.email || "",
-                }));
-            } catch (error) {
-                console.error("❌ Erreur lors du décodage du token :", error);
+                const decoded: any = jwtDecode(tokenFromUrl);
+                console.log("📩 Token décodé :", decoded);
+
+                if (decoded.email) {
+                    setFormData((prevData) => ({
+                        ...prevData,
+                        email: decoded.email, // Pré-remplit l'email
+                    }));
+                }
+            } catch (err) {
+                console.error("❌ Erreur lors du décodage du token :", err);
+                setError("Token invalide ou expiré.");
             }
         }
-    }, [location]);
+    }, [location.search]);
 
     // 🛠 Gérer les changements de formulaire
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,7 +54,10 @@ export default function Registration() {
         const response = await fetch("http://localhost:4000/api/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formData),
+            body: JSON.stringify({
+                ...formData,
+                token, // 🔥 Envoie bien le token au backend
+            }),
         });
 
         const data = await response.json();
@@ -69,11 +79,10 @@ export default function Registration() {
                 <h2>Inscription</h2>
 
                 {error && <p style={{ color: "red" }}>{error}</p>}
-                {success && <p style={{ color: "green" }}>{success}</p>}
 
                 <label htmlFor="name">
                     <fieldset>
-                        <legend>Nom </legend>
+                        <legend>Nom</legend>
                         <input
                             type="text"
                             id="name"
@@ -87,7 +96,7 @@ export default function Registration() {
 
                 <label htmlFor="lastname">
                     <fieldset>
-                        <legend>Prénom </legend>
+                        <legend>Prénom</legend>
                         <input
                             type="text"
                             id="lastname"
@@ -101,7 +110,7 @@ export default function Registration() {
 
                 <label htmlFor="email">
                     <fieldset>
-                        <legend>Email </legend>
+                        <legend>Email</legend>
                         <input
                             type="email"
                             id="email"
@@ -109,14 +118,14 @@ export default function Registration() {
                             value={formData.email}
                             onChange={handleChange}
                             required
-                            disabled={formData.email !== ""} // 🔒 Empêche la modification si l'email vient de l'invitation
+                            disabled={!!token} // 🔒 Empêche la modification si l'email vient de l'invitation
                         />
                     </fieldset>
                 </label>
 
                 <label htmlFor="password">
                     <fieldset>
-                        <legend>Mot de passe </legend>
+                        <legend>Mot de passe</legend>
                         <input
                             type="password"
                             id="password"
@@ -130,7 +139,7 @@ export default function Registration() {
 
                 <label htmlFor="confirmPassword">
                     <fieldset>
-                        <legend>Confirmation du mot de passe </legend>
+                        <legend>Confirmation du mot de passe</legend>
                         <input
                             type="password"
                             id="confirmPassword"

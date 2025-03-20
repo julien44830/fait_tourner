@@ -78,9 +78,10 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     // ✅ Ajout de l'utilisateur au book après inscription
     if (token) {
       try {
+        console.log("🔍 Vérification du token :", token);
         const decoded = jwt.verify(token, process.env.SECRET_KEY as string) as { bookId: number, email: string };
 
-        console.log(`📩 Token décodé : L'utilisateur ${decoded.email} est invité au book ${decoded.bookId}`);
+        console.log(`📩 Token décodé : email=${decoded.email}, bookId=${decoded.bookId}`);
 
         const [bookCheck]: any = await connection.execute(
           "SELECT id FROM book WHERE id = ?",
@@ -93,21 +94,27 @@ export const register = async (req: Request, res: Response): Promise<void> => {
           return;
         }
 
-        console.log(`📌 Ajout de l'utilisateur ${newUserId} au book ${decoded.bookId}`);
-
         const [insertResult]: any = await connection.execute(
-          "INSERT INTO users_book (user_id, book_id, role) VALUES (?, ?, 'member')",
+          "INSERT INTO users_book (user_id, book_id, role) VALUES (?, ?, 'viewer')",
           [newUserId, decoded.bookId]
         );
 
-        console.log(`✅ L'utilisateur ${newUserId} a bien été ajouté au book ${decoded.bookId}`);
+        console.log("🔍 Vérification ajout à users_book :", insertResult);
+
+        console.log("Ajout à users_book :", newUserId, decoded.bookId, insertResult);
+
+        if (insertResult.affectedRows > 0) {
+          console.log(`✅ L'utilisateur ${email} a bien été ajouté au book ${decoded.bookId}`);
+        } else {
+          console.error("❌ Échec de l'ajout du book.");
+        }
+
       } catch (err) {
         console.error("❌ Erreur lors de la validation du token d'invitation :", err);
         res.status(400).json({ error: "Token invalide ou expiré." });
         return;
       }
     }
-
 
     res.status(201).json({ message: "Inscription réussie !" });
   } catch (error) {

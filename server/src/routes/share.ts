@@ -49,6 +49,27 @@ router.post("/invite", verifyToken, async (req: AuthRequest, res: Response): Pro
       [email]
     );
 
+    if (userRows.length > 0) {
+      const invitedUserId = userRows[0].id;
+
+      // ✅ Vérifier si l'utilisateur est déjà lié au book
+      const [bookLink]: any = await connection.execute(
+        `SELECT * FROM users_book WHERE user_id = ? AND book_id = ?`,
+        [invitedUserId, bookId]
+      );
+
+      if (bookLink.length === 0) {
+        // 🔥 L'utilisateur n'est pas encore dans le book, on l'ajoute
+        await connection.execute(
+          `INSERT INTO users_book (user_id, book_id, role) VALUES (?, ?, 'viewer')`,
+          [invitedUserId, bookId]
+        );
+        console.log(`✅ Utilisateur existant ${email} ajouté au book ${bookId}`);
+      } else {
+        console.log(`🔹 Utilisateur ${email} est déjà membre du book ${bookId}`);
+      }
+    }
+
     let inviteToken: string;
     let inviteLink: string;
 

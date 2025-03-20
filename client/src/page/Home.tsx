@@ -40,6 +40,7 @@ export default function Home() {
                 const data = await response.json();
                 console.log("📚 Réponse API books :", data);
                 setBooks(data);
+                setName(data.name);
             } catch (error) {
                 console.error(
                     "❌ Erreur lors de la récupération des books :",
@@ -53,6 +54,8 @@ export default function Home() {
 
     // ✅ Gestion de l'affichage
     if (!books) return <p>Chargement...</p>;
+
+    console.log("%c⧭", "color: #1d5673", name);
 
     return (
         <div>
