@@ -88,7 +88,6 @@ router.get("/books/:id", verifyToken, async (req: Request, res: Response): Promi
     );
 
 
-
     if (rows.length === 0) {
       res.status(404).json({ error: "Book non trouvé" });
       return

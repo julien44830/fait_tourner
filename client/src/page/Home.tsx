@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom"; // Assure-toi d'importer React
-import BookHome from "../component/BookHome";
 
 interface Book {
     id: number;
@@ -8,12 +7,15 @@ interface Book {
 }
 
 export default function Home() {
-    // ✅ useState doit être dans le composant
-    const [book, setBooks] = useState<Book[]>([]);
-    const [name, setName] = useState<string | null>(null);
+    // ✅ Stocker les books et le nom de l'utilisateur dans des états
+    const [books, setBooks] = useState<Book[]>([]);
+    const [name, setName] = useState<string | null>("");
 
     useEffect(() => {
-        setName(localStorage.getItem("name"));
+        // ✅ Récupère le nom de l'utilisateur stocké dans le localStorage
+        const storedName = localStorage.getItem("name");
+        setName(storedName);
+
         console.log("Token stocké :", localStorage.getItem("token"));
 
         const fetchBooks = async () => {
@@ -40,7 +42,7 @@ export default function Home() {
                 }
 
                 const data = await response.json();
-                console.log("%c⧭", "color: #0088cc", data);
+                console.log("%c📚 Books reçus :", "color: #0088cc", data);
                 setBooks(data);
             } catch (error) {
                 console.error(
@@ -53,18 +55,18 @@ export default function Home() {
         fetchBooks();
     }, []);
 
-    if (!book) return <h1>Chargement...</h1>;
-    console.log("%c⧭", "color: #d90000", book);
+    // ✅ Gestion de l'affichage
+    if (!books) return <h1>Chargement...</h1>;
 
     return (
         <div>
-            <h2>Bonjour, {localStorage.getItem("name")}</h2>
+            <h2>Bonjour, {name ? name : "Utilisateur"}</h2>
             <br />
             <button>Créer un nouveau book</button>
             <br />
             <h3>📚 Mes Books :</h3>
-            {Array.isArray(book) && book.length > 0 ? (
-                book.map((b) => (
+            {books.length > 0 ? (
+                books.map((b) => (
                     <NavLink
                         key={b.id}
                         to={`/book/${b.id}`}
