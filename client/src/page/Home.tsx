@@ -12,14 +12,10 @@ export default function Home() {
     const [name, setName] = useState<string | null>("");
 
     useEffect(() => {
-        // ✅ Récupère le nom de l'utilisateur stocké dans le localStorage
-        const storedName = localStorage.getItem("name");
-        setName(storedName);
-
-        console.log("Token stocké :", localStorage.getItem("token"));
-
         const fetchBooks = async () => {
-            const token = localStorage.getItem("token"); // Vérifie que le token est bien stocké
+            const token = localStorage.getItem("token");
+            console.log("📌 Token utilisé :", token); // 🔥 Vérifie que le token est bien récupéré
+
             if (!token) {
                 console.error("❌ Aucun token trouvé, accès refusé.");
                 return;
@@ -32,7 +28,7 @@ export default function Home() {
                         method: "GET",
                         headers: {
                             "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`, // Ajout du token
+                            Authorization: `Bearer ${token}`, // 🔥 Ajout du token
                         },
                     }
                 );
@@ -42,7 +38,7 @@ export default function Home() {
                 }
 
                 const data = await response.json();
-                console.log("%c📚 Books reçus :", "color: #0088cc", data);
+                console.log("📚 Réponse API books :", data);
                 setBooks(data);
             } catch (error) {
                 console.error(
@@ -56,7 +52,7 @@ export default function Home() {
     }, []);
 
     // ✅ Gestion de l'affichage
-    if (!books) return <h1>Chargement...</h1>;
+    if (!books) return <p>Chargement...</p>;
 
     return (
         <div>

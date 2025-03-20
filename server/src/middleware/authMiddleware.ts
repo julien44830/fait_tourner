@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-const SECRET_KEY = "ton_secret_token"; // Mets ça en variable d'environnement
+const SECRET_KEY = process.env.SECRET_KEY as string;
 
 interface AuthRequest extends Request {
   user?: { id: number };
@@ -29,14 +29,18 @@ export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction)
 
   if (!token) {
     res.status(401).json({ error: "Accès refusé, token manquant" });
-    return
+    return;
   }
 
   try {
+    console.log("🔍 Token reçu :", token);
+    console.log("🔑 Clé secrète utilisée pour la vérification :", SECRET_KEY);
+
     const decoded = jwt.verify(token, SECRET_KEY) as { userId: number };
     req.user = { id: decoded.userId };
     next();
   } catch (error) {
+    console.error("❌ Erreur JWT :", error);
     res.status(403).json({ error: "Token invalide" });
   }
 };
