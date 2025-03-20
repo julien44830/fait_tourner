@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import argon2 from "argon2";
 import { getConnection } from "../dbconfig"; // Assure-toi que ce chemin est correct
 
-const SECRET_KEY = "ton_secret_token"; // Remplace par une variable d'environnement
+const SECRET_KEY = process.env.SECRET_KEY as string; // Remplace par une variable d'environnement
 
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -46,20 +46,79 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, token } = req.body;
+    const connection = await getConnection();
 
-    // Hash du mot de passe avec Argon2
+    console.log("🟢 Demande d'inscription reçue :", { name, email, token });
+
+    // ✅ Vérifier si l'utilisateur existe déjà
+    const [existingUser]: any = await connection.execute(
+      "SELECT id FROM user WHERE email = ?",
+      [email]
+    );
+
+    if (existingUser.length > 0) {
+      res.status(400).json({ error: "Un compte avec cet email existe déjà." });
+      return;
+    }
+
+    // ✅ Hachage du mot de passe avec Argon2
     const hashedPassword = await argon2.hash(password);
 
-    const connection = await getConnection();
-    await connection.execute(
+    // ✅ Créer l'utilisateur avec le mot de passe haché
+    const [result]: any = await connection.execute(
       "INSERT INTO user (name, email, password) VALUES (?, ?, ?)",
       [name, email, hashedPassword]
     );
 
-    res.status(201).json({ message: "Utilisateur créé avec succès" });
+    const newUserId = result.insertId;
+    console.log(`✅ Utilisateur créé avec l'ID ${newUserId}`);
+
+    // ✅ Si un token d'invitation est présent, ajouter l'utilisateur au book
+    // ✅ Ajout de l'utilisateur au book après inscription
+    if (token) {
+      try {
+        console.log("🔍 Vérification du token :", token);
+        const decoded = jwt.verify(token, process.env.SECRET_KEY as string) as { bookId: number, email: string };
+
+        console.log(`📩 Token décodé : email=${decoded.email}, bookId=${decoded.bookId}`);
+
+        const [bookCheck]: any = await connection.execute(
+          "SELECT id FROM book WHERE id = ?",
+          [decoded.bookId]
+        );
+
+        if (bookCheck.length === 0) {
+          console.error("❌ Erreur : Le book n'existe pas.");
+          res.status(400).json({ error: "Le book n'existe pas." });
+          return;
+        }
+
+        const [insertResult]: any = await connection.execute(
+          "INSERT INTO users_book (user_id, book_id, role) VALUES (?, ?, 'viewer')",
+          [newUserId, decoded.bookId]
+        );
+
+        console.log("🔍 Vérification ajout à users_book :", insertResult);
+
+        console.log("Ajout à users_book :", newUserId, decoded.bookId, insertResult);
+
+        if (insertResult.affectedRows > 0) {
+          console.log(`✅ L'utilisateur ${email} a bien été ajouté au book ${decoded.bookId}`);
+        } else {
+          console.error("❌ Échec de l'ajout du book.");
+        }
+
+      } catch (err) {
+        console.error("❌ Erreur lors de la validation du token d'invitation :", err);
+        res.status(400).json({ error: "Token invalide ou expiré." });
+        return;
+      }
+    }
+
+    res.status(201).json({ message: "Inscription réussie !" });
   } catch (error) {
-    console.error("❌ Erreur lors de l'inscription :", error);
-    res.status(500).json({ error: "Erreur serveur" });
+    console.error("❌ Erreur serveur :", error);
+    res.status(500).json({ error: "Erreur serveur." });
   }
 };

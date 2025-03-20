@@ -9,40 +9,35 @@ interface AuthRequest extends Request {
 }
 
 // 📌 Route GET pour récupérer les books appartenant à l'utilisateur ou accessibles via invitation
-router.get("/books", verifyToken, async (req: AuthRequest, res: Response): Promise<void> => {
+router.get("/books", verifyToken, async (req: AuthRequest, res: Response) => {
+  console.log("🔍 User ID reçu :", req.user?.id);
+
+  if (!req.user?.id) {
+    res.status(401).json({ error: "Non autorisé." });
+    return;
+  }
 
   try {
     const connection = await getConnection();
-    const userId = req.user?.id;
+    const userId = req.user.id;
 
-    if (!userId) {
-      res.status(401).json({ error: "Non autorisé" });
-      return;
-    }
-
-    // 🔥 Récupérer les books créés par l'utilisateur OU auxquels il a accès
     const [rows]: any = await connection.execute(
-      `SELECT DISTINCT b.*
-      FROM book b
-      JOIN users_book ub ON b.id = ub.book_id
-      WHERE ub.user_id = ?`,
+      `SELECT DISTINCT b.* 
+       FROM book b
+       JOIN users_book ub ON b.id = ub.book_id
+       WHERE ub.user_id = ?`,
       [userId]
     );
 
-    if (rows.length === 0) {
-      res.json([]); // Renvoie un tableau vide au lieu d'une erreur
-      return;
-    }
+    console.log("📚 Books trouvés :", rows);
 
-
-
-
-    res.json(rows);
+    res.json(rows.length > 0 ? rows : []);
   } catch (error) {
     console.error("❌ Erreur MySQL :", error);
-    res.status(500).json({ error: "Erreur serveur" });
+    res.status(500).json({ error: "Erreur serveur." });
   }
 });
+
 
 // 📌 Route GET pour récupérer un book par ID
 router.get("/books/:id", verifyToken, async (req: Request, res: Response): Promise<void> => {
@@ -86,7 +81,6 @@ router.get("/books/:id", verifyToken, async (req: Request, res: Response): Promi
           GROUP BY picture.id;`,
       [bookId]
     );
-
 
 
     if (rows.length === 0) {

@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import bookRoutes from "./routes/book";
 import authRoutes from "./routes/auth";
+import share from "./routes/share";
 
 dotenv.config(); // Charge les variables d'environnement
 
@@ -15,6 +16,7 @@ app.use(express.json()); // Analyse JSON
 // Routes
 app.use("/api", bookRoutes);
 app.use("/api", authRoutes);
+app.use("/api", share);
 console.log("✅ Routes d'authentification chargées !");
 
 
