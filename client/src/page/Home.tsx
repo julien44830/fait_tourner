@@ -14,8 +14,6 @@ export default function Home() {
     useEffect(() => {
         const fetchBooks = async () => {
             const token = localStorage.getItem("token");
-            console.log("📌 Token utilisé :", token); // 🔥 Vérifie que le token est bien récupéré
-
             if (!token) {
                 console.error("❌ Aucun token trouvé, accès refusé.");
                 return;
@@ -38,7 +36,6 @@ export default function Home() {
                 }
 
                 const data = await response.json();
-                console.log("📚 Réponse API books :", data);
                 setBooks(data);
                 setName(data.name);
             } catch (error) {
@@ -54,8 +51,6 @@ export default function Home() {
 
     // ✅ Gestion de l'affichage
     if (!books) return <p>Chargement...</p>;
-
-    console.log("%c⧭", "color: #1d5673", name);
 
     return (
         <div>

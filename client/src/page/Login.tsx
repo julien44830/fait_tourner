@@ -26,7 +26,6 @@ export default function Login() {
             localStorage.setItem("token", data.token);
             localStorage.setItem("name", data.name);
 
-            console.log("✅ Connexion réussie ! Redirection...");
             navigate("/accueil");
         } catch (error) {
             console.error("❌ Erreur de connexion :", error);

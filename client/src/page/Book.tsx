@@ -20,6 +20,7 @@ export default function Book() {
     const [email, setEmail] = useState("");
     const [message, setMessage] = useState("");
     const [showModal, setShowModal] = useState(false);
+    const [selectedFile, setSelectedFile] = useState(null); // Stocke le fichier sélectionné
 
     useEffect(() => {
         const fetchBook = async () => {
@@ -90,11 +91,67 @@ export default function Book() {
         }
     };
 
+    const handleFileChange = (event) => {
+        setSelectedFile(event.target.files[0]);
+    };
+
+    const handleUpload = async () => {
+        if (!selectedFile) {
+            alert("Veuillez sélectionner une image.");
+            return;
+        }
+
+        const token = localStorage.getItem("token");
+        if (!token) {
+            alert("Vous devez être connecté pour envoyer une image.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("image", selectedFile);
+
+        try {
+            const response = await fetch(
+                `http://localhost:4000/api/upload/${id}`,
+                {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: formData,
+                }
+            );
+
+            const data = await response.json();
+            if (response.ok) {
+                alert("✅ Image envoyée avec succès !");
+                setPictures([
+                    ...pictures,
+                    { name: selectedFile.name, path: data.path },
+                ]); // Mise à jour des images affichées
+            } else {
+                alert(`❌ Erreur : ${data.error}`);
+            }
+        } catch (error) {
+            console.error("❌ Erreur lors de l'upload :", error);
+            alert("Erreur serveur.");
+        }
+    };
+
     if (!book) return <h1>Chargement...</h1>;
 
     return (
         <div>
             <h2>{book.name}</h2>
+
+            <div>
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                />
+                <button onClick={handleUpload}>Envoyer l'image</button>
+            </div>
 
             {/* ✅ Bouton pour ouvrir la modal */}
             <button
