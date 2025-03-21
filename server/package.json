@@ -6,7 +6,8 @@
         "dev": "nodemon --exec ts-node src/index.ts",
         "build": "tsc",
         "start": "node dist/index.js",
-        "seed": "ts-node src/dataBase/dataSeed.ts"
+        "seed": "ts-node src/dataBase/dataSeed.ts",
+        "migrate": "ts-node src/migrations/runMigrations.ts"
     },
     "dependencies": {
         "argon2": "^0.41.1",
