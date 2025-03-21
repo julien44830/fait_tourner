@@ -25,7 +25,6 @@ export default function Login() {
             const data = await response.json();
             localStorage.setItem("token", data.token);
             localStorage.setItem("name", data.name);
-
             navigate("/accueil");
         } catch (error) {
             console.error("❌ Erreur de connexion :", error);
