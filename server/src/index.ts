@@ -11,7 +11,8 @@ dotenv.config(); // Charge les variables d'environnement
 const app = express();
 
 // Middleware
-app.use(cors()); // Autorise CORS
+app.use(cors({ origin: "https://fait-tourner.vercel.app" }));
+
 app.use(express.json()); // Analyse JSON
 
 // Routes
