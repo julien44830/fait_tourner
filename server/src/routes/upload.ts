@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { upload } from "../service/uploadService";
+import upload from "../service/uploadService";
 import { verifyToken } from "../middleware/authMiddleware";
 import { getConnection } from "../dbconfig";
 

@@ -1,0 +1,86 @@
+/* 📌 Conteneur principal */
+.home-container {
+    max-width: 500px;
+    margin: auto;
+    padding: 20px;
+    text-align: center;
+    background: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 📌 Titre */
+h2 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+/* 📌 Bouton de création */
+.create-book-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.create-book-btn:hover {
+    background-color: #0056b3;
+}
+
+/* 📌 Liste des books */
+.books-list {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* 📌 Liens vers les books */
+.book-link {
+    display: block;
+    padding: 10px;
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    color: #333;
+    text-decoration: none;
+    font-size: 18px;
+    transition: background 0.3s ease;
+}
+
+.book-link:hover {
+    background: #f1f1f1;
+}
+
+/* 📌 Message d'absence de books */
+.no-books {
+    font-size: 14px;
+    color: #777;
+}
+
+/* 📌 Responsive */
+@media (max-width: 600px) {
+    .home-container {
+        padding: 15px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    .create-book-btn {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+
+    .book-link {
+        font-size: 16px;
+        padding: 8px;
+    }
+}

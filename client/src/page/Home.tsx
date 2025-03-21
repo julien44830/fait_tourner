@@ -55,24 +55,28 @@ export default function Home() {
     if (!books) return <p>Chargement...</p>;
 
     return (
-        <div>
+        <div className="home-container">
             <h2>Bonjour, {name}</h2>
-            <br />
-            <button>Créer un nouveau book</button>
-            <br />
+            <button className="create-book-btn">Créer un nouveau book</button>
+
             <h3>📚 Mes Books :</h3>
-            {books.length > 0 ? (
-                books.map((b) => (
-                    <NavLink
-                        key={b.id}
-                        to={`/book/${b.id}`}
-                    >
-                        {b.name}
-                    </NavLink>
-                ))
-            ) : (
-                <p>❌ Vous n'avez aucun book actuellement</p>
-            )}
+            <div className="books-list">
+                {books.length > 0 ? (
+                    books.map((b) => (
+                        <NavLink
+                            key={b.id}
+                            to={`/book/${b.id}`}
+                            className="book-link"
+                        >
+                            {b.name}
+                        </NavLink>
+                    ))
+                ) : (
+                    <p className="no-books">
+                        ❌ Vous n'avez aucun book actuellement
+                    </p>
+                )}
+            </div>
         </div>
     );
 }

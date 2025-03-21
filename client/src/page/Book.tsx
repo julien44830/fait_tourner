@@ -141,10 +141,10 @@ export default function Book() {
     if (!book) return <h1>Chargement...</h1>;
 
     return (
-        <div>
+        <div className="book-container">
             <h2>{book.name}</h2>
 
-            <div>
+            <div className="upload-section">
                 <input
                     type="file"
                     accept="image/*"
@@ -170,17 +170,7 @@ export default function Book() {
 
             {/* ✅ Modal d'invitation */}
             {showModal && (
-                <div
-                    style={{
-                        position: "fixed",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                        backgroundColor: "white",
-                        padding: "20px",
-                        boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-                    }}
-                >
+                <div className="modal">
                     <h3>Inviter un utilisateur</h3>
                     <input
                         type="email"
@@ -197,15 +187,20 @@ export default function Book() {
             {/* ✅ Affichage des images */}
             {pictures.length > 0 ? (
                 pictures.map((picture) => (
-                    <div key={picture.picture_id}>
-                        <img
-                            src={picture.path}
-                            alt={picture.picture_name}
-                            width={200}
-                        />
-                        <p>Nom : {picture.picture_name}</p>
-                        <p>Tags : {picture.tags || "Aucun tag"}</p>
-                        <p>Chemin : {picture.path}</p>
+                    <div
+                        key={picture.picture_id}
+                        className="image-grid"
+                    >
+                        <div className="image-card">
+                            <img
+                                src={`http://localhost:4000/uploads/${id}/${picture.picture_name}`}
+                                alt={picture.picture_name}
+                                width={200}
+                            />
+                            <p>Nom : {picture.picture_name}</p>
+                            <p>Tags : {picture.tags || "Aucun tag"}</p>
+                            <p>Chemin : {picture.path}</p>
+                        </div>
                     </div>
                 ))
             ) : (
