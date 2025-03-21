@@ -15,6 +15,7 @@ export default function Registration() {
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
     const location = useLocation(); // 🔥 Récupère l'URL actuelle
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
     // ✅ Récupérer et décoder le token s'il est présent dans l'URL
     useEffect(() => {
@@ -49,7 +50,7 @@ export default function Registration() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const response = await fetch("http://localhost:4000/api/register", {
+        const response = await fetch(`${API_BASE_URL}/api/register`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

@@ -8,8 +8,9 @@ export default function InviteModal({ bookId }: { bookId: number }) {
         e.preventDefault();
 
         try {
+            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
             const token = localStorage.getItem("token");
-            const response = await fetch("http://localhost:4000/api/invite", {
+            const response = await fetch(`${API_BASE_URL}/api/invite`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

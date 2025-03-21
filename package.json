@@ -4,6 +4,7 @@
         "seed": "concurrently \"npm run seed --prefix server\""
     },
     "devDependencies": {
+        "@types/node": "^22.13.10",
         "concurrently": "^9.1.2"
     }
 }
