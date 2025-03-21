@@ -15,11 +15,14 @@ export default function Login() {
         try {
             console.log("🔍 API_BASE_URL:", import.meta.env.VITE_API_BASE_URL);
 
-            const response = await fetch(`${API_BASE_URL}/api/login`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password }),
-            });
+            const response = await fetch(
+                `https://faittourner-production.up.railway.app/api/login`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password }),
+                }
+            );
 
             if (!response.ok) {
                 throw new Error("Échec de la connexion");
