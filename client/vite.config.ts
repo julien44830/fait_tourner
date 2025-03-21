@@ -20,6 +20,5 @@ export default defineConfig({
         secure: false
       }
     },
-    historyApiFallback: true, // Permet d'éviter le 404 sur les routes React
   }
 });
