@@ -50,14 +50,17 @@ export default function Registration() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const response = await fetch(`${API_BASE_URL}/api/register`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                ...formData,
-                token, // 🔥 Envoie bien le token au backend
-            }),
-        });
+        const response = await fetch(
+            `https://faittourner-production.up.railway.app/api/register`,
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    ...formData,
+                    token, // 🔥 Envoie bien le token au backend
+                }),
+            }
+        );
 
         const data = await response.json();
 

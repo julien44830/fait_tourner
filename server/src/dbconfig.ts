@@ -1,13 +1,23 @@
-import mysql from "mysql2/promise";
-import dotenv from "dotenv";
+import mysql from 'mysql2/promise';
+import dotenv from 'dotenv';
 
-dotenv.config();
+
+dotenv.config(); // Charge les variables d'environnement
+
 
 export const getConnection = async () => {
-    if (!process.env.DATABASE_URL) {
-        throw new Error("DATABASE_URL n'est pas défini dans les variables d'environnement");
+    try {
+        const connection = await mysql.createConnection({
+            host: process.env.MYSQLHOST,
+            user: process.env.MYSQLUSER,
+            password: process.env.MYSQLPASSWORD,
+            database: process.env.MYSQLDATABASE,
+            port: Number(process.env.MYSQLPORT),
+        });
+
+        console.log("✅ Connexion à la base de données réussie !");
+        return connection;
+    } catch (err) {
+        throw err;
     }
-    const connection = await mysql.createConnection(process.env.DATABASE_URL);
-    if (!connection) throw new Error("Connexion à la BDD échouée");
-    return connection;
 };
