@@ -10,27 +10,9 @@ export default function Footer() {
     };
 
     return (
-        <footer
-            style={{
-                display: "flex",
-                justifyContent: "space-between",
-                padding: "10px",
-                borderTop: "1px solid #ccc",
-            }}
-        >
+        <footer>
             <p>© 2025 - Mon Application</p>
-            <button
-                onClick={handleLogout}
-                style={{
-                    backgroundColor: "red",
-                    color: "white",
-                    padding: "5px 10px",
-                    border: "none",
-                    cursor: "pointer",
-                }}
-            >
-                Déconnexion
-            </button>
+            <button onClick={handleLogout}>Déconnexion</button>
         </footer>
     );
 }
