@@ -13,11 +13,19 @@ export default function Registration() {
 
     const [token, setToken] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [passwordError, setPasswordError] = useState<string | null>(null);
     const navigate = useNavigate();
-    const location = useLocation(); // 🔥 Récupère l'URL actuelle
+    const location = useLocation();
     const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-    // ✅ Récupérer et décoder le token s'il est présent dans l'URL
+    // ✅ Vérification de la force du mot de passe
+    const isStrongPassword = (password: string) => {
+        const strongPasswordRegex =
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&+=!]).{8,}$/;
+        return strongPasswordRegex.test(password);
+    };
+
+    // ✅ Vérification si un token est présent dans l'URL
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const tokenFromUrl = params.get("token");
@@ -41,32 +49,46 @@ export default function Registration() {
         }
     }, [location.search]);
 
-    // 🛠 Gérer les changements de formulaire
+    // 🛠 Gestion des changements dans le formulaire
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+
+        // Vérification de la force du mot de passe en temps réel
+        if (name === "password") {
+            if (!isStrongPassword(value)) {
+                setPasswordError(
+                    "⚠️ Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial."
+                );
+            } else {
+                setPasswordError(null);
+            }
+        }
     };
 
     // 📌 Soumission du formulaire
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const response = await fetch(
-            `https://faittourner-production.up.railway.app/api/register`,
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    ...formData,
-                    token, // 🔥 Envoie bien le token au backend
-                }),
-            }
-        );
+        if (!isStrongPassword(formData.password)) {
+            setError("❌ Votre mot de passe n'est pas assez fort.");
+            return;
+        }
+
+        const response = await fetch(`${API_BASE_URL}/api/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                ...formData,
+                token, // 🔥 Envoie bien le token au backend
+            }),
+        });
 
         const data = await response.json();
 
         if (response.ok) {
             alert("✅ Inscription réussie !");
-            navigate("/connexion"); // 🔥 Rediriger vers la page de connexion
+            navigate("/connexion"); // 🔥 Redirection vers la page de connexion
         } else {
             setError(`❌ Erreur : ${data.error}`);
         }
@@ -137,6 +159,9 @@ export default function Registration() {
                             required
                         />
                     </fieldset>
+                    {passwordError && (
+                        <p style={{ color: "red" }}>{passwordError}</p>
+                    )}
                 </label>
 
                 <label htmlFor="confirmPassword">
