@@ -26,5 +26,5 @@ app.use("/uploads", express.static("uploads"));
 // Définition du port
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
-  console.log(`🚀 Serveur: http://localhost:${PORT} ✅`);
+  console.log(`🚀 Serveur start ✅`);
 });
