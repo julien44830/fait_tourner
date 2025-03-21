@@ -47,8 +47,10 @@ export default function Book() {
                 }
 
                 const data = await response.json();
-                setBook({ id: id as string, name: data.name });
-                setPictures(data);
+                console.log("📂 Book récupéré :", data);
+
+                setBook(data.book); // ✅ Utilise data.book
+                setPictures(data.pictures); // ✅ Utilise data.pictures
             } catch (error) {
                 console.error(
                     "❌ Erreur lors de la récupération du book :",
@@ -197,9 +199,6 @@ export default function Book() {
                                 alt={picture.picture_name}
                                 width={200}
                             />
-                            <p>Nom : {picture.picture_name}</p>
-                            <p>Tags : {picture.tags || "Aucun tag"}</p>
-                            <p>Chemin : {picture.path}</p>
                         </div>
                     </div>
                 ))
