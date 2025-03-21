@@ -72,14 +72,17 @@ export default function Book() {
 
         try {
             const token = localStorage.getItem("token");
-            const response = await fetch(`${API_BASE_URL}/api/invite`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({ email, bookId: book?.id }),
-            });
+            const response = await fetch(
+                `https://faittourner-production.up.railway.app/api/invite`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({ email, bookId: book?.id }),
+                }
+            );
 
             const data = await response.json();
             if (response.ok) {
