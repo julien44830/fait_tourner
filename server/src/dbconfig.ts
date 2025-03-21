@@ -1,17 +1,13 @@
-import dotenv from "dotenv";
 import mysql from "mysql2/promise";
+import dotenv from "dotenv";
 
 dotenv.config();
 
-// 🔧 Configuration de la connexion MySQL
-const dbConfig = {
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
+export const getConnection = async () => {
+    if (!process.env.DATABASE_URL) {
+        throw new Error("DATABASE_URL n'est pas défini dans les variables d'environnement");
+    }
+    const connection = await mysql.createConnection(process.env.DATABASE_URL);
+    if (!connection) throw new Error("Connexion à la BDD échouée");
+    return connection;
 };
-
-// Fonction pour obtenir une connexion MySQL
-export async function getConnection() {
-    return await mysql.createConnection(dbConfig);
-}
