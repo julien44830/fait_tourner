@@ -10,14 +10,17 @@ export default function InviteModal({ bookId }: { bookId: number }) {
         try {
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
             const token = localStorage.getItem("token");
-            const response = await fetch(`${API_BASE_URL}/api/invite`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({ email, bookId }),
-            });
+            const response = await fetch(
+                `https://faittourner-production.up.railway.app/api/invite`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({ email, bookId }),
+                }
+            );
 
             const data = await response.json();
             if (response.ok) {

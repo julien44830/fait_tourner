@@ -25,13 +25,16 @@ export default function Home() {
             }
 
             try {
-                const response = await fetch(`${API_BASE_URL}/api/books`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+                const response = await fetch(
+                    `https://faittourner-production.up.railway.app/api/books`,
+                    {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
 
                 if (!response.ok) {
                     throw new Error(`Erreur HTTP ${response.status}`);
@@ -64,14 +67,17 @@ export default function Home() {
         }
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/books`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({ name: newBookName }),
-            });
+            const response = await fetch(
+                `https://faittourner-production.up.railway.app/api/books`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({ name: newBookName }),
+                }
+            );
 
             const data = await response.json();
 

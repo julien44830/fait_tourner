@@ -33,7 +33,7 @@ export default function Book() {
 
             try {
                 const response = await fetch(
-                    `${API_BASE_URL}/api/books/${id}`,
+                    `https://faittourner-production.up.railway.app/api/books/${id}`,
                     {
                         method: "GET",
                         headers: {
@@ -114,13 +114,16 @@ export default function Book() {
         formData.append("image", selectedFile);
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/upload/${id}`, {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-                body: formData,
-            });
+            const response = await fetch(
+                `https://faittourner-production.up.railway.app/api/upload/${id}`,
+                {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: formData,
+                }
+            );
 
             const data = await response.json();
             if (response.ok) {
