@@ -5,8 +5,6 @@ export default function Footer() {
     const handleLogout = () => {
         // Supprime le token d'authentification
         localStorage.removeItem("token"); // Ou sessionStorage.removeItem("token")
-        console.log("Utilisateur déconnecté !");
-
         // Redirige vers la page de connexion
         navigate("/connexion");
     };

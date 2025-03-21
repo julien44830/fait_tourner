@@ -10,7 +10,6 @@ interface AuthRequest extends Request {
 
 // 📌 Route GET pour récupérer les books appartenant à l'utilisateur ou accessibles via invitation
 router.get("/books", verifyToken, async (req: AuthRequest, res: Response) => {
-  console.log("🔍 User ID reçu :", req.user?.id);
 
   if (!req.user?.id) {
     res.status(401).json({ error: "Non autorisé." });
@@ -28,8 +27,6 @@ router.get("/books", verifyToken, async (req: AuthRequest, res: Response) => {
        WHERE ub.user_id = ?`,
       [userId]
     );
-
-    console.log("📚 Books trouvés :", rows);
 
     res.json(rows.length > 0 ? rows : []);
   } catch (error) {

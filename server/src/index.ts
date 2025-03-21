@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import bookRoutes from "./routes/book";
 import authRoutes from "./routes/auth";
 import share from "./routes/share";
+import uploadRoutes from "./routes/upload";
 
 dotenv.config(); // Charge les variables d'environnement
 
@@ -17,7 +18,9 @@ app.use(express.json()); // Analyse JSON
 app.use("/api", bookRoutes);
 app.use("/api", authRoutes);
 app.use("/api", share);
-console.log("✅ Routes d'authentification chargées !");
+app.use("/api", uploadRoutes);
+app.use("/uploads", express.static("uploads"));
+
 
 
 // Définition du port

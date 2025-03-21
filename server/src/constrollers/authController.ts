@@ -49,7 +49,6 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     const { name, email, password, token } = req.body;
     const connection = await getConnection();
 
-    console.log("🟢 Demande d'inscription reçue :", { name, email, token });
 
     // ✅ Vérifier si l'utilisateur existe déjà
     const [existingUser]: any = await connection.execute(
@@ -72,13 +71,11 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     );
 
     const newUserId = result.insertId;
-    console.log(`✅ Utilisateur créé avec l'ID ${newUserId}`);
 
     // ✅ Si un token d'invitation est présent, ajouter l'utilisateur au book
     // ✅ Ajout de l'utilisateur au book après inscription
     if (token) {
       try {
-        console.log("🔍 Vérification du token :", token);
         const decoded = jwt.verify(token, process.env.SECRET_KEY as string) as { bookId: number, email: string };
 
         console.log(`📩 Token décodé : email=${decoded.email}, bookId=${decoded.bookId}`);
@@ -99,12 +96,9 @@ export const register = async (req: Request, res: Response): Promise<void> => {
           [newUserId, decoded.bookId]
         );
 
-        console.log("🔍 Vérification ajout à users_book :", insertResult);
 
-        console.log("Ajout à users_book :", newUserId, decoded.bookId, insertResult);
 
         if (insertResult.affectedRows > 0) {
-          console.log(`✅ L'utilisateur ${email} a bien été ajouté au book ${decoded.bookId}`);
         } else {
           console.error("❌ Échec de l'ajout du book.");
         }

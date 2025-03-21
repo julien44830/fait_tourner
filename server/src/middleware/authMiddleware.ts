@@ -33,9 +33,6 @@ export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction)
   }
 
   try {
-    console.log("🔍 Token reçu :", token);
-    console.log("🔑 Clé secrète utilisée pour la vérification :", SECRET_KEY);
-
     const decoded = jwt.verify(token, SECRET_KEY) as { userId: number };
     req.user = { id: decoded.userId };
     next();

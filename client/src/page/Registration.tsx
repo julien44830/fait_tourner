@@ -22,12 +22,10 @@ export default function Registration() {
         const tokenFromUrl = params.get("token");
 
         if (tokenFromUrl) {
-            console.log("🔗 Token récupéré depuis l'URL :", tokenFromUrl);
             setToken(tokenFromUrl);
 
             try {
                 const decoded: any = jwtDecode(tokenFromUrl);
-                console.log("📩 Token décodé :", decoded);
 
                 if (decoded.email) {
                     setFormData((prevData) => ({

@@ -64,9 +64,6 @@ router.post("/invite", verifyToken, async (req: AuthRequest, res: Response): Pro
           `INSERT INTO users_book (user_id, book_id, role) VALUES (?, ?, 'viewer')`,
           [invitedUserId, bookId]
         );
-        console.log(`✅ Utilisateur existant ${email} ajouté au book ${bookId}`);
-      } else {
-        console.log(`🔹 Utilisateur ${email} est déjà membre du book ${bookId}`);
       }
     }
 
@@ -96,7 +93,6 @@ router.post("/invite", verifyToken, async (req: AuthRequest, res: Response): Pro
       return;
     }
 
-    console.log("✅ Invitation envoyée avec succès !");
     res.json({ message: "Invitation envoyée avec succès !" });
   } catch (error) {
     console.error("❌ Erreur lors de l'envoi de l'invitation :", error);

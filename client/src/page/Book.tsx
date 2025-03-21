@@ -20,6 +20,7 @@ export default function Book() {
     const [email, setEmail] = useState("");
     const [message, setMessage] = useState("");
     const [showModal, setShowModal] = useState(false);
+    const [selectedFile, setSelectedFile] = useState(null); // Stocke le fichier sélectionné
 
     useEffect(() => {
         const fetchBook = async () => {
@@ -90,11 +91,67 @@ export default function Book() {
         }
     };
 
+    const handleFileChange = (event) => {
+        setSelectedFile(event.target.files[0]);
+    };
+
+    const handleUpload = async () => {
+        if (!selectedFile) {
+            alert("Veuillez sélectionner une image.");
+            return;
+        }
+
+        const token = localStorage.getItem("token");
+        if (!token) {
+            alert("Vous devez être connecté pour envoyer une image.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("image", selectedFile);
+
+        try {
+            const response = await fetch(
+                `http://localhost:4000/api/upload/${id}`,
+                {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: formData,
+                }
+            );
+
+            const data = await response.json();
+            if (response.ok) {
+                alert("✅ Image envoyée avec succès !");
+                setPictures([
+                    ...pictures,
+                    { name: selectedFile.name, path: data.path },
+                ]); // Mise à jour des images affichées
+            } else {
+                alert(`❌ Erreur : ${data.error}`);
+            }
+        } catch (error) {
+            console.error("❌ Erreur lors de l'upload :", error);
+            alert("Erreur serveur.");
+        }
+    };
+
     if (!book) return <h1>Chargement...</h1>;
 
     return (
-        <div>
+        <div className="book-container">
             <h2>{book.name}</h2>
+
+            <div className="upload-section">
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                />
+                <button onClick={handleUpload}>Envoyer l'image</button>
+            </div>
 
             {/* ✅ Bouton pour ouvrir la modal */}
             <button
@@ -113,17 +170,7 @@ export default function Book() {
 
             {/* ✅ Modal d'invitation */}
             {showModal && (
-                <div
-                    style={{
-                        position: "fixed",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                        backgroundColor: "white",
-                        padding: "20px",
-                        boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-                    }}
-                >
+                <div className="modal">
                     <h3>Inviter un utilisateur</h3>
                     <input
                         type="email"
@@ -140,15 +187,20 @@ export default function Book() {
             {/* ✅ Affichage des images */}
             {pictures.length > 0 ? (
                 pictures.map((picture) => (
-                    <div key={picture.picture_id}>
-                        <img
-                            src={picture.path}
-                            alt={picture.picture_name}
-                            width={200}
-                        />
-                        <p>Nom : {picture.picture_name}</p>
-                        <p>Tags : {picture.tags || "Aucun tag"}</p>
-                        <p>Chemin : {picture.path}</p>
+                    <div
+                        key={picture.picture_id}
+                        className="image-grid"
+                    >
+                        <div className="image-card">
+                            <img
+                                src={`http://localhost:4000/uploads/${id}/${picture.picture_name}`}
+                                alt={picture.picture_name}
+                                width={200}
+                            />
+                            <p>Nom : {picture.picture_name}</p>
+                            <p>Tags : {picture.tags || "Aucun tag"}</p>
+                            <p>Chemin : {picture.path}</p>
+                        </div>
                     </div>
                 ))
             ) : (
