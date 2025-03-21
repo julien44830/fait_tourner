@@ -36,22 +36,21 @@ router.get("/books", verifyToken, async (req: AuthRequest, res: Response) => {
 });
 
 
-// 📌 Route GET pour récupérer un book par ID
+// 📌 Route GET pour récupérer un book par ID avec ses images
 router.get("/books/:id", verifyToken, async (req: Request, res: Response): Promise<void> => {
   try {
-    const connection = await getConnection(); // Connexion à la BDD
+    const connection = await getConnection();
     const bookId = parseInt(req.params.id, 10);
-    const userId = (req as AuthRequest).user?.id; // Récupérer l'ID de l'utilisateur connecté
+    const userId = (req as AuthRequest).user?.id;
 
     if (!userId) {
       res.status(401).json({ error: "Non autorisé" });
       return;
     }
 
+    // Vérifier si l'utilisateur a accès au book
     const [accessRows]: any = await connection.execute(
-      `SELECT 1 
-      FROM users_book 
-      WHERE book_id = ? AND user_id = ?`,
+      `SELECT 1 FROM users_book WHERE book_id = ? AND user_id = ?`,
       [bookId, userId]
     );
 
@@ -60,8 +59,19 @@ router.get("/books/:id", verifyToken, async (req: Request, res: Response): Promi
       return;
     }
 
-    // 🔥 Requête SQL pour récupérer un book
-    const [rows]: any = await connection.execute(
+    // 🔥 Récupérer les détails du book
+    const [bookRows]: any = await connection.execute(
+      `SELECT id, name, owner_id FROM book WHERE id = ?`,
+      [bookId]
+    );
+
+    if (bookRows.length === 0) {
+      res.status(404).json({ error: "Book non trouvé" });
+      return;
+    }
+
+    // 🔥 Récupérer les images associées au book
+    const [pictureRows]: any = await connection.execute(
       `SELECT 
           picture.id AS picture_id, 
           picture.name AS picture_name, 
@@ -71,26 +81,56 @@ router.get("/books/:id", verifyToken, async (req: Request, res: Response): Promi
           picture.date_upload,
           picture.path,
           GROUP_CONCAT(tag.name) AS tags
-          FROM picture
-          LEFT JOIN picture_tag ON picture_tag.picture_id = picture.id
-          LEFT JOIN tag ON tag.id = picture_tag.tag_id
-          WHERE picture.book_id = ?
-          GROUP BY picture.id;`,
+      FROM picture
+      LEFT JOIN picture_tag ON picture_tag.picture_id = picture.id
+      LEFT JOIN tag ON tag.id = picture_tag.tag_id
+      WHERE picture.book_id = ?
+      GROUP BY picture.id`,
       [bookId]
     );
 
+    // Renvoie le book et ses images
+    res.json({
+      book: bookRows[0],
+      pictures: pictureRows.length > 0 ? pictureRows : []
+    });
+  } catch (error) {
+    console.error("❌ Erreur MySQL :", error);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
 
-    if (rows.length === 0) {
-      res.status(404).json({ error: "Book non trouvé" });
+// 📌 Route pour créer un book
+router.post("/books", verifyToken, async (req: Request, res: Response): Promise<void> => {
+  console.log("📌 Token reçu :", req.header("Authorization"));
+
+  try {
+    const { name } = req.body;
+    const userId = (req as any).user?.id;
+
+    if (!name) {
+      res.status(400).json({ error: "Le nom du book est requis." });
       return
     }
 
-    res.json(rows);
-    return
+    const connection = await getConnection();
+    const [result]: any = await connection.execute(
+      `INSERT INTO book (name, owner_id) VALUES (?, ?)`,
+      [name, userId]
+    );
+
+    const bookId = result.insertId;
+
+    // Ajoute l'utilisateur comme propriétaire du book
+    await connection.execute(
+      `INSERT INTO users_book (user_id, book_id, role) VALUES (?, ?, 'owner')`,
+      [userId, bookId]
+    );
+
+    res.status(201).json({ message: "Book créé avec succès.", bookId });
   } catch (error) {
-    console.error("❌ Erreur MySQL :", error);
-    res.status(500).json({ error: "Erreur serveur" });
-    return
+    console.error("❌ Erreur lors de la création du book :", error);
+    res.status(500).json({ error: "Erreur serveur." });
   }
 });
 
