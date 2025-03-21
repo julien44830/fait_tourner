@@ -34,7 +34,7 @@ router.post(
       }
 
       // 📂 Enregistrer l'image en base de données
-      const imagePath = `/uploads/${req.file.filename}`;
+      const imagePath = `/uploads/${bookId}/${req.file.filename}`;
       await connection.execute(
         `INSERT INTO picture (name, path, book_id, user_id, is_private) VALUES (?, ?, ?, ?, ?)`,
         [req.file.filename, imagePath, bookId, userId, false]

@@ -12,6 +12,7 @@ interface Picture {
     path: string;
     tags: string | null;
 }
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Book() {
     const { id } = useParams<{ id: string }>();
@@ -32,7 +33,7 @@ export default function Book() {
 
             try {
                 const response = await fetch(
-                    `http://localhost:4000/api/books/${id}`,
+                    `${API_BASE_URL}/api/books/${id}`,
                     {
                         method: "GET",
                         headers: {
@@ -71,7 +72,7 @@ export default function Book() {
 
         try {
             const token = localStorage.getItem("token");
-            const response = await fetch("http://localhost:4000/api/invite", {
+            const response = await fetch(`${API_BASE_URL}/api/invite`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -113,16 +114,13 @@ export default function Book() {
         formData.append("image", selectedFile);
 
         try {
-            const response = await fetch(
-                `http://localhost:4000/api/upload/${id}`,
-                {
-                    method: "POST",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: formData,
-                }
-            );
+            const response = await fetch(`${API_BASE_URL}/api/upload/${id}`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                body: formData,
+            });
 
             const data = await response.json();
             if (response.ok) {
@@ -141,6 +139,8 @@ export default function Book() {
     };
 
     if (!book) return <h1>Chargement...</h1>;
+
+    console.log("%c⧭", "color: #1d3f73", pictures);
 
     return (
         <div className="book-container">
@@ -195,7 +195,7 @@ export default function Book() {
                     >
                         <div className="image-card">
                             <img
-                                src={`http://localhost:4000/uploads/${id}/${picture.picture_name}`}
+                                src={`${API_BASE_URL}${picture.path}`}
                                 alt={picture.picture_name}
                                 width={200}
                             />

@@ -6,6 +6,8 @@ interface Book {
     name: string;
 }
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 export default function Home() {
     const [books, setBooks] = useState<Book[]>([]);
     const [name, setName] = useState<string>("");
@@ -23,16 +25,13 @@ export default function Home() {
             }
 
             try {
-                const response = await fetch(
-                    "http://localhost:4000/api/books",
-                    {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
+                const response = await fetch(`${API_BASE_URL}/api/books`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
 
                 if (!response.ok) {
                     throw new Error(`Erreur HTTP ${response.status}`);
@@ -65,7 +64,7 @@ export default function Home() {
         }
 
         try {
-            const response = await fetch("http://localhost:4000/api/books", {
+            const response = await fetch(`${API_BASE_URL}/api/books`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

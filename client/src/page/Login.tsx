@@ -6,13 +6,16 @@ export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate(); // Redirection après connexion
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
     const handleLogin = async (e: React.FormEvent) => {
         // ✅ Correction de la typo
         e.preventDefault();
 
         try {
-            const response = await fetch("http://localhost:4000/api/login", {
+            console.log("🔍 API_BASE_URL:", import.meta.env.VITE_API_BASE_URL);
+
+            const response = await fetch(`${API_BASE_URL}/api/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
