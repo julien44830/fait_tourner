@@ -201,7 +201,7 @@ export default function Book() {
                     >
                         <div className="image-card">
                             <img
-                                src={`${API_BASE_URL}${picture.path}`}
+                                src={`https://faittourner-production.up.railway.app${picture.path}`}
                                 alt={picture.picture_name}
                                 width={200}
                             />
