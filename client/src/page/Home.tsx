@@ -6,8 +6,6 @@ interface Book {
     name: string;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 export default function Home() {
     const [books, setBooks] = useState<Book[]>([]);
     const [name, setName] = useState<string>("");

@@ -12,7 +12,6 @@ interface Picture {
     path: string;
     tags: string | null;
 }
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Book() {
     const { id } = useParams<{ id: string }>();
@@ -21,7 +20,7 @@ export default function Book() {
     const [email, setEmail] = useState("");
     const [message, setMessage] = useState("");
     const [showModal, setShowModal] = useState(false);
-    const [selectedFile, setSelectedFile] = useState(null); // Stocke le fichier sélectionné
+    const [selectedFile, setSelectedFile] = useState<File | null>(null); // Stocke le fichier sélectionné
 
     useEffect(() => {
         const fetchBook = async () => {
@@ -97,8 +96,10 @@ export default function Book() {
         }
     };
 
-    const handleFileChange = (event) => {
-        setSelectedFile(event.target.files[0]);
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files.length > 0) {
+            setSelectedFile(event.target.files[0]);
+        }
     };
 
     const handleUpload = async () => {
@@ -133,7 +134,12 @@ export default function Book() {
                 alert("✅ Image envoyée avec succès !");
                 setPictures([
                     ...pictures,
-                    { name: selectedFile.name, path: data.path },
+                    {
+                        picture_id: data.picture_id || Date.now(), // Assign a unique ID if not provided
+                        picture_name: selectedFile.name,
+                        path: data.path,
+                        tags: null, // Default value for tags
+                    },
                 ]); // Mise à jour des images affichées
             } else {
                 alert(`❌ Erreur : ${data.error}`);

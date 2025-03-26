@@ -16,7 +16,6 @@ export default function Registration() {
     const [passwordError, setPasswordError] = useState<string | null>(null);
     const navigate = useNavigate();
     const location = useLocation();
-    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
     // ✅ Vérification de la force du mot de passe
     const isStrongPassword = (password: string) => {
@@ -75,14 +74,17 @@ export default function Registration() {
             return;
         }
 
-        const response = await fetch(`${API_BASE_URL}/api/register`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                ...formData,
-                token, // 🔥 Envoie bien le token au backend
-            }),
-        });
+        const response = await fetch(
+            `https://faittourner-production.up.railway.app/api/register`,
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    ...formData,
+                    token, // 🔥 Envoie bien le token au backend
+                }),
+            }
+        );
 
         const data = await response.json();
 
