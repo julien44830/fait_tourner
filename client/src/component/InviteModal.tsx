@@ -8,7 +8,6 @@ export default function InviteModal({ bookId }: { bookId: number }) {
         e.preventDefault();
 
         try {
-            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
             const token = localStorage.getItem("token");
             const response = await fetch(
                 `https://faittourner-production.up.railway.app/api/invite`,
