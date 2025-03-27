@@ -8,22 +8,30 @@ import uploadRoutes from "./routes/upload";
 import { getConnection } from "./dbconfig";
 import "./service/passport";
 
-
 dotenv.config(); // Charge les variables d'environnement
 console.log("✅ Variables d'environnement chargées.");
 
 const app = express();
+// app.use(cors({ origin: "https://fait-tourner.vercel.app" }));
+app.use(
+  cors({
+    origin: "https://fait-tourner.vercel.app",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
+app.options("*", cors());
 
-// Middleware
-app.use(cors({ origin: "https://fait-tourner.vercel.app" }));
+app.use((req, res, next) => {
+  console.log("🔧 Requête reçue:", req.method, req.path);
+  next();
+});
 app.use(express.json()); // Analyse JSON
 
-// Fonction pour démarrer le serveur après la connexion à la DB
 const startServer = async () => {
   try {
     await getConnection();
-
-    // Routes
     app.use("/api", bookRoutes);
     app.use("/api", authRoutes);
     app.use("/api", share);
@@ -31,16 +39,14 @@ const startServer = async () => {
     app.use("/uploads", express.static("uploads"));
     console.log("✅ authRoutes loaded !");
 
-    // Définition du port
     const PORT = process.env.PORT || 4000;
     app.listen(PORT, () => {
       console.log(`🚀 Serveur start ✅ sur le port ${PORT}`);
     });
 
-  } catch (err: unknown) {  // 🔥 Correction du typage de `err`
+  } catch (err: unknown) {
     console.error("⛔ Le serveur ne démarre pas à cause d'une erreur DB.", err);
   }
 };
 
-// 🔥 Lancement du serveur
 startServer();
