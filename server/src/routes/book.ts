@@ -5,43 +5,47 @@ import { verifyToken } from "../middleware/authMiddleware";
 const router = express.Router();
 
 interface AuthRequest extends Request {
-  user?: { id: number };
+  user?: { id?: number };
 }
 
 // 📌 Route GET pour récupérer les books appartenant à l'utilisateur ou accessibles via invitation
-router.get("/books", verifyToken, async (req: AuthRequest, res: Response) => {
+router.get(
+  "/books",
+  verifyToken as unknown as express.RequestHandler,
+  async (req: AuthRequest, res: Response) => {
+    if (!req.user?.id) {
+      res.status(401).json({ error: "Non autorisé." });
+      return;
+    }
 
-  if (!req.user?.id) {
-    res.status(401).json({ error: "Non autorisé." });
-    return;
-  }
-
-  try {
-    const connection = await getConnection();
     const userId = req.user.id;
 
-    const [rows]: any = await connection.execute(
-      `SELECT DISTINCT b.* 
-       FROM book b
-       JOIN users_book ub ON b.id = ub.book_id
-       WHERE ub.user_id = ?`,
-      [userId]
-    );
+    try {
+      const connection = await getConnection();
 
-    res.json(rows.length > 0 ? rows : []);
-  } catch (error) {
-    console.error("❌ Erreur MySQL :", error);
-    res.status(500).json({ error: "Erreur serveur." });
+      const [rows]: any = await connection.execute(
+        `SELECT DISTINCT b.* 
+         FROM book b
+         JOIN users_book ub ON b.id = ub.book_id
+         WHERE ub.user_id = ?`,
+        [userId]
+      );
+
+      res.json(rows.length > 0 ? rows : []);
+    } catch (error) {
+      console.error("❌ Erreur MySQL :", error);
+      res.status(500).json({ error: "Erreur serveur." });
+    }
   }
-});
+);
 
 
 // 📌 Route GET pour récupérer un book par ID avec ses images
-router.get("/books/:id", verifyToken, async (req: Request, res: Response): Promise<void> => {
+router.get("/books/:id", verifyToken as any, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const connection = await getConnection();
     const bookId = parseInt(req.params.id, 10);
-    const userId = (req as AuthRequest).user?.id;
+    const userId = req.user?.id;
 
     if (!userId) {
       res.status(401).json({ error: "Non autorisé" });
@@ -70,69 +74,41 @@ router.get("/books/:id", verifyToken, async (req: Request, res: Response): Promi
       return;
     }
 
-    // 🔥 Récupérer les images associées au book
-    const [pictureRows]: any = await connection.execute(
-      `SELECT 
-          picture.id AS picture_id, 
-          picture.name AS picture_name, 
-          picture.user_id, 
-          picture.is_private, 
-          picture.create_at, 
-          picture.date_upload,
-          picture.path,
-          GROUP_CONCAT(tag.name) AS tags
-      FROM picture
-      LEFT JOIN picture_tag ON picture_tag.picture_id = picture.id
-      LEFT JOIN tag ON tag.id = picture_tag.tag_id
-      WHERE picture.book_id = ?
-      GROUP BY picture.id`,
-      [bookId]
-    );
+    res.status(200).json(bookRows[0]);
 
-    // Renvoie le book et ses images
-    res.json({
-      book: bookRows[0],
-      pictures: pictureRows.length > 0 ? pictureRows : []
-    });
   } catch (error) {
-    console.error("❌ Erreur MySQL :", error);
-    res.status(500).json({ error: "Erreur serveur." });
+    console.error("❌ Erreur serveur :", error);
+    res.status(500).json({ error: "Erreur serveur" });
   }
 });
 
 // 📌 Route pour créer un book
-router.post("/books", verifyToken, async (req: Request, res: Response): Promise<void> => {
+router.post("/books", verifyToken as any, async (req: AuthRequest, res: Response): Promise<void> => {
   console.log("📌 Token reçu :", req.header("Authorization"));
 
+  if (!req.user?.id) {
+    res.status(401).json({ error: "Non autorisé." });
+    return;
+  }
+
   try {
-    const { name } = req.body;
-    const userId = (req as any).user?.id;
-
-    if (!name) {
-      res.status(400).json({ error: "Le nom du book est requis." });
-      return
-    }
-
     const connection = await getConnection();
-    const [result]: any = await connection.execute(
-      `INSERT INTO book (name, owner_id) VALUES (?, ?)`,
-      [name, userId]
-    );
+    const { title, owner_id } = req.body;
 
-    const bookId = result.insertId;
-
-    // Ajoute l'utilisateur comme propriétaire du book
+    // Exemple d’insertion :
     await connection.execute(
-      `INSERT INTO users_book (user_id, book_id, role) VALUES (?, ?, 'owner')`,
-      [userId, bookId]
+      `INSERT INTO book (name, owner_id) VALUES (?, ?)`,
+      [title, req.user.id]
     );
 
-    res.status(201).json({ message: "Book créé avec succès.", bookId });
+    res.status(201).json({ message: "Livre ajouté avec succès" });
   } catch (error) {
-    console.error("❌ Erreur lors de la création du book :", error);
-    res.status(500).json({ error: "Erreur serveur." });
+    console.error("❌ Erreur lors de l'ajout du livre :", error);
+    res.status(500).json({ error: "Erreur serveur" });
   }
 });
+
+
 
 
 
