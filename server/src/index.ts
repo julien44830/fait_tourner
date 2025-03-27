@@ -13,49 +13,38 @@ console.log("✅ Variables d'environnement chargées.");
 
 const app = express();
 
-// // Middleware manuel pour CORS (utile en cas de bug avec preflight)
-// app.use((req, res, next) => {
-//   res.header("Access-Control-Allow-Origin", "https://fait-tourner.vercel.app");
-//   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-//   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-//   res.header("Access-Control-Allow-Credentials", "true");
-//   next();
-// });
+// Configuration CORS robuste
+const corsOptions = {
+  origin: "https://fait-tourner.vercel.app",
+  methods: "GET,POST,PUT,DELETE,OPTIONS",
+  allowedHeaders: "Content-Type,Authorization",
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
 
-// Middleware officiel CORS
-app.use(
-  cors({
-    origin: "https://fait-tourner.vercel.app",
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
+app.use(cors(corsOptions));
 
-// Important : gérer les requêtes OPTIONS
-app.options("*", cors());
+// Important pour que les requêtes préflight OPTIONS passent
+app.options("*", cors(corsOptions));
 
-// JSON parser
 app.use(express.json());
 
 const startServer = async () => {
   try {
     await getConnection();
+
     app.use("/api", bookRoutes);
     app.use("/api", authRoutes);
     app.use("/api", share);
     app.use("/api", uploadRoutes);
     app.use("/uploads", express.static("uploads"));
 
-    const PORT = process.env.PORT || 3000;
-    console.log("👉 process.env.PORT =", process.env.PORT);
-    if (!PORT) {
-      throw new Error("❌ La variable d'environnement PORT est manquante !");
-    }
+    const PORT = process.env.PORT || 4000;
+    console.log(`👉 process.env.PORT = ${PORT}`);
     app.listen(PORT, () => {
       console.log(`🚀 Serveur start ✅ sur le port ${PORT}`);
     });
-  } catch (err: unknown) {
+  } catch (err) {
     console.error("⛔ Le serveur ne démarre pas à cause d'une erreur DB.", err);
   }
 };
