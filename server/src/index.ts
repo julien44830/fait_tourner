@@ -5,7 +5,8 @@ import bookRoutes from "./routes/book";
 import authRoutes from "./routes/auth";
 import share from "./routes/share";
 import uploadRoutes from "./routes/upload";
-import { getConnection } from "./dbconfig"; // Import de la connexion DB
+import { getConnection } from "./dbconfig";
+import "./service/passport";
 
 
 dotenv.config(); // Charge les variables d'environnement

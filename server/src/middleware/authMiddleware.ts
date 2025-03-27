@@ -1,11 +1,8 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 import jwt from "jsonwebtoken";
+import { AuthRequest } from "../../types/AuthRequest";
 
 const SECRET_KEY = process.env.SECRET_KEY as string;
-
-interface AuthRequest extends Request {
-  user?: { id: number };
-}
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const token = req.header("Authorization")?.split(" ")[1];
@@ -24,20 +21,20 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
   }
 };
 
-export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction): void => {
+export const verifyToken = (req: Request, res: Response, next: NextFunction): void => {
   const token = req.header("Authorization")?.split(" ")[1];
 
   if (!token) {
     res.status(401).json({ error: "Accès refusé, token manquant" });
-    return;
+    return
   }
 
   try {
     const decoded = jwt.verify(token, SECRET_KEY) as { userId: number };
-    req.user = { id: decoded.userId };
+    (req as AuthRequest).user = { id: decoded.userId };
     next();
-  } catch (error) {
-    console.error("❌ Erreur JWT :", error);
+  } catch (err) {
+    console.error("❌ Token invalide :", err);
     res.status(403).json({ error: "Token invalide" });
   }
 };

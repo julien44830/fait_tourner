@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
+import GoogleConnexion from "../component/GoogleConnexion";
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -37,44 +38,47 @@ export default function Login() {
     };
 
     return (
-        <form
-            className="form-group-connexion"
-            onSubmit={handleLogin}
-        >
-            {" "}
-            {/* ✅ Correction de la typo */}
-            <h2>Connexion</h2>
-            <label htmlFor="email">
-                <fieldset>
-                    <legend>Email</legend>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                    />
-                </fieldset>
-            </label>
-            <label htmlFor="password">
-                <fieldset>
-                    <legend>Mot de passe</legend>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                </fieldset>
-            </label>
-            <button className="form-btn-connexion">Connexion</button>
-            <p>
-                Pas encore inscrit ?{" "}
-                <NavLink to="/inscription">Créer un compte</NavLink>
-            </p>
-        </form>
+        <>
+            <form
+                className="form-group-connexion"
+                onSubmit={handleLogin}
+            >
+                {" "}
+                {/* ✅ Correction de la typo */}
+                <h2>Connexion</h2>
+                <label htmlFor="email">
+                    <fieldset>
+                        <legend>Email</legend>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+                    </fieldset>
+                </label>
+                <label htmlFor="password">
+                    <fieldset>
+                        <legend>Mot de passe</legend>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </fieldset>
+                </label>
+                <button className="form-btn-connexion">Connexion</button>
+                <p>
+                    Pas encore inscrit ?{" "}
+                    <NavLink to="/inscription">Créer un compte</NavLink>
+                </p>
+            </form>
+            <GoogleConnexion />
+        </>
     );
 }

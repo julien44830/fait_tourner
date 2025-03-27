@@ -11,15 +11,17 @@ interface AuthRequest extends Request {
 }
 
 // 📌 Route pour inviter un utilisateur à rejoindre un book
-router.post("/invite", verifyToken, async (req: AuthRequest, res: Response): Promise<void> => {
+router.post("/invite", verifyToken, async (req: Request, res: Response): Promise<void> => {
+  const userId = (req as AuthRequest).user?.id;
+
+  if (!userId) {
+    res.status(401).json({ error: "Non autorisé." });
+    return;
+  }
+
+
   try {
     const { email, bookId } = req.body;
-    const userId = req.user?.id;
-
-    if (!userId) {
-      res.status(401).json({ error: "Non autorisé." });
-      return;
-    }
 
     const connection = await getConnection();
 
