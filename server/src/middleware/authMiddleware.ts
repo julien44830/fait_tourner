@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
 import jwt from "jsonwebtoken";
-import { AuthRequest } from "../../types/AuthRequest";
+import { AuthRequest } from "../types/AuthRequest";
 
 const SECRET_KEY = process.env.SECRET_KEY as string;
 
