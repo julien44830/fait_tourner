@@ -5,7 +5,7 @@
     "scripts": {
         "dev": "nodemon --exec ts-node src/index.ts",
         "build": "tsc",
-        "start": "node dist/index.js",
+        "start": "ls dist && node dist/index.js",
         "seed": "ts-node src/dataBase/dataSeed.ts",
         "migrate": "ts-node src/migrations/runMigrations.ts",
         "postinstall": "npm run build"
