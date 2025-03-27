@@ -13,14 +13,14 @@ console.log("✅ Variables d'environnement chargées.");
 
 const app = express();
 
-// Middleware manuel pour CORS (utile en cas de bug avec preflight)
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://fait-tourner.vercel.app");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.header("Access-Control-Allow-Credentials", "true");
-  next();
-});
+// // Middleware manuel pour CORS (utile en cas de bug avec preflight)
+// app.use((req, res, next) => {
+//   res.header("Access-Control-Allow-Origin", "https://fait-tourner.vercel.app");
+//   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+//   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//   res.header("Access-Control-Allow-Credentials", "true");
+//   next();
+// });
 
 // Middleware officiel CORS
 app.use(
@@ -47,7 +47,7 @@ const startServer = async () => {
     app.use("/api", uploadRoutes);
     app.use("/uploads", express.static("uploads"));
 
-    const PORT = process.env.PORT;
+    const PORT = process.env.PORT || 3000;
     console.log("👉 process.env.PORT =", process.env.PORT);
     if (!PORT) {
       throw new Error("❌ La variable d'environnement PORT est manquante !");
