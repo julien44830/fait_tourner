@@ -29,6 +29,7 @@ const startServer = async () => {
     app.use("/api", share);
     app.use("/api", uploadRoutes);
     app.use("/uploads", express.static("uploads"));
+    console.log("✅ authRoutes loaded !");
 
     // Définition du port
     const PORT = process.env.PORT || 4000;

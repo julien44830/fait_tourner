@@ -9,6 +9,6 @@
         "esModuleInterop": true,
         "typeRoots": ["./src/types", "./node_modules/@types"]
     },
-    "include": ["src", "types"],
+    "include": ["src/**/*", "types"],
     "files": ["./src/types/passport-google-token/index.d.ts"]
 }

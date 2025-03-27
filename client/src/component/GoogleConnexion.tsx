@@ -3,13 +3,14 @@ import axios from "axios";
 
 export default function GoogleConnexion() {
     const login = useGoogleLogin({
+        flow: "implicit",
         onSuccess: async (tokenResponse) => {
+            console.log(tokenResponse);
             try {
                 const res = await axios.post(
                     "https://faittourner-production.up.railway.app/api/auth/google/token",
                     { token: tokenResponse.access_token }
                 );
-                console.log(tokenResponse);
 
                 console.log("✅ Utilisateur connecté :", res.data);
                 // Stocker le token, rediriger, etc.

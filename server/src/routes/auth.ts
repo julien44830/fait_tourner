@@ -36,6 +36,7 @@ router.get(
 
 router.post("/auth/google/token", (req, res, next) => {
   console.log("📥 Requête POST /auth/google/token reçue");
+  console.log(req.body)
   next();
 }, passport.authenticate("google-token"), (req, res) => {
   if (req.user) {
