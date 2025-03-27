@@ -23,10 +23,10 @@ app.use(
 );
 app.options("*", cors());
 
-app.use((req, res, next) => {
-  console.log("🔧 Requête reçue:", req.method, req.path);
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log("🔧 Requête reçue:", req.method, req.path);
+//   next();
+// });
 app.use(express.json()); // Analyse JSON
 
 const startServer = async () => {
