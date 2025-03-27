@@ -8,11 +8,21 @@ import uploadRoutes from "./routes/upload";
 import { getConnection } from "./dbconfig";
 import "./service/passport";
 
-dotenv.config(); // Charge les variables d'environnement
+dotenv.config();
 console.log("✅ Variables d'environnement chargées.");
 
 const app = express();
-// app.use(cors({ origin: "https://fait-tourner.vercel.app" }));
+
+// Middleware manuel pour CORS (utile en cas de bug avec preflight)
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "https://fait-tourner.vercel.app");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
+  next();
+});
+
+// Middleware officiel CORS
 app.use(
   cors({
     origin: "https://fait-tourner.vercel.app",
@@ -21,13 +31,12 @@ app.use(
     credentials: true,
   })
 );
+
+// Important : gérer les requêtes OPTIONS
 app.options("*", cors());
 
-// app.use((req, res, next) => {
-//   console.log("🔧 Requête reçue:", req.method, req.path);
-//   next();
-// });
-app.use(express.json()); // Analyse JSON
+// JSON parser
+app.use(express.json());
 
 const startServer = async () => {
   try {
@@ -37,13 +46,11 @@ const startServer = async () => {
     app.use("/api", share);
     app.use("/api", uploadRoutes);
     app.use("/uploads", express.static("uploads"));
-    console.log("✅ authRoutes loaded !");
 
     const PORT = process.env.PORT || 4000;
     app.listen(PORT, () => {
       console.log(`🚀 Serveur start ✅ sur le port ${PORT}`);
     });
-
   } catch (err: unknown) {
     console.error("⛔ Le serveur ne démarre pas à cause d'une erreur DB.", err);
   }
