@@ -1,11 +1,11 @@
 {
     "name": "server",
     "version": "1.0.0",
-    "main": "dist/server-cors-test.ts",
+    "main": "dist/index.ts",
     "scripts": {
-        "dev": "nodemon --exec ts-node src/server-cors-test.ts",
+        "dev": "nodemon --exec ts-node src/index.ts",
         "build": "tsc",
-        "start": "node dist/server-cors-test.ts",
+        "start": "node dist/index.ts",
         "seed": "ts-node src/dataBase/dataSeed.ts",
         "migrate": "ts-node src/migrations/runMigrations.ts",
         "postinstall": "npm run build"
