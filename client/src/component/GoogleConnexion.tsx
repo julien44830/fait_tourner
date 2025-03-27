@@ -9,6 +9,7 @@ export default function GoogleConnexion() {
                     "https://faittourner-production.up.railway.app/api/auth/google/token",
                     { token: tokenResponse.access_token }
                 );
+                console.log(tokenResponse);
 
                 console.log("✅ Utilisateur connecté :", res.data);
                 // Stocker le token, rediriger, etc.
