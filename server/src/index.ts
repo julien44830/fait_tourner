@@ -47,7 +47,11 @@ const startServer = async () => {
     app.use("/api", uploadRoutes);
     app.use("/uploads", express.static("uploads"));
 
-    const PORT = process.env.PORT || 4000;
+    const PORT = process.env.PORT;
+    console.log("👉 process.env.PORT =", process.env.PORT);
+    if (!PORT) {
+      throw new Error("❌ La variable d'environnement PORT est manquante !");
+    }
     app.listen(PORT, () => {
       console.log(`🚀 Serveur start ✅ sur le port ${PORT}`);
     });
