@@ -13,19 +13,12 @@ console.log("✅ Variables d'environnement chargées.");
 
 const app = express();
 
-// Configuration CORS robuste
-const corsOptions = {
-  origin: "https://fait-tourner.vercel.app",
-  methods: "GET,POST,PUT,DELETE,OPTIONS",
-  allowedHeaders: "Content-Type,Authorization",
-  credentials: true,
-  optionsSuccessStatus: 200,
-};
-
-app.use(cors(corsOptions));
-
-// Important pour que les requêtes préflight OPTIONS passent
-app.options("*", cors(corsOptions));
+app.use(
+  cors({
+    origin: "https://fait-tourner.vercel.app",
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 
