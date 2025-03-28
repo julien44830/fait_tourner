@@ -13,12 +13,24 @@ console.log("✅ Variables d'environnement chargées.");
 
 const app = express();
 
-app.use(
-  cors({
-    origin: "https://www.pictevent.fr",
-    credentials: true,
-  })
-);
+const allowedOrigins = [
+  "http://localhost:5173",            // pour le dev local
+  "https://www.pictevent.fr",         // prod
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    console.log("🌐 Requête CORS depuis :", origin);
+
+    if (!origin) return callback(null, true); // autorise Postman/curl etc.
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+}));
 
 app.use(express.json());
 
