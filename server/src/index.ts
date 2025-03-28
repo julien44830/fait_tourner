@@ -1,7 +1,11 @@
 import express from "express";
+
 const app = express();
 
+console.log("🚨 Démarrage de l'application Express");
+
 app.get("/", (_req, res) => {
+  console.log("✅ Route GET / appelée");
   res.json({ message: "Hello depuis Railway ✅" });
 });
 
