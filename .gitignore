@@ -26,4 +26,7 @@ dist-ssr
 
 .vercel
 .next
+
+# Build output
 /dist
+/server/dist
