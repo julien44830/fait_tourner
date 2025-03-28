@@ -5,6 +5,8 @@ dotenv.config();
 
 const app = express();
 
+console.log('🚨🟢 Ceci est le fichier actif🚨');
+
 console.log("🚨 Démarrage de l'application Express");
 
 app.get("/", (_req, res) => {
