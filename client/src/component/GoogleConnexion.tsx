@@ -9,7 +9,7 @@ export default function GoogleConnexion() {
             try {
                 const res = await axios.post(
                     "https://faittourner-production.up.railway.app/api/auth/google/token",
-                    { token: tokenResponse.access_token }
+                    { access_token: tokenResponse.access_token }
                 );
 
                 console.log("✅ Utilisateur connecté :", res.data);
