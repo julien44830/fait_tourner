@@ -15,7 +15,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "https://fait-tourner.vercel.app",
+    origin: "https://www.pictevent.fr",
     credentials: true,
   })
 );
