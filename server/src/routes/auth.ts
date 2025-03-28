@@ -40,7 +40,7 @@ router.post("/auth/google/token", (req, res, next) => {
 
   req.query.access_token = req.body.token;
   next();
-}, passport.authenticate("google-token"), (req, res) => {
+}, passport.authenticate("google-token", { session: false }), (req, res) => {
   if (req.user) {
     console.log("✅ Utilisateur authentifié avec Google :", req.user);
     res.status(200).json({ message: "Authentifié avec Google", user: req.user });
