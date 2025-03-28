@@ -1,7 +1,11 @@
 import { useGoogleLogin } from "@react-oauth/google";
+import { useNavigate } from "react-router-dom";
+
 import axios from "axios";
 
 export default function GoogleConnexion() {
+    const navigate = useNavigate(); // Redirection après connexion
+
     const login = useGoogleLogin({
         flow: "implicit",
         onSuccess: async (tokenResponse) => {
@@ -13,6 +17,11 @@ export default function GoogleConnexion() {
                 );
 
                 console.log("✅ Utilisateur connecté :", res.data);
+
+                localStorage.setItem("token", res.data.token);
+                localStorage.setItem("name", res.data.user.name);
+                setTimeout(() => navigate("/accueil"), 1000);
+
                 // Stocker le token, rediriger, etc.
             } catch (err) {
                 console.error("❌ Erreur de login Google :", err);
