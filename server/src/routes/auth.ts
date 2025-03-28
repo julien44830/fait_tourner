@@ -1,6 +1,7 @@
 import express from "express";
 import { login, register } from "../constrollers/authController";
 import passport from "passport";
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
@@ -34,20 +35,40 @@ router.get(
   }
 );
 
-router.post("/auth/google/token", (req, res, next) => {
-  console.log("📥 Requête POST /auth/google/token reçue");
-  console.log("👉 Token reçu :", req.body.token)
+router.post(
+  "/auth/google/token",
+  (req, res, next) => {
+    console.log("📥 Requête POST /auth/google/token reçue");
+    console.log("👉 Token reçu :", req.body.token);
+    req.query.access_token = req.body.token;
+    next();
+  },
+  passport.authenticate("google-token", { session: false }),
+  (req, res) => {
+    if (req.user) {
+      console.log("✅ Utilisateur authentifié avec Google :", req.user);
 
-  req.query.access_token = req.body.token;
-  next();
-}, passport.authenticate("google-token", { session: false }), (req, res) => {
-  if (req.user) {
-    console.log("✅ Utilisateur authentifié avec Google :", req.user);
-    res.status(200).json({ message: "Authentifié avec Google", user: req.user });
-  } else {
-    console.log("❌ Échec d'authentification Google");
-    res.status(401).json({ message: "Échec d'authentification Google" });
+      // 🔐 Création du JWT
+      const user = req.user as { id: string; email: string };
+      const token = jwt.sign(
+        {
+          id: user.id,
+          email: user.email,
+        },
+        process.env.SECRET_KEY!, { expiresIn: "2h" }
+      );
+
+      // ✅ Réponse avec token + user
+      res.status(200).json({
+        message: "Authentifié avec Google",
+        token,
+        user: req.user,
+      });
+    } else {
+      console.log("❌ Échec d'authentification Google");
+      res.status(401).json({ message: "Échec d'authentification Google" });
+    }
   }
-});
+);
 
 export default router;
