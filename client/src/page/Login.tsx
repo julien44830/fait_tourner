@@ -29,8 +29,11 @@ export default function Login() {
             }
 
             const data = await response.json();
+            console.log("%c⧭", "color: #735656", data);
+            console.log(data.tokenResponse);
             localStorage.setItem("token", data.token);
             localStorage.setItem("name", data.name);
+
             setTimeout(() => navigate("/accueil"), 1000);
         } catch (error) {
             console.error("❌ Erreur de connexion :", error);
@@ -44,7 +47,6 @@ export default function Login() {
                 onSubmit={handleLogin}
             >
                 {" "}
-                {/* ✅ Correction de la typo */}
                 <h2>Connexion</h2>
                 <label htmlFor="email">
                     <fieldset>
