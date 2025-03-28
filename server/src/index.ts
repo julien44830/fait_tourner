@@ -14,6 +14,15 @@ app.get("/", (_req, res) => {
   res.json({ message: "Hello depuis Railway ✅" });
 });
 
+app.options("*", (_req, res) => {
+  res.sendStatus(200); // gérer les preflight
+});
+
+app.post("/api/login", (req, res) => {
+  console.log("🔐 Requête POST /api/login reçue !");
+  res.json({ message: "Login OK ✅" });
+});
+
 const PORT = parseInt(process.env.PORT || "2000", 10);
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Serveur Express écoute sur le port ${PORT}`);
