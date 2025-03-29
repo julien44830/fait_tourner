@@ -12,7 +12,7 @@ export const sendInvitationEmail = async (
 ) => {
   try {
     const response = await resend.emails.send({
-      from: "onboarding@resend.dev", // 
+      from: "noreply@send.pictevent.fr", // 
       to: recipientEmail,
       subject: `Invitation à rejoindre le book : ${bookName}`,
       html: `
