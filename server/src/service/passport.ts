@@ -49,8 +49,6 @@ async function findOrCreateUserFromGoogle(profile: Profile): Promise<User> {
   const id = profile.id;
   const email = profile.emails?.[0]?.value || "no-email@example.com";
   const name = profile.displayName;
-  console.log("🔍 Profil Google a la creation du compte :", profile);
-
   const connection = await getConnection();
 
   // 🔍 Vérifie si l'utilisateur existe déjà en base
