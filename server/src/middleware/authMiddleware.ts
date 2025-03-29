@@ -25,9 +25,6 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
 export const verifyToken = (req: Request, res: Response, next: NextFunction): void => {
   const token = req.header("Authorization")?.split(" ")[1];
 
-  console.log("🛡️ Token reçu :", token);
-  console.log("🧪 Clé secrète utilisée :", SECRET_KEY);
-
   if (!token) {
     res.status(401).json({ error: "Accès refusé, token manquant" });
     return
@@ -38,6 +35,7 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction): vo
     (req as AuthRequest).user = { id: parseInt(decoded.userId, 10) };
 
     console.log("🔍 Payload décodé :", decoded);
+    console.log("🔍 userId :", decoded.userId);
     next();
   } catch (err) {
     console.error("❌ Token invalide :", err);
