@@ -92,7 +92,8 @@ router.post("/books", verifyToken as any, async (req: AuthRequest, res: Response
 
   try {
     const connection = await getConnection();
-    const { title, owner_id } = req.body;
+    const title = req.body;
+    const owner_id = req.user?.id;
     console.log("📦 Body reçu :", req.body);
     console.log("👤 ID utilisateur (via JWT) :", req.user?.id);
 
@@ -100,7 +101,7 @@ router.post("/books", verifyToken as any, async (req: AuthRequest, res: Response
     // Exemple d’insertion :
     await connection.execute(
       `INSERT INTO book (name, owner_id) VALUES (?, ?)`,
-      [title, req.user.id]
+      [title, owner_id]
     );
     res.status(201).json({ message: "Livre ajouté avec succès" });
   } catch (error) {
