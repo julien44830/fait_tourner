@@ -93,6 +93,8 @@ router.post("/books", verifyToken as any, async (req: AuthRequest, res: Response
   try {
     const connection = await getConnection();
     const { title, owner_id } = req.body;
+    console.log("📦 Body reçu :", req.body);
+
 
     // Exemple d’insertion :
     await connection.execute(
