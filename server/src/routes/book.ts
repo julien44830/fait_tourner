@@ -84,7 +84,6 @@ router.get("/books/:id", verifyToken as any, async (req: AuthRequest, res: Respo
 
 // 📌 Route pour créer un book
 router.post("/books", verifyToken as any, async (req: AuthRequest, res: Response): Promise<void> => {
-  console.log("📌 Token reçu :", req.header("Authorization"));
 
   if (!req.user?.id) {
     res.status(401).json({ error: "Non autorisé." });

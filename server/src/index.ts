@@ -9,7 +9,6 @@ import { getConnection } from "./dbconfig";
 import "./service/passport";
 
 dotenv.config();
-console.log("✅ Variables d'environnement chargées.");
 
 const app = express();
 
@@ -45,7 +44,6 @@ const startServer = async () => {
     app.use("/uploads", express.static("uploads"));
 
     const PORT = process.env.PORT || 4000;
-    console.log(`👉 process.env.PORT = ${PORT}`);
     app.listen(PORT, () => {
       console.log(`🚀 Serveur start ✅ sur le port ${PORT}`);
     });

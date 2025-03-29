@@ -13,8 +13,6 @@ export default function Login() {
         e.preventDefault();
 
         try {
-            console.log("🔍 API_BASE_URL:", import.meta.env.VITE_API_BASE_URL);
-
             const response = await fetch(
                 `https://faittourner-production.up.railway.app/api/login`,
                 {
@@ -29,8 +27,6 @@ export default function Login() {
             }
 
             const data = await response.json();
-            console.log("%c⧭", "color: #735656", data);
-            console.log(data.tokenResponse);
             localStorage.setItem("token", data.token);
             localStorage.setItem("name", data.name);
 

@@ -9,14 +9,11 @@ export default function GoogleConnexion() {
     const login = useGoogleLogin({
         flow: "implicit",
         onSuccess: async (tokenResponse) => {
-            console.log(tokenResponse);
             try {
                 const res = await axios.post(
                     "https://faittourner-production.up.railway.app/api/auth/google/token",
                     { access_token: tokenResponse.access_token }
                 );
-
-                console.log("✅ Utilisateur connecté :", res.data);
 
                 localStorage.setItem("token", res.data.token);
                 localStorage.setItem("name", res.data.user.name);
