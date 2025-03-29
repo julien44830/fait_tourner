@@ -99,8 +99,14 @@ router.post("/books", verifyToken as any, async (req: AuthRequest, res: Response
     console.log("📦 Body reçu :", req.body);
     console.log("📘 UUID généré :", bookId);
     console.log("👤 owner_id :", owner_id, " → longueur :", owner_id.length);
-    console.log("📤 Insertion avec :", { bookId, title, owner_id });
-
+    console.log("📤 Insertion avec :", {
+      bookId,
+      bookId_type: typeof bookId,
+      title,
+      title_type: typeof title,
+      owner_id,
+      owner_id_type: typeof owner_id,
+    });
 
 
     // Exemple d’insertion :
