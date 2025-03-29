@@ -94,6 +94,7 @@ router.post("/books", verifyToken as any, async (req: AuthRequest, res: Response
     const connection = await getConnection();
     const { title, owner_id } = req.body;
     console.log("📦 Body reçu :", req.body);
+    console.log("👤 ID utilisateur (via JWT) :", req.user?.id);
 
 
     // Exemple d’insertion :
