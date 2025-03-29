@@ -1,4 +1,5 @@
 import express, { Request, Response, NextFunction } from "express";
+import { v4 as uuidv4 } from "uuid";
 import { getConnection } from "../dbconfig"; // Vérifie que le chemin est bon
 import { verifyToken } from "../middleware/authMiddleware";
 
@@ -94,13 +95,15 @@ router.post("/books", verifyToken as any, async (req: AuthRequest, res: Response
     const connection = await getConnection();
     const { title } = req.body;
     const owner_id = req.user?.id;
-    console.log("📦 Body reçu :", req.body.title, title);
+    const bookId = uuidv4();
+
+    console.log("📦 Body reçu :", title);
     console.log("👤 ID utilisateur (via JWT) :", req.user?.id);
 
     // Exemple d’insertion :
     await connection.execute(
       `INSERT INTO book (name, owner_id) VALUES (?, ?)`,
-      [title, owner_id]
+      [bookId, title, owner_id]
     );
     res.status(201).json({ message: "Livre ajouté avec succès" });
   } catch (error) {
@@ -114,3 +117,4 @@ router.post("/books", verifyToken as any, async (req: AuthRequest, res: Response
 
 
 export default router;
+// Assurez-vous d'avoir installé uuid : npm install uuid
