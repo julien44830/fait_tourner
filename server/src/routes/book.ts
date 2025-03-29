@@ -94,11 +94,12 @@ router.post("/books", verifyToken as any, async (req: AuthRequest, res: Response
   try {
     const connection = await getConnection();
     const { title } = req.body;
-    const owner_id = req.user?.id;
-    const bookId = uuidv4();
+    const owner_id = String(req.user?.id).trim(); const bookId = uuidv4();
 
     console.log("📦 Body reçu :", req.body);
     console.log("📘 UUID généré :", bookId);
+    console.log("👤 owner_id :", owner_id, " → longueur :", owner_id.length);
+
 
     // Exemple d’insertion :
     await connection.execute(
