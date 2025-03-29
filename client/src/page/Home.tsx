@@ -73,7 +73,7 @@ export default function Home() {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${token}`,
                     },
-                    body: JSON.stringify({ name: newBookName }),
+                    body: JSON.stringify({ title: newBookName }),
                 }
             );
 
