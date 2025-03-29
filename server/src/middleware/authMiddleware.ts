@@ -34,7 +34,6 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction): vo
     const decoded = jwt.verify(token, SECRET_KEY!) as { userId: string };
     (req as AuthRequest).user = { id: parseInt(decoded.userId, 10) };
 
-    console.log("🔍 Payload décodé :", decoded);
     console.log("🔍 userId :", decoded.userId);
     next();
   } catch (err) {
