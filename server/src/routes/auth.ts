@@ -45,7 +45,7 @@ router.post(
       const user = req.user as { id: string; email: string };
       const token = jwt.sign(
         {
-          id: user.id,
+          userId: user.id,
           email: user.email,
         },
         process.env.SECRET_KEY!, { expiresIn: "2h" }

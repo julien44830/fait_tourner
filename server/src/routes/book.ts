@@ -101,7 +101,6 @@ router.post("/books", verifyToken as any, async (req: AuthRequest, res: Response
       `INSERT INTO book (name, owner_id) VALUES (?, ?)`,
       [title, req.user.id]
     );
-
     res.status(201).json({ message: "Livre ajouté avec succès" });
   } catch (error) {
     console.error("❌ Erreur lors de l'ajout du livre :", error);
