@@ -43,10 +43,35 @@ interface User {
   email: string;
 }
 
+import { getConnection } from "../dbconfig"; // adapte le chemin selon ton projet
+
 async function findOrCreateUserFromGoogle(profile: Profile): Promise<User> {
+  const id = profile.id;
+  const email = profile.emails?.[0]?.value || "no-email@example.com";
+  const name = profile.displayName;
+
+  const connection = await getConnection();
+
+  // 🔍 Vérifie si l'utilisateur existe déjà en base
+  const [rows]: any = await connection.execute(
+    "SELECT * FROM user WHERE id = ?",
+    [id]
+  );
+
+  if (rows.length > 0) {
+    return rows[0]; // ✅ Utilisateur trouvé
+  }
+
+  // 🧪 Création de l'utilisateur
+  await connection.execute(
+    "INSERT INTO user (id, email, name, password) VALUES (?, ?, ?, ?)",
+    [id, email, name, "google"] // on met un mot de passe factice pour les comptes Google
+  );
+
   return {
-    id: profile.id,
-    name: profile.displayName,
-    email: profile.emails?.[0]?.value || "no-email@example.com",
+    id,
+    email,
+    name,
   };
 }
+
