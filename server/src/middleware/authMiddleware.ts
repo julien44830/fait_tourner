@@ -30,8 +30,8 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction): vo
   }
 
   try {
-    const decoded = jwt.verify(token, SECRET_KEY) as { id: number };
-    (req as AuthRequest).user = { id: decoded.id };
+    const decoded = jwt.verify(token, SECRET_KEY!) as { id: string };
+    (req as AuthRequest).user = { id: parseInt(decoded.id, 10) };
     next();
   } catch (err) {
     console.error("❌ Token invalide :", err);
