@@ -78,7 +78,6 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       try {
         const decoded = jwt.verify(token, process.env.SECRET_KEY as string) as { bookId: number, email: string };
 
-        console.log(`📩 Token décodé : email=${decoded.email}, bookId=${decoded.bookId}`);
 
         const [bookCheck]: any = await connection.execute(
           "SELECT id FROM book WHERE id = ?",
