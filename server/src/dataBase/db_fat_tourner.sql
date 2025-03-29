@@ -75,7 +75,7 @@ USE fait_tourner_db;
 
 -- Table des utilisateurs
 CREATE TABLE user (
-    id BIGINT UNSIGNED PRIMARY KEY,
+    id VARCHAR(30) NOT NULL PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
     name VARCHAR(255) NOT NULL,
     password VARCHAR(255)
@@ -85,13 +85,13 @@ CREATE TABLE user (
 CREATE TABLE book (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    owner_id BIGINT UNSIGNED NOT NULL,
+    owner_id VARCHAR(30) NOT NULL,
     FOREIGN KEY (owner_id) REFERENCES user(id) ON DELETE CASCADE
 );
 
 -- Table de liaison entre utilisateurs et books
 CREATE TABLE users_book (
-    user_id BIGINT UNSIGNED NOT NULL,
+    user_id VARCHAR(30) NOT NULL,
     book_id INT NOT NULL,
     is_owner BOOLEAN DEFAULT FALSE,
     role ENUM('owner', 'editor', 'viewer') DEFAULT 'viewer',
@@ -103,7 +103,7 @@ CREATE TABLE users_book (
 -- Table des images
 CREATE TABLE picture (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id BIGINT UNSIGNED NOT NULL,
+    user_id  VARCHAR(30) NOT NULL,
     book_id INT NOT NULL,
     is_private BOOLEAN DEFAULT FALSE,
     filter INT,
@@ -135,3 +135,11 @@ CREATE TABLE picture_tag (
     FOREIGN KEY (picture_id) REFERENCES picture(id) ON DELETE CASCADE,
     FOREIGN KEY (tag_id) REFERENCES tag(id) ON DELETE CASCADE
 );
+
+DROP TABLE IF EXISTS picture_tag;
+DROP TABLE IF EXISTS tag;
+DROP TABLE IF EXISTS picture;
+DROP TABLE IF EXISTS users_book;
+DROP TABLE IF EXISTS book;
+DROP TABLE IF EXISTS user;
+DROP TABLE IF EXISTS filter;
