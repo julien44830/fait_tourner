@@ -111,7 +111,7 @@ router.post("/books", verifyToken as any, async (req: AuthRequest, res: Response
 
     // Exemple d’insertion :
     await connection.execute(
-      `INSERT INTO book (name, owner_id) VALUES (?, ?, ?)`,
+      `INSERT INTO book (id, name, owner_id) VALUES (?, ?, ?)`,
       [bookId, title, owner_id]
     );
     res.status(201).json({ message: "Livre ajouté avec succès" });
