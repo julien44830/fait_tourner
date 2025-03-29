@@ -50,6 +50,7 @@ router.post(
         },
         process.env.SECRET_KEY!, { expiresIn: "2h" }
       );
+      console.log("🔐 Clé secrète pour signer :", process.env.SECRET_KEY);
 
       // ✅ Réponse avec token + user
       res.status(200).json({
