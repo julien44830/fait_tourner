@@ -10,7 +10,7 @@ interface AuthRequest extends Request {
 const router = express.Router();
 
 // 📌 Route pour uploader une image vers un book
-router.post("/upload/:bookId", verifyToken as any, async (req: Request, res: Response) => {
+router.post("/upload/:bookId", verifyToken as any, upload.single("image"), async (req: Request, res: Response) => {
   const authReq = req as AuthRequest;
   let userId = authReq.user?.id;
   if (!userId) {
@@ -18,8 +18,7 @@ router.post("/upload/:bookId", verifyToken as any, async (req: Request, res: Res
     return;
   }
   userId = (req as any).user?.id;
-  const bookId = parseInt(req.params.bookId, 10);
-
+  const bookId = req.params.bookId;
   if (!req.file) {
     res.status(400).json({ error: "Aucun fichier envoyé." });
     return;
