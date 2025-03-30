@@ -10,7 +10,7 @@ interface AuthRequest extends Request {
 const router = express.Router();
 
 // 📌 Route pour uploader une image vers un book
-router.post("/upload/:bookId", verifyToken as any, upload.single("image"), async (req: Request, res: Response) => {
+router.post("/upload/:bookId", upload.single("image"), verifyToken as any, async (req: Request, res: Response) => {
   const authReq = req as AuthRequest;
   let userId = authReq.user?.id;
   if (!userId) {
