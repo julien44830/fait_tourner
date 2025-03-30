@@ -42,10 +42,11 @@ router.get(
 
 
 // 📌 Route GET pour récupérer un book par ID avec ses images
-router.get("/books/:id", verifyToken as any, async (req: AuthRequest, res: Response): Promise<void> => {
+router.get("/book/:id", verifyToken as any, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const connection = await getConnection();
     const bookId = parseInt(req.params.id, 10);
+    console.log('%c⧭', 'color: #99adcc', bookId);
     const userId = req.user?.id;
 
     if (!userId) {
