@@ -117,6 +117,7 @@ export default function Book() {
 
         const formData = new FormData();
         formData.append("image", selectedFile);
+        console.log("%c⧭", "color: #f279ca", formData);
 
         try {
             const response = await fetch(
