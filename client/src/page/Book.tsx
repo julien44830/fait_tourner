@@ -22,6 +22,8 @@ export default function Book() {
     const [showModal, setShowModal] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null); // Stocke le fichier sélectionné
 
+    console.log("%c⧭", "color: #408059", "id : ", id);
+    console.log("%c⧭", "color: #408059", "book : ", book);
     useEffect(() => {
         const fetchBook = async () => {
             const token = localStorage.getItem("token");
@@ -32,7 +34,7 @@ export default function Book() {
 
             try {
                 const response = await fetch(
-                    `https://faittourner-production.up.railway.app/api/books/${id}`,
+                    `https://faittourner-production.up.railway.app/api/book/${id}`,
                     {
                         method: "GET",
                         headers: {

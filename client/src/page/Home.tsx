@@ -92,8 +92,6 @@ export default function Home() {
         }
     };
 
-    console.log("%c⧭", "color: #ffcc00", books);
-
     return (
         <div className="home-container">
             <h2>Bonjour, {name}</h2>
