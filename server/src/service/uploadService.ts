@@ -6,9 +6,10 @@ import fs from "fs";
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const bookId = req.params.bookId;
+    console.log("📦 req.params dans destination:", req.params);
 
     // Vérifier que bookId est valide
-    if (!bookId || isNaN(Number(bookId))) {
+    if (!bookId || typeof bookId !== "string") {
       return cb(new Error("Book ID invalide ou manquant"), "");
     }
 
