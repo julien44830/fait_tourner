@@ -117,8 +117,9 @@ export default function Book() {
 
         const formData = new FormData();
         formData.append("image", selectedFile);
-        console.log("%c⧭", "color: #f279ca", formData);
-
+        for (const pair of formData.entries()) {
+            console.log(`📦 FormData -> ${pair[0]}:`, pair[1]);
+        }
         try {
             const response = await fetch(
                 `https://faittourner-production.up.railway.app/api/upload/${id}`,
