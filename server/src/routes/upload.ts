@@ -4,7 +4,7 @@ import { verifyToken } from "../middleware/authMiddleware";
 import { getConnection } from "../dbconfig";
 
 interface AuthRequest extends Request {
-  user: { id: number };
+  user: { id: string };
 }
 
 const router = express.Router();
