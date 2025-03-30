@@ -45,7 +45,7 @@ router.get(
 router.get("/book/:id", verifyToken as any, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const connection = await getConnection();
-    const bookId = parseInt(req.params.id, 10);
+    const bookId = req.params.id;
     console.log('%c⧭', 'color: #99adcc', bookId);
     const userId = req.user?.id;
 
