@@ -83,9 +83,8 @@ router.get("/books/:id", verifyToken as any, async (req: AuthRequest, res: Respo
   }
 });
 
-// 📌 Route pour créer un book
+// 📘 Route : créer un book et lier à l'utilisateur
 router.post("/books", verifyToken as any, async (req: AuthRequest, res: Response): Promise<void> => {
-
   if (!req.user?.id) {
     res.status(401).json({ error: "Non autorisé." });
     return;
@@ -93,33 +92,34 @@ router.post("/books", verifyToken as any, async (req: AuthRequest, res: Response
 
   try {
     const connection = await getConnection();
+
     const { title } = req.body;
-    const owner_id = String(req.user?.id).trim(); const bookId = uuidv4();
+    const owner_id = String(req.user.id).trim(); // ← id de l'utilisateur connecté
+    const bookId = uuidv4(); // ← id du book
 
     console.log("📦 Body reçu :", req.body);
-    console.log("📘 UUID généré :", bookId);
-    console.log("👤 owner_id :", owner_id, " → longueur :", owner_id.length);
-    console.log("📤 Insertion avec :", {
-      bookId,
-      bookId_type: typeof bookId,
-      title,
-      title_type: typeof title,
-      owner_id,
-      owner_id_type: typeof owner_id,
-    });
+    console.log("🆔 UUID généré :", bookId);
+    console.log("👤 owner_id :", owner_id, "→ longueur :", owner_id.length);
 
-
-    // Exemple d’insertion :
+    // 🔹 Insertion du book
     await connection.execute(
       `INSERT INTO book (id, name, owner_id) VALUES (?, ?, ?)`,
       [bookId, title, owner_id]
     );
-    res.status(201).json({ message: "Livre ajouté avec succès" });
+
+    // 🔹 Insertion dans users_book
+    await connection.execute(
+      `INSERT INTO users_book (user_id, book_id, is_owner, role) VALUES (?, ?, ?, ?)`,
+      [owner_id, bookId, true, 'owner']
+    );
+
+    res.status(201).json({ message: "📘 Livre ajouté avec succès" });
   } catch (error) {
     console.error("❌ Erreur lors de l'ajout du livre :", error);
     res.status(500).json({ error: "Erreur serveur" });
   }
 });
+
 
 
 
