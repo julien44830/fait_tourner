@@ -6,7 +6,7 @@ import { verifyToken } from "../middleware/authMiddleware";
 const router = express.Router();
 
 interface AuthRequest extends Request {
-  user?: { id?: number };
+  user?: { id?: string };
 }
 
 // 📌 Route GET pour récupérer les books appartenant à l'utilisateur ou accessibles via invitation
