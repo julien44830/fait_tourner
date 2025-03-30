@@ -45,7 +45,7 @@ router.post("/upload/:bookId", upload.single("image"), verifyToken as any, async
     const imagePath = `/uploads/${bookId}/${req.file.filename}`;
     const pictureId = uuidv4();
     await connection.execute(
-      `INSERT INTO picture (id, name, path, book_id, user_id, is_private) VALUES (?, ?, ?, ?, ?)`,
+      `INSERT INTO picture (id, name, path, book_id, user_id, is_private) VALUES (?, ?, ?, ?, ?, ?)`,
       [pictureId, req.file.filename, imagePath, bookId, userId, false]
     );
   } catch (error) {
