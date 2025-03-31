@@ -22,7 +22,6 @@ export default function Book() {
     const [showModal, setShowModal] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null); // Stocke le fichier sélectionné
 
-    console.log("%c⧭", "color: #408059", "id : ", id);
     useEffect(() => {
         const fetchBook = async () => {
             const token = localStorage.getItem("token");
@@ -48,7 +47,6 @@ export default function Book() {
                 }
 
                 const data = await response.json();
-                console.log("📂 Book récupéré :", data);
 
                 setBook(data); // ✅ Utilise data.book
                 setPictures(data.pictures || []);
@@ -153,11 +151,7 @@ export default function Book() {
         }
     };
 
-    console.log("%c⧭", "color: #408059", "book : ", book);
-
     if (!book) return <h1>Chargement...</h1>;
-
-    console.log("%c⧭", "color: #1d3f73", "pictures : ", pictures);
 
     return (
         <div className="book-container">
