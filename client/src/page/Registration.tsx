@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, NavLink } from "react-router-dom";
 import { jwtDecode } from "jwt-decode"; // Assure-toi d'installer jwt-decode via `npm install jwt-decode`
 import GoogleConnexion from "../component/GoogleConnexion";
 
@@ -187,6 +187,10 @@ export default function Registration() {
                 >
                     Inscription
                 </button>
+                <p>
+                    Déjà un compte ?{" "}
+                    <NavLink to="/connexion">Connecte toi</NavLink>
+                </p>
             </form>
             <GoogleConnexion />
         </>
