@@ -38,7 +38,7 @@ router.post("/request-delete", verifyToken, async (req: Request, res: Response):
 });
 
 // Route appelée lors du clic sur le lien de suppression envoyé par email
-router.get("/confirm-delete", async (req: Request, res: Response): Promise<void> => {
+router.get("/confirm-delete", verifyToken, async (req: Request, res: Response): Promise<void> => {
   // Récupération du token passé en query string
   const token = req.query.token as string;
   if (!token) {
