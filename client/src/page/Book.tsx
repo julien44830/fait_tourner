@@ -70,10 +70,11 @@ export default function Book() {
 
         try {
             const token = localStorage.getItem("token");
-            console.log("📤 Données envoyées :", {
-                email,
-                bookId: book?.id,
-            });
+            "📤 Données envoyées :",
+                {
+                    email,
+                    bookId: book?.id,
+                };
 
             const response = await fetch(
                 `https://faittourner-production.up.railway.app/api/invite`,
@@ -121,7 +122,7 @@ export default function Book() {
         const formData = new FormData();
         formData.append("image", selectedFile);
         for (const pair of formData.entries()) {
-            console.log(`📦 FormData -> ${pair[0]}:`, pair[1]);
+            `📦 FormData -> ${pair[0]}:`, pair[1];
         }
         try {
             const response = await fetch(

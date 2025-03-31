@@ -6,7 +6,7 @@ import fs from "fs";
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const bookId = req.params.bookId;
-    console.log("📦 req.params dans destination:", req.params);
+    ("📦 req.params dans destination:", req.params);
 
     // Vérifier que bookId est valide
     if (!bookId || typeof bookId !== "string") {
