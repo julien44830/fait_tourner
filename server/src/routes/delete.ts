@@ -28,7 +28,6 @@ router.post("/request-delete", verifyToken, async (req: Request, res: Response):
       { expiresIn: "1h" }
     );
     console.log("Token de suppression généré :", deleteToken);
-    console.log(process.env.JWT_SECRET)
 
     // Construction du lien de confirmation à envoyer par e-mail
     const link = `https://faittourner-production.up.railway.app/confirm-delete?token=${deleteToken}`;
@@ -71,7 +70,7 @@ router.get("/confirm-delete", async (req: Request, res: Response): Promise<void>
 
     // Exécution de la requête SQL pour supprimer l'utilisateur
     console.log(`Suppression de l'utilisateur avec l'id : ${decoded.id}`);
-    await connection.query("DELETE FROM users WHERE id = ?", [decoded.id]);
+    await connection.query("DELETE FROM user WHERE id = ?", [decoded.id]);
 
     // Fermeture de la connexion
     await connection.end();
