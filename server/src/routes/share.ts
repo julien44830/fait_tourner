@@ -12,6 +12,7 @@ interface AuthRequest extends Request {
 
 router.post("/invite", verifyToken, async (req: Request, res: Response): Promise<void> => {
   const userId = (req as AuthRequest).user?.id;
+  console.log("📨 Body reçu dans /invite :", req.body);
 
   if (!userId) {
     res.status(401).json({ error: "Non autorisé." });
@@ -85,14 +86,14 @@ router.post("/invite", verifyToken, async (req: Request, res: Response): Promise
         expiresIn: "7d",
       });
 
-      inviteLink = `http://192.168.1.80:5173/accepter-invitation?token=${inviteToken}`;
+      inviteLink = `https://www.pictevent.fr/accepter-invitation?token=${inviteToken}`;
     } else {
       // 🔗 L'utilisateur n'existe pas encore : créer lien vers inscription
       inviteToken = jwt.sign({ email, bookId }, process.env.SECRET_KEY as string, {
         expiresIn: "7d",
       });
 
-      inviteLink = `http://192.168.1.80:5173/inscription?token=${inviteToken}`;
+      inviteLink = `https://www.pictevent.fr/inscription?token=${inviteToken}`;
     }
 
     // ✉️ Envoi de l'email
