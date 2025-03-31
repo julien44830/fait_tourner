@@ -48,6 +48,13 @@ router.post("/upload/:bookId", upload.single("image"), verifyToken as any, async
       `INSERT INTO picture (id, name, path, book_id, user_id, is_private) VALUES (?, ?, ?, ?, ?, ?)`,
       [pictureId, req.file.filename, imagePath, bookId, userId, false]
     );
+
+    // ✅ Envoie une réponse JSON correcte au frontend
+    res.status(200).json({
+      message: "Image uploadée avec succès !",
+      picture_id: pictureId,
+      path: imagePath,
+    });
   } catch (error) {
     console.error("❌ Erreur lors de l'upload :", error);
     res.status(500).json({ error: "Erreur serveur." });

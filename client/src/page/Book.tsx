@@ -121,9 +121,6 @@ export default function Book() {
 
         const formData = new FormData();
         formData.append("image", selectedFile);
-        for (const pair of formData.entries()) {
-            `📦 FormData -> ${pair[0]}:`, pair[1];
-        }
         try {
             const response = await fetch(
                 `https://faittourner-production.up.railway.app/api/upload/${id}`,
