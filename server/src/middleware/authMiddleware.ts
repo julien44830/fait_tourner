@@ -32,7 +32,7 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction): vo
   try {
     const decoded = jwt.verify(token, SECRET_KEY!) as { userId: string, email: string };
     (req as AuthRequest).user = {
-      _id: decoded.userId,
+      id: decoded.userId,
       email: decoded.email,
     };
     next();
