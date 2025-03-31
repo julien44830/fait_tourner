@@ -51,7 +51,7 @@ export default function Book() {
                 console.log("📂 Book récupéré :", data);
 
                 setBook(data); // ✅ Utilise data.book
-                setPictures([]);
+                setPictures(data.pictures || []);
             } catch (error) {
                 console.error(
                     "❌ Erreur lors de la récupération du book :",
@@ -157,7 +157,7 @@ export default function Book() {
 
     if (!book) return <h1>Chargement...</h1>;
 
-    console.log("%c⧭", "color: #1d3f73", pictures);
+    console.log("%c⧭", "color: #1d3f73", "pictures : ", pictures);
 
     return (
         <div className="book-container">
