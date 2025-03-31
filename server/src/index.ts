@@ -19,7 +19,7 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, callback) => {
-    console.log("🌐 Requête CORS depuis :", origin);
+    ("🌐 Requête CORS depuis :", origin);
 
     if (!origin) return callback(null, true); // autorise Postman/curl etc.
     if (allowedOrigins.includes(origin)) {

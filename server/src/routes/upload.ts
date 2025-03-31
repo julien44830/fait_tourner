@@ -21,7 +21,7 @@ router.post("/upload/:bookId", upload.single("image"), verifyToken as any, async
   }
   userId = (req as any).user?.id;
   const bookId = req.params.bookId;
-  console.log("🖼️ Fichier reçu :", req.file);
+  ("🖼️ Fichier reçu :", req.file);
   if (!req.file) {
     res.status(400).json({ error: "Aucun fichier envoyé." });
     return;

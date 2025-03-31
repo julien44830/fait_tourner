@@ -113,9 +113,9 @@ router.post("/books", verifyToken as any, async (req: AuthRequest, res: Response
     const owner_id = String(req.user.id).trim(); // ← id de l'utilisateur connecté
     const bookId = uuidv4(); // ← id du book
 
-    console.log("📦 Body reçu :", req.body);
-    console.log("🆔 UUID généré :", bookId);
-    console.log("👤 owner_id :", owner_id, "→ longueur :", owner_id.length);
+    ("📦 Body reçu :", req.body);
+    ("🆔 UUID généré :", bookId);
+    ("👤 owner_id :", owner_id, "→ longueur :", owner_id.length);
 
     // 🔹 Insertion du book
     await connection.execute(

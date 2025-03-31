@@ -24,7 +24,7 @@ export const sendInvitationEmail = async (
       `,
     });
 
-    console.log("📤 Réponse de Resend :", response);
+    ("📤 Réponse de Resend :", response);
 
     return { success: true, message: "Email envoyé avec succès !" };
   } catch (error) {
