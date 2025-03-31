@@ -15,10 +15,10 @@ export default function Footer() {
         if (!token) return alert("Vous devez être connecté.");
 
         const res = await fetch(
-            "https://faittourner-production.up.railway.app/confirm-delete?token=xxx",
+            "https://faittourner-production.up.railway.app/request-delete",
             {
-                method: "GET",
                 headers: {
+                    "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
                 },
             }
