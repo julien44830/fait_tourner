@@ -30,10 +30,10 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction): vo
   }
 
   try {
-    const decoded = jwt.verify(token, SECRET_KEY!) as { userId: string, mail: string };
+    const decoded = jwt.verify(token, SECRET_KEY!) as { userId: string, email: string };
     (req as AuthRequest).user = {
       _id: decoded.userId,
-      email: decoded.mail,
+      email: decoded.email,
     };
     next();
   } catch (err) {
