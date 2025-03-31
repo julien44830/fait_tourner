@@ -6,6 +6,8 @@ import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
+// src/routes/auth.ts
+
 router.post("/login", (req, res, next) => {
   next();
 }, login);
@@ -104,4 +106,5 @@ router.post(
     }
   }
 );
+
 export default router;

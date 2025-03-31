@@ -30,3 +30,32 @@ export const sendInvitationEmail = async (
     return { success: false, message: "Erreur lors de l'envoi de l'email." };
   }
 };
+
+export const sendDeleteAccountEmail = async (email: string, link: string) => {
+  try {
+    const response = await resend.emails.send({
+      from: "noreply@pictevent.fr",
+      to: email,
+      subject: "Confirmation de suppression de compte",
+      html: `
+            <h2>Suppression de votre compte</h2>
+              <ul>
+                <p><strong>Conséquences de la suppression :</strong></p>
+                <li>Tous vos books seront supprimés</li>
+                <li>Les images qu'ils contiennent seront supprimées</li>
+                <li>Vos ami(e)s ne pourront plus accéder à vos books</li>
+                <li>Les books de vos ami(e)s et les images que vous avez partagées ne vous seront plus accessibles</li>
+                <li>Les images partagées dans les books de vos ami(e)s ne seront pas supprimées</li>
+              </ul>
+            <p>Si vous souhaitez supprimer définitivement votre compte, cliquez sur le lien ci-dessous :</p>
+            <a href="${link}">Confirmer la suppression de mon compte</a>
+            <p>Ce lien est valable 1 heure.</p>
+            <p>Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.</p>`,
+    });
+
+    return { success: true, message: "Email envoyé avec succès !" };
+  } catch (error) {
+    console.error("❌ Erreur lors de l'envoi de l'email :", error);
+    return { success: false, message: "Erreur lors de l'envoi de l'email." };
+  }
+};
