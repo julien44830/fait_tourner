@@ -5,6 +5,7 @@ import bookRoutes from "./routes/book";
 import authRoutes from "./routes/auth";
 import share from "./routes/share";
 import uploadRoutes from "./routes/upload";
+import deleteRouter from "./routes/delete";
 import { getConnection } from "./dbconfig";
 import "./service/passport";
 
@@ -40,6 +41,7 @@ const startServer = async () => {
     app.use("/api", share);
     app.use("/api", uploadRoutes);
     app.use("/uploads", express.static("uploads"));
+    app.use("/", deleteRouter);
 
     const PORT = process.env.PORT || 4000;
     app.listen(PORT, () => {

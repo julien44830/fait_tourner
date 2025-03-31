@@ -70,11 +70,6 @@ export default function Book() {
 
         try {
             const token = localStorage.getItem("token");
-            "📤 Données envoyées :",
-                {
-                    email,
-                    bookId: book?.id,
-                };
 
             const response = await fetch(
                 `https://faittourner-production.up.railway.app/api/invite`,
