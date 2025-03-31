@@ -60,6 +60,10 @@ router.post("/invite", verifyToken, async (req: Request, res: Response): Promise
         [invitedUserId, bookId]
       );
 
+
+      console.log('✅ Utilisateur ajouté au book: ', invitedUserId);
+      console.log('✅ id du book: ', bookId);
+
       if (bookLink.length === 0) {
         // 🔥 L'utilisateur n'est pas encore dans le book, on l'ajoute
         await connection.execute(
