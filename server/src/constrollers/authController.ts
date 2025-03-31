@@ -14,7 +14,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     // Vérifier si l'utilisateur existe
     const connection = await getConnection();
     const [users]: any = await connection.execute(
-      "SELECT id, name, password FROM user WHERE email = ?",
+      "SELECT id, name, password, email FROM user WHERE email = ?",
       [email]
     );
 
