@@ -30,7 +30,7 @@ router.post("/request-delete", verifyToken, async (req: Request, res: Response):
     console.log("Token de suppression généré :", deleteToken);
 
     // Construction du lien de confirmation à envoyer par e-mail
-    const link = `https://faittourner-production.up.railway.app/confirm-delete?token=${deleteToken}`;
+    const link = `https://www.pictevent.fr/confirm-delete?token=${deleteToken}`;
     console.log("Lien de confirmation généré :", link);
 
     // Envoi de l'e-mail de confirmation via le service mailer
