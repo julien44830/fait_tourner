@@ -23,14 +23,14 @@ router.post("/request-delete", verifyToken, async (req: Request, res: Response):
   try {
     // Génération d'un token de suppression valable 1 heure
     const deleteToken = jwt.sign(
-      { id: user.id },
+      { id: user.id, email: user.email },
       process.env.JWT_SECRET || "secret",
       { expiresIn: "1h" }
     );
     console.log("Token de suppression généré :", deleteToken);
 
     // Construction du lien de confirmation à envoyer par e-mail
-    const link = `https://tonapp.com/confirm-delete?token=${deleteToken}`;
+    const link = `https://faittourner-production.up.railway.app/confirm-delete?token=${deleteToken}`;
     console.log("Lien de confirmation généré :", link);
 
     // Envoi de l'e-mail de confirmation via le service mailer
