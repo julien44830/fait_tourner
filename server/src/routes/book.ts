@@ -42,47 +42,64 @@ router.get(
 
 
 // 📌 Route GET pour récupérer un book par ID avec ses images
-router.get("/book/:id", verifyToken as any, async (req: AuthRequest, res: Response): Promise<void> => {
-  try {
-    const connection = await getConnection();
-    const bookId = req.params.id;
-    console.log('%c⧭', 'color: #99adcc', bookId);
-    const userId = req.user?.id;
+router.get(
+  "/book/:id",
+  verifyToken as any,
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const connection = await getConnection();
+      const bookId = req.params.id;
+      const userId = req.user?.id;
 
-    if (!userId) {
-      res.status(401).json({ error: "Non autorisé" });
-      return;
+      console.log('%c⧭', 'color: #99adcc', `🔍 Requête pour le book : ${bookId}, utilisateur : ${userId}`);
+
+      if (!userId) {
+        res.status(401).json({ error: "Non autorisé" });
+        return;
+      }
+
+      // 🔒 Vérifie si l'utilisateur a accès au book
+      const [accessRows]: any = await connection.execute(
+        `SELECT 1 FROM users_book WHERE book_id = ? AND user_id = ?`,
+        [bookId, userId]
+      );
+
+      if (accessRows.length === 0) {
+        res.status(403).json({
+          error: "Accès refusé, vous n'avez pas les droits sur ce book",
+        });
+        return;
+      }
+
+      // 📘 Récupère les infos du book
+      const [bookRows]: any = await connection.execute(
+        `SELECT id, name, owner_id FROM book WHERE id = ?`,
+        [bookId]
+      );
+
+      if (bookRows.length === 0) {
+        res.status(404).json({ error: "Book non trouvé" });
+        return;
+      }
+
+      // 🖼️ Récupère les images liées au book
+      const [pictureRows]: any = await connection.execute(
+        `SELECT picture_id, name AS picture_name, path, tags FROM picture WHERE book_id = ?`,
+        [bookId]
+      );
+
+      // ✅ Envoie la réponse complète
+      res.status(200).json({
+        book: bookRows[0],
+        pictures: pictureRows,
+      });
+    } catch (error) {
+      console.error("❌ Erreur serveur :", error);
+      res.status(500).json({ error: "Erreur serveur" });
     }
-
-    // Vérifier si l'utilisateur a accès au book
-    const [accessRows]: any = await connection.execute(
-      `SELECT 1 FROM users_book WHERE book_id = ? AND user_id = ?`,
-      [bookId, userId]
-    );
-
-    if (accessRows.length === 0) {
-      res.status(403).json({ error: "Accès refusé, vous n'avez pas les droits sur ce book" });
-      return;
-    }
-
-    // 🔥 Récupérer les détails du book
-    const [bookRows]: any = await connection.execute(
-      `SELECT id, name, owner_id FROM book WHERE id = ?`,
-      [bookId]
-    );
-
-    if (bookRows.length === 0) {
-      res.status(404).json({ error: "Book non trouvé" });
-      return;
-    }
-
-    res.status(200).json(bookRows[0]);
-
-  } catch (error) {
-    console.error("❌ Erreur serveur :", error);
-    res.status(500).json({ error: "Erreur serveur" });
   }
-});
+);
+
 
 // 📘 Route : créer un book et lier à l'utilisateur
 router.post("/books", verifyToken as any, async (req: AuthRequest, res: Response): Promise<void> => {
