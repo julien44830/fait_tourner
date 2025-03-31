@@ -22,7 +22,6 @@ export default function Book() {
     const [showModal, setShowModal] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null); // Stocke le fichier sélectionné
 
-    console.log("%c⧭", "color: #408059", "id : ", id);
     useEffect(() => {
         const fetchBook = async () => {
             const token = localStorage.getItem("token");
