@@ -30,7 +30,7 @@ export default function Login() {
             localStorage.setItem("token", data.token);
             localStorage.setItem("name", data.name);
 
-            setTimeout(() => navigate("/accueil"), 1000);
+            setTimeout(() => navigate("/accueil"), 3000);
         } catch (error) {
             console.error("❌ Erreur de connexion :", error);
         }
