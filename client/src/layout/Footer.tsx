@@ -17,6 +17,7 @@ export default function Footer() {
         const res = await fetch(
             "https://faittourner-production.up.railway.app/request-delete",
             {
+                method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,

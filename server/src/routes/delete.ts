@@ -3,11 +3,12 @@ import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { getConnection } from "../dbconfig"; // adapte le chemin selon ton projet
 import { sendDeleteAccountEmail } from "../service/mailerService";
+import { verifyToken } from "../middleware/authMiddleware";
 
 const router = express.Router();
 
 // Route pour demander la suppression du compte
-router.post("/request-delete", async (req: Request, res: Response): Promise<void> => {
+router.post("/request-delete", verifyToken, async (req: Request, res: Response): Promise<void> => {
   // On suppose que req.user contient l'utilisateur authentifié (grâce à un middleware d'auth)
   const user = req.user as { id: string; email: string };
   if (!user) {
