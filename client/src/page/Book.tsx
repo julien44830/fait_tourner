@@ -48,7 +48,7 @@ export default function Book() {
 
                 const data = await response.json();
 
-                setBook(data); // ✅ Utilise data.book
+                setBook(data.book);
                 setPictures(data.pictures || []);
             } catch (error) {
                 console.error(
@@ -63,13 +63,18 @@ export default function Book() {
 
     // ✅ Gère l'envoi d'invitation
     const handleShare = async () => {
-        if (!email) {
-            setMessage("Veuillez entrer un email.");
+        if (!email || !book?.id) {
+            setMessage("Email ou ID du book manquant.");
             return;
         }
 
         try {
             const token = localStorage.getItem("token");
+            console.log("📤 Données envoyées :", {
+                email,
+                bookId: book?.id,
+            });
+
             const response = await fetch(
                 `https://faittourner-production.up.railway.app/api/invite`,
                 {
