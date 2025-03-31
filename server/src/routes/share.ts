@@ -7,7 +7,7 @@ import { verifyToken } from "../middleware/authMiddleware";
 const router = express.Router();
 
 interface AuthRequest extends Request {
-  user?: { id: number };
+  user?: { id: string };
 }
 
 // 📌 Route pour inviter un utilisateur à rejoindre un book
