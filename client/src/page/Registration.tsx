@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode"; // Assure-toi d'installer jwt-decode via `npm install jwt-decode`
+import GoogleConnexion from "../component/GoogleConnexion";
 
 export default function Registration() {
     const [formData, setFormData] = useState({
@@ -187,6 +188,7 @@ export default function Registration() {
                     Inscription
                 </button>
             </form>
+            <GoogleConnexion />
         </>
     );
 }
