@@ -15,6 +15,7 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:5173",            // pour le dev local
+  "http://192.168.1.80:5173",        // pour le dev local sur mobile
   "https://www.pictevent.fr",         // prod
 ];
 
