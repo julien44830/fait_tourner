@@ -28,9 +28,10 @@ router.post("/request-delete", verifyToken, async (req: Request, res: Response):
       { expiresIn: "1h" }
     );
     console.log("Token de suppression généré :", deleteToken);
+    console.log(process.env.JWT_SECRET)
 
     // Construction du lien de confirmation à envoyer par e-mail
-    const link = `https://www.pictevent.fr/confirm-delete?token=${deleteToken}`;
+    const link = `https://faittourner-production.up.railway.app/confirm-delete?token=${deleteToken}`;
     console.log("Lien de confirmation généré :", link);
 
     // Envoi de l'e-mail de confirmation via le service mailer
@@ -48,6 +49,7 @@ router.post("/request-delete", verifyToken, async (req: Request, res: Response):
 // Route appelée lors du clic sur le lien de suppression envoyé par email
 router.get("/confirm-delete", async (req: Request, res: Response): Promise<void> => {
   console.log("=== Route GET /confirm-delete appelée ===");
+  console.log(process.env.JWT_SECRET)
 
   // Récupération du token passé en query string
   const token = req.query.token as string;
