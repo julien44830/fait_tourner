@@ -2,8 +2,39 @@ import express from "express";
 import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { getConnection } from "../dbconfig"; // adapte le chemin selon ton projet
+import { sendDeleteAccountEmail } from "../service/mailerService";
 
 const router = express.Router();
+
+// Route pour demander la suppression du compte
+router.post("/request-delete", async (req: Request, res: Response): Promise<void> => {
+  // On suppose que req.user contient l'utilisateur authentifié (grâce à un middleware d'auth)
+  const user = req.user as { id: string; email: string };
+  if (!user) {
+    res.status(401).json({ message: "Utilisateur non authentifié." });
+    return;
+  }
+
+  try {
+    // Génération d'un token de suppression valable 1 heure
+    const deleteToken = jwt.sign(
+      { id: user.id },
+      process.env.JWT_SECRET || "secret",
+      { expiresIn: "1h" }
+    );
+
+    // Construction du lien de confirmation à envoyer par e-mail
+    const link = `https://tonapp.com/confirm-delete?token=${deleteToken}`;
+
+    // Envoi de l'e-mail de confirmation via le service mailer
+    await sendDeleteAccountEmail(user.email, link);
+
+    res.status(200).json({ message: "Un e-mail de confirmation vous a été envoyé." });
+  } catch (error) {
+    console.error("Erreur lors de la demande de suppression :", error);
+    res.status(500).json({ message: "Erreur lors de la demande de suppression." });
+  }
+});
 
 // Route appelée lors du clic sur le lien de suppression envoyé par email
 router.get("/confirm-delete", async (req: Request, res: Response): Promise<void> => {
