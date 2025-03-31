@@ -66,15 +66,15 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     // ✅ Hachage du mot de passe avec Argon2
     const hashedPassword = await argon2.hash(password);
 
-    const bookId = uuidv4(); // ← id du book
+
+    const userId = uuidv4(); // ← UUID du nouvel utilisateur
 
     // ✅ Créer l'utilisateur avec le mot de passe haché
     const [result]: any = await connection.execute(
       "INSERT INTO user (id, name, email, password) VALUES (?, ?, ?, ?)",
-      [bookId, name, email, hashedPassword]
+      [userId, name, email, hashedPassword]
     );
 
-    const newUserId = result.insertId;
 
     // ✅ Si un token d'invitation est présent, ajouter l'utilisateur au book
     // ✅ Ajout de l'utilisateur au book après inscription
@@ -96,7 +96,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
         const [insertResult]: any = await connection.execute(
           "INSERT INTO users_book (user_id, book_id, role) VALUES (?, ?, 'viewer')",
-          [newUserId, decoded.bookId]
+          [userId, decoded.bookId]
         );
 
 
