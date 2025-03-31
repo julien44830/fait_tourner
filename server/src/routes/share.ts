@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import { getConnection } from "../dbconfig";
 import jwt from "jsonwebtoken";
-import { sendInvitationEmail } from "../service/mailerService"; // ✅ Import du service Resend
+import { sendInvitationEmail } from "../service/mailerService";
 import { verifyToken } from "../middleware/authMiddleware";
 
 const router = express.Router();
@@ -10,7 +10,6 @@ interface AuthRequest extends Request {
   user?: { id: string };
 }
 
-// 📌 Route pour inviter un utilisateur à rejoindre un book
 router.post("/invite", verifyToken, async (req: Request, res: Response): Promise<void> => {
   const userId = (req as AuthRequest).user?.id;
 
@@ -19,13 +18,17 @@ router.post("/invite", verifyToken, async (req: Request, res: Response): Promise
     return;
   }
 
-
   try {
     const { email, bookId } = req.body;
 
+    if (!email || !bookId) {
+      res.status(400).json({ error: "Email ou ID du book manquant." });
+      return;
+    }
+
     const connection = await getConnection();
 
-    // ✅ Vérifier si le book existe et que l'utilisateur en est bien l'auteur
+    // 🔍 Vérifier si le book existe et que l'utilisateur en est le propriétaire
     const [bookResult]: any = await connection.execute(
       `SELECT name, owner_id FROM book WHERE id = ?`,
       [bookId]
@@ -45,53 +48,53 @@ router.post("/invite", verifyToken, async (req: Request, res: Response): Promise
       return;
     }
 
-    // ✅ Vérifier si l'utilisateur invité existe déjà
+    // 🔍 Vérifier si l'utilisateur invité existe
     const [userRows]: any = await connection.execute(
       `SELECT id FROM user WHERE email = ?`,
       [email]
     );
 
+    let inviteToken: string;
+    let inviteLink: string;
+
     if (userRows.length > 0) {
       const invitedUserId = userRows[0].id;
 
-      // ✅ Vérifier si l'utilisateur est déjà lié au book
+      if (!invitedUserId || !bookId) {
+        console.error("🚨 Paramètres manquants pour l'ajout au book :", { invitedUserId, bookId });
+        res.status(400).json({ error: "Paramètres manquants." });
+        return;
+      }
+
+      // 🔍 Vérifier si déjà dans le book
       const [bookLink]: any = await connection.execute(
         `SELECT * FROM users_book WHERE user_id = ? AND book_id = ?`,
         [invitedUserId, bookId]
       );
 
-
-      console.log('✅ Utilisateur ajouté au book: ', invitedUserId);
-      console.log('✅ id du book: ', bookId);
-
       if (bookLink.length === 0) {
-        // 🔥 L'utilisateur n'est pas encore dans le book, on l'ajoute
         await connection.execute(
           `INSERT INTO users_book (user_id, book_id, is_owner, role) VALUES (?, ?, 0, 'viewer')`,
           [invitedUserId, bookId]
         );
         console.log("✅ Utilisateur ajouté au book :", invitedUserId, bookId);
       }
-    }
 
-    let inviteToken: string;
-    let inviteLink: string;
-
-    if (userRows.length > 0) {
-      // 🎯 L'utilisateur existe, générer un lien pour accepter l'invitation
       inviteToken = jwt.sign({ bookId, email }, process.env.SECRET_KEY as string, {
         expiresIn: "7d",
       });
+
       inviteLink = `http://192.168.1.80:5173/accepter-invitation?token=${inviteToken}`;
     } else {
-      // ❌ L'utilisateur n'existe pas, générer un lien d'inscription
+      // 🔗 L'utilisateur n'existe pas encore : créer lien vers inscription
       inviteToken = jwt.sign({ email, bookId }, process.env.SECRET_KEY as string, {
         expiresIn: "7d",
       });
+
       inviteLink = `http://192.168.1.80:5173/inscription?token=${inviteToken}`;
     }
 
-    // 📧 Envoyer l'email avec Resend
+    // ✉️ Envoi de l'email
     const mailResponse = await sendInvitationEmail(email, bookName, inviteLink);
 
     if (!mailResponse.success) {
@@ -100,7 +103,8 @@ router.post("/invite", verifyToken, async (req: Request, res: Response): Promise
       return;
     }
 
-    res.json({ message: "Invitation envoyée avec succès !" });
+    res.json({ message: "✅ Invitation envoyée avec succès !" });
+
   } catch (error) {
     console.error("❌ Erreur lors de l'envoi de l'invitation :", error);
     res.status(500).json({ error: "Erreur serveur." });
