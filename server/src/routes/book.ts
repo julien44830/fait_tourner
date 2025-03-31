@@ -41,64 +41,62 @@ router.get(
 );
 
 
-// 📌 Route GET pour récupérer un book par ID avec ses images
-router.get(
-  "/book/:id",
-  verifyToken as any,
-  async (req: AuthRequest, res: Response): Promise<void> => {
-    try {
-      const connection = await getConnection();
-      const bookId = req.params.id;
-      const userId = req.user?.id;
+// 📌 Route GET pour récupérer un book par ID avec ses images et leurs tags
+router.get("/book/:id", verifyToken as any, async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const connection = await getConnection();
+    const bookId = req.params.id;
+    const userId = req.user?.id;
 
-      console.log('%c⧭', 'color: #99adcc', `🔍 Requête pour le book : ${bookId}, utilisateur : ${userId}`);
-
-      if (!userId) {
-        res.status(401).json({ error: "Non autorisé" });
-        return;
-      }
-
-      // 🔒 Vérifie si l'utilisateur a accès au book
-      const [accessRows]: any = await connection.execute(
-        `SELECT 1 FROM users_book WHERE book_id = ? AND user_id = ?`,
-        [bookId, userId]
-      );
-
-      if (accessRows.length === 0) {
-        res.status(403).json({
-          error: "Accès refusé, vous n'avez pas les droits sur ce book",
-        });
-        return;
-      }
-
-      // 📘 Récupère les infos du book
-      const [bookRows]: any = await connection.execute(
-        `SELECT id, name, owner_id FROM book WHERE id = ?`,
-        [bookId]
-      );
-
-      if (bookRows.length === 0) {
-        res.status(404).json({ error: "Book non trouvé" });
-        return;
-      }
-
-      // 🖼️ Récupère les images liées au book
-      const [pictureRows]: any = await connection.execute(
-        `SELECT id AS picture_id, name AS picture_name, path, tags FROM picture WHERE book_id = ?`,
-        [bookId]
-      );
-
-      // ✅ Envoie la réponse complète
-      res.status(200).json({
-        book: bookRows[0],
-        pictures: pictureRows,
-      });
-    } catch (error) {
-      console.error("❌ Erreur serveur :", error);
-      res.status(500).json({ error: "Erreur serveur" });
+    if (!userId) {
+      res.status(401).json({ error: "Non autorisé" });
+      return;
     }
+
+    // Vérifier l'accès
+    const [accessRows]: any = await connection.execute(
+      `SELECT 1 FROM users_book WHERE book_id = ? AND user_id = ?`,
+      [bookId, userId]
+    );
+
+    if (accessRows.length === 0) {
+      res.status(403).json({ error: "Accès refusé" });
+      return;
+    }
+
+    // Récupérer le book
+    const [bookRows]: any = await connection.execute(
+      `SELECT id, name, owner_id FROM book WHERE id = ?`,
+      [bookId]
+    );
+
+    if (bookRows.length === 0) {
+      res.status(404).json({ error: "Book non trouvé" });
+      return;
+    }
+
+    // Récupérer les images avec tags
+    const [pictures]: any = await connection.execute(
+      `SELECT p.id AS picture_id, p.name AS picture_name, p.path,
+              JSON_ARRAYAGG(t.name) AS tags
+       FROM picture p
+       LEFT JOIN picture_tag pt ON p.id = pt.picture_id
+       LEFT JOIN tag t ON pt.tag_id = t.id
+       WHERE p.book_id = ?
+       GROUP BY p.id`,
+      [bookId]
+    );
+
+    res.status(200).json({
+      book: bookRows[0],
+      pictures,
+    });
+
+  } catch (error) {
+    console.error("❌ Erreur serveur :", error);
+    res.status(500).json({ error: "Erreur serveur" });
   }
-);
+});
 
 
 // 📘 Route : créer un book et lier à l'utilisateur
