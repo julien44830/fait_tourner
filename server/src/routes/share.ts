@@ -63,9 +63,10 @@ router.post("/invite", verifyToken, async (req: Request, res: Response): Promise
       if (bookLink.length === 0) {
         // 🔥 L'utilisateur n'est pas encore dans le book, on l'ajoute
         await connection.execute(
-          `INSERT INTO users_book (user_id, book_id, role) VALUES (?, ?, 'viewer')`,
+          `INSERT INTO users_book (user_id, book_id, is_owner, role) VALUES (?, ?, 0, 'viewer')`,
           [invitedUserId, bookId]
         );
+        console.log("✅ Utilisateur ajouté au book :", invitedUserId, bookId);
       }
     }
 
