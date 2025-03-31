@@ -17,6 +17,7 @@ router.post("/invite", verifyToken, async (req: Request, res: Response): Promise
     res.status(401).json({ error: "Non autorisé." });
     return;
   }
+  console.log('%c⧭', 'color: #e5de73', req.body);
 
   try {
     const { email, bookId } = req.body;
