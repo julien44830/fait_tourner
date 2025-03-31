@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { v4 as uuidv4 } from "uuid";
+
 import argon2 from "argon2";
 import { getConnection } from "../dbconfig"; // Assure-toi que ce chemin est correct
 
@@ -64,10 +66,12 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     // ✅ Hachage du mot de passe avec Argon2
     const hashedPassword = await argon2.hash(password);
 
+    const bookId = uuidv4(); // ← id du book
+
     // ✅ Créer l'utilisateur avec le mot de passe haché
     const [result]: any = await connection.execute(
-      "INSERT INTO user (name, email, password) VALUES (?, ?, ?)",
-      [name, email, hashedPassword]
+      "INSERT INTO user (id, name, email, password) VALUES (?, ?, ?, ?)",
+      [bookId, name, email, hashedPassword]
     );
 
     const newUserId = result.insertId;
