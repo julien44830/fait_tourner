@@ -84,7 +84,7 @@ router.get(
 
       // 🖼️ Récupère les images liées au book
       const [pictureRows]: any = await connection.execute(
-        `SELECT picture_id, name AS picture_name, path, tags FROM picture WHERE book_id = ?`,
+        `SELECT id AS picture_id, name AS picture_name, path, tags FROM picture WHERE book_id = ?`,
         [bookId]
       );
 
