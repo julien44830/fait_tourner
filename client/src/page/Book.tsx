@@ -11,12 +11,15 @@ interface Picture {
     picture_name: string;
     path: string;
     tags: string | null;
+    resized_url: string; // ✅ ici
 }
+
+type PictureWithResizedUrl = Picture & { resized_url: string };
 
 export default function Book() {
     const { id } = useParams<{ id: string }>();
     const [book, setBook] = useState<Book | null>(null);
-    const [pictures, setPictures] = useState<Picture[]>([]);
+    const [pictures, setPictures] = useState<PictureWithResizedUrl[]>([]);
     const [email, setEmail] = useState("");
     const [message, setMessage] = useState("");
     const [showModal, setShowModal] = useState(false);
@@ -141,6 +144,7 @@ export default function Book() {
             picture_name: string;
             path: any;
             tags: null;
+            resized_url: string;
         }[] = [];
 
         for (const file of selectedFiles) {
@@ -167,6 +171,7 @@ export default function Book() {
                         picture_name: file.name,
                         path: data.path,
                         tags: null,
+                        resized_url: `https://faittourner-production.up.railway.app/api/image/${id}/${file.name}`,
                     });
                 } else {
                     alert(`❌ Erreur pour ${file.name} : ${data.error}`);
@@ -183,6 +188,13 @@ export default function Book() {
     };
 
     if (!book) return <h1>Chargement...</h1>;
+
+    const getImageSize = () => {
+        const width = window.innerWidth;
+        if (width < 600) return 300;
+        if (width < 1024) return 600;
+        return 1000;
+    };
 
     return (
         <div className="book-container">
@@ -279,12 +291,15 @@ export default function Book() {
                             }}
                         >
                             <img
-                                src={`https://faittourner-production.up.railway.app${picture.path}`}
+                                src={`${
+                                    picture.resized_url
+                                }?w=${getImageSize()}`}
                                 alt={picture.picture_name}
+                                loading="lazy"
                                 style={{
                                     width: "100%",
-                                    height: "100%",
-                                    objectFit: isGridView ? "cover" : "contain",
+                                    height: "auto",
+                                    objectFit: "cover",
                                 }}
                             />
                         </div>

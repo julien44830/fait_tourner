@@ -87,9 +87,16 @@ router.get("/book/:id", verifyToken as any, async (req: AuthRequest, res: Respon
       [bookId]
     );
 
+    const BASE_URL = process.env.BASE_URL || "https://faittourner-production.up.railway.app/api";
+
+    const picturesWithResizedPath = pictures.map((pic: any) => ({
+      ...pic,
+      resized_url: `${BASE_URL}/image/${bookId}/${pic.picture_name}`, // 👈
+    }));
+
     res.status(200).json({
       book: bookRows[0],
-      pictures,
+      pictures: picturesWithResizedPath,
     });
 
   } catch (error) {
