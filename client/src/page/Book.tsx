@@ -20,7 +20,8 @@ export default function Book() {
     const [email, setEmail] = useState("");
     const [message, setMessage] = useState("");
     const [showModal, setShowModal] = useState(false);
-    const [selectedFile, setSelectedFile] = useState<File | null>(null); // Stocke le fichier sélectionné
+    const [isGridView, setIsGridView] = useState(true);
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
     useEffect(() => {
         const fetchBook = async () => {
@@ -104,8 +105,6 @@ export default function Book() {
         }
     };
 
-    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-
     const MAX_FILES = 10;
 
     // 📦 Gère la sélection des fichiers
@@ -146,7 +145,7 @@ export default function Book() {
 
         for (const file of selectedFiles) {
             const formData = new FormData();
-            formData.append("image", file); // 👈 côté backend, on attend "image" même pour plusieurs fichiers
+            formData.append("images", file); // 👈 côté backend, on attend "image" même pour plusieurs fichiers
 
             try {
                 const response = await fetch(
@@ -204,6 +203,21 @@ export default function Book() {
                 )}
             </div>
 
+            <button
+                onClick={() => setIsGridView(!isGridView)}
+                style={{
+                    marginBottom: "10px",
+                    padding: "6px 12px",
+                    backgroundColor: "#333",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                }}
+            >
+                {isGridView ? "🔍 Affichage normal" : "🖼️ Vue grille"}
+            </button>
+
             {/* ✅ Bouton pour ouvrir la modal */}
             <button
                 onClick={() => setShowModal(true)}
@@ -236,24 +250,50 @@ export default function Book() {
             )}
 
             {/* ✅ Affichage des images */}
-            {pictures.length > 0 ? (
-                pictures.map((picture) => (
+            <div
+                className={isGridView ? "image-grid" : "image-list"}
+                style={{
+                    display: "flex",
+                    flexDirection: isGridView ? "row" : "column",
+                    flexWrap: "wrap",
+                    gap: "10px",
+                }}
+            >
+                {pictures.map((picture) => (
                     <div
                         key={picture.picture_id}
-                        className="image-grid"
+                        style={{
+                            border: "1px solid #ccc",
+                            padding: "8px",
+                            borderRadius: "6px",
+                            width: isGridView ? "calc(25% - 10px)" : "100%",
+                            boxSizing: "border-box",
+                        }}
                     >
-                        <div className="image-card">
+                        <div
+                            style={{
+                                width: "100%",
+                                aspectRatio: isGridView ? "1 / 1" : "auto", // ✅ carré en grid
+                                overflow: "hidden",
+                                borderRadius: "4px",
+                            }}
+                        >
                             <img
                                 src={`https://faittourner-production.up.railway.app${picture.path}`}
                                 alt={picture.picture_name}
-                                width={200}
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: isGridView ? "cover" : "contain",
+                                }}
                             />
                         </div>
+                        <p style={{ marginTop: "5px", textAlign: "center" }}>
+                            {picture.picture_name}
+                        </p>
                     </div>
-                ))
-            ) : (
-                <p>Aucune image dans ce book.</p>
-            )}
+                ))}
+            </div>
         </div>
     );
 }
