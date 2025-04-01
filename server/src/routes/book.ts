@@ -145,7 +145,7 @@ router.post("/books", verifyToken as any, async (req: AuthRequest, res: Response
 router.get("/image/:bookId/:filename", async (req: AuthRequest, res: Response): Promise<void> => {
   const { bookId, filename } = req.params;
   const width = parseInt(req.query.w as string);
-  const imagePath = path.resolve("server/uploads", bookId, filename);
+  const imagePath = path.resolve("/uploads", bookId, filename);
   // 🔍 Vérifie que le fichier existe
   if (!fs.existsSync(imagePath)) {
     console.error("⛔ Image introuvable :", imagePath);
