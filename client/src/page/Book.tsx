@@ -86,6 +86,14 @@ export default function Book() {
             const data = await response.json();
             if (response.ok) {
                 setMessage("✅ Invitation envoyée avec succès !");
+                // ⏳ Attente de 5 secondes avant de réinitialiser la modale
+
+                console.log("%c⧭", "color: #ffa280", "mail envoyer");
+                setTimeout(() => {
+                    setEmail(""); // Réinitialise le champ email
+                    setMessage(""); // Supprime le message
+                    setShowModal(false); // Ferme la modale
+                }, 2500);
             } else {
                 setMessage(
                     data.error || "❌ Erreur lors de l'envoi de l'invitation."
@@ -96,57 +104,83 @@ export default function Book() {
         }
     };
 
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
+    const MAX_FILES = 10;
+
+    // 📦 Gère la sélection des fichiers
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files && event.target.files.length > 0) {
-            setSelectedFile(event.target.files[0]);
+        if (event.target.files) {
+            const filesArray = Array.from(event.target.files);
+
+            if (filesArray.length > MAX_FILES) {
+                alert(
+                    `❌ Vous ne pouvez sélectionner que ${MAX_FILES} images maximum.`
+                );
+                return;
+            }
+
+            setSelectedFiles(filesArray);
         }
     };
 
+    // 🚀 Gère l'upload de toutes les images
     const handleUpload = async () => {
-        if (!selectedFile) {
-            alert("Veuillez sélectionner une image.");
+        if (selectedFiles.length === 0) {
+            alert("Veuillez sélectionner au moins une image.");
             return;
         }
 
         const token = localStorage.getItem("token");
         if (!token) {
-            alert("Vous devez être connecté pour envoyer une image.");
+            alert("Vous devez être connecté pour envoyer des images.");
             return;
         }
 
-        const formData = new FormData();
-        formData.append("image", selectedFile);
-        try {
-            const response = await fetch(
-                `https://faittourner-production.up.railway.app/api/upload/${id}`,
-                {
-                    method: "POST",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: formData,
-                }
-            );
+        const uploadedPictures: {
+            picture_id: any;
+            picture_name: string;
+            path: any;
+            tags: null;
+        }[] = [];
 
-            const data = await response.json();
-            if (response.ok) {
-                alert("✅ Image envoyée avec succès !");
-                setPictures([
-                    ...pictures,
+        for (const file of selectedFiles) {
+            const formData = new FormData();
+            formData.append("image", file); // 👈 côté backend, on attend "image" même pour plusieurs fichiers
+
+            try {
+                const response = await fetch(
+                    `https://faittourner-production.up.railway.app/api/upload/${id}`,
                     {
-                        picture_id: data.picture_id || Date.now(), // Assign a unique ID if not provided
-                        picture_name: selectedFile.name,
+                        method: "POST",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                        body: formData,
+                    }
+                );
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    uploadedPictures.push({
+                        picture_id: data.picture_id || Date.now(),
+                        picture_name: file.name,
                         path: data.path,
-                        tags: null, // Default value for tags
-                    },
-                ]); // Mise à jour des images affichées
-            } else {
-                alert(`❌ Erreur : ${data.error}`);
+                        tags: null,
+                    });
+                } else {
+                    alert(`❌ Erreur pour ${file.name} : ${data.error}`);
+                }
+            } catch (error) {
+                console.error(`❌ Erreur serveur pour ${file.name}`, error);
+                alert(`Erreur serveur pour le fichier ${file.name}`);
             }
-        } catch (error) {
-            console.error("❌ Erreur lors de l'upload :", error);
-            alert("Erreur serveur.");
         }
+
+        // 🖼️ Met à jour la liste des images visibles
+        setPictures((prev) => [...prev, ...uploadedPictures]);
+        setSelectedFiles([]); // 🔄 Reset la sélection après upload
     };
 
     if (!book) return <h1>Chargement...</h1>;
@@ -159,9 +193,15 @@ export default function Book() {
                 <input
                     type="file"
                     accept="image/*"
+                    multiple
                     onChange={handleFileChange}
                 />
-                <button onClick={handleUpload}>Envoyer l'image</button>
+                <button onClick={handleUpload}>Envoyer les images</button>
+
+                {/* Affichage UX */}
+                {selectedFiles.length > 0 && (
+                    <p>{selectedFiles.length} fichier(s) sélectionné(s)</p>
+                )}
             </div>
 
             {/* ✅ Bouton pour ouvrir la modal */}
