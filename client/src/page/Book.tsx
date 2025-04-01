@@ -11,13 +11,16 @@ interface Picture {
     picture_name: string;
     path: string;
     tags: string | null;
-    resized_url: string; // ✅ ici
 }
 
 type PictureWithResizedUrl = Picture & { resized_url: string };
 
+// 🔧 Fonction utilitaire pour générer l'URL redimensionnée
+const getResizedImageUrl = (bookId: string, fileName: string) =>
+    `https://faittourner-production.up.railway.app/api/image/${bookId}/${fileName}`;
+
 export default function Book() {
-    const { id } = useParams<{ id: string }>();
+    const { id: bookId } = useParams<{ id: string }>();
     const [book, setBook] = useState<Book | null>(null);
     const [pictures, setPictures] = useState<PictureWithResizedUrl[]>([]);
     const [email, setEmail] = useState("");
@@ -26,19 +29,16 @@ export default function Book() {
     const [isGridView, setIsGridView] = useState(true);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
+    // 📥 Chargement du book et des images
     useEffect(() => {
         const fetchBook = async () => {
             const token = localStorage.getItem("token");
-            if (!token) {
-                console.error("❌ Aucun token trouvé, accès refusé.");
-                return;
-            }
+            if (!token || !bookId) return;
 
             try {
                 const response = await fetch(
-                    `https://faittourner-production.up.railway.app/api/book/${id}`,
+                    `https://faittourner-production.up.railway.app/api/book/${bookId}`,
                     {
-                        method: "GET",
                         headers: {
                             "Content-Type": "application/json",
                             Authorization: `Bearer ${token}`,
@@ -46,14 +46,19 @@ export default function Book() {
                     }
                 );
 
-                if (!response.ok) {
-                    throw new Error(`Erreur HTTP ${response.status}`);
-                }
-
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const data = await response.json();
 
                 setBook(data.book);
-                setPictures(data.pictures || []);
+                setPictures(
+                    (data.pictures || []).map((pic: Picture) => ({
+                        ...pic,
+                        resized_url: getResizedImageUrl(
+                            bookId,
+                            pic.picture_name
+                        ),
+                    }))
+                );
             } catch (error) {
                 console.error(
                     "❌ Erreur lors de la récupération du book :",
@@ -62,10 +67,10 @@ export default function Book() {
             }
         };
 
-        if (id) fetchBook();
-    }, [id]);
+        fetchBook();
+    }, [bookId]);
 
-    // ✅ Gère l'envoi d'invitation
+    // 📤 Envoi d'invitation par email
     const handleShare = async () => {
         if (!email || !book?.id) {
             setMessage("Email ou ID du book manquant.");
@@ -74,7 +79,6 @@ export default function Book() {
 
         try {
             const token = localStorage.getItem("token");
-
             const response = await fetch(
                 `https://faittourner-production.up.railway.app/api/invite`,
                 {
@@ -83,111 +87,90 @@ export default function Book() {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${token}`,
                     },
-                    body: JSON.stringify({ email, bookId: book?.id }),
+                    body: JSON.stringify({ email, bookId: book.id }),
                 }
             );
 
             const data = await response.json();
-            if (response.ok) {
-                setMessage("✅ Invitation envoyée avec succès !");
-                // ⏳ Attente de 5 secondes avant de réinitialiser la modale
+            setMessage(
+                response.ok
+                    ? "✅ Invitation envoyée avec succès !"
+                    : data.error || "❌ Erreur lors de l'envoi de l'invitation."
+            );
 
-                console.log("%c⧭", "color: #ffa280", "mail envoyer");
+            if (response.ok) {
                 setTimeout(() => {
-                    setEmail(""); // Réinitialise le champ email
-                    setMessage(""); // Supprime le message
-                    setShowModal(false); // Ferme la modale
+                    setEmail("");
+                    setMessage("");
+                    setShowModal(false);
                 }, 2500);
-            } else {
-                setMessage(
-                    data.error || "❌ Erreur lors de l'envoi de l'invitation."
-                );
             }
-        } catch (error) {
+        } catch {
             setMessage("❌ Erreur serveur.");
         }
     };
 
-    const MAX_FILES = 10;
-
-    // 📦 Gère la sélection des fichiers
+    // 📦 Gestion sélection fichiers
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files) {
-            const filesArray = Array.from(event.target.files);
+        const files = event.target.files;
+        if (!files) return;
 
-            if (filesArray.length > MAX_FILES) {
-                alert(
-                    `❌ Vous ne pouvez sélectionner que ${MAX_FILES} images maximum.`
-                );
-                return;
-            }
-
-            setSelectedFiles(filesArray);
-        }
-    };
-
-    // 🚀 Gère l'upload de toutes les images
-    const handleUpload = async () => {
-        if (selectedFiles.length === 0) {
-            alert("Veuillez sélectionner au moins une image.");
+        const filesArray = Array.from(files);
+        if (filesArray.length > 10) {
+            alert("❌ Vous ne pouvez sélectionner que 10 images maximum.");
             return;
         }
+
+        setSelectedFiles(filesArray);
+    };
+
+    // 🚀 Upload des images
+    const handleUpload = async () => {
+        if (!book?.id || selectedFiles.length === 0) return;
 
         const token = localStorage.getItem("token");
         if (!token) {
-            alert("Vous devez être connecté pour envoyer des images.");
+            alert("Vous devez être connecté.");
             return;
         }
 
-        const uploadedPictures: {
-            picture_id: any;
-            picture_name: string;
-            path: any;
-            tags: null;
-            resized_url: string;
-        }[] = [];
+        const uploadedPictures: PictureWithResizedUrl[] = [];
 
         for (const file of selectedFiles) {
             const formData = new FormData();
-            formData.append("images", file); // 👈 côté backend, on attend "image" même pour plusieurs fichiers
+            formData.append("images", file);
 
             try {
-                const response = await fetch(
-                    `https://faittourner-production.up.railway.app/api/upload/${id}`,
+                const res = await fetch(
+                    `https://faittourner-production.up.railway.app/api/upload/${book.id}`,
                     {
                         method: "POST",
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
+                        headers: { Authorization: `Bearer ${token}` },
                         body: formData,
                     }
                 );
 
-                const data = await response.json();
+                const data = await res.json();
 
-                if (response.ok) {
+                if (res.ok) {
                     uploadedPictures.push({
                         picture_id: data.picture_id || Date.now(),
                         picture_name: file.name,
                         path: data.path,
                         tags: null,
-                        resized_url: `https://faittourner-production.up.railway.app/api/image/${id}/${file.name}`,
+                        resized_url: getResizedImageUrl(book.id, file.name),
                     });
                 } else {
                     alert(`❌ Erreur pour ${file.name} : ${data.error}`);
                 }
-            } catch (error) {
-                console.error(`❌ Erreur serveur pour ${file.name}`, error);
-                alert(`Erreur serveur pour le fichier ${file.name}`);
+            } catch (err) {
+                console.error("❌ Upload error :", err);
             }
         }
 
-        // 🖼️ Met à jour la liste des images visibles
         setPictures((prev) => [...prev, ...uploadedPictures]);
-        setSelectedFiles([]); // 🔄 Reset la sélection après upload
+        setSelectedFiles([]);
     };
-
-    if (!book) return <h1>Chargement...</h1>;
 
     const getImageSize = () => {
         const width = window.innerWidth;
@@ -195,6 +178,8 @@ export default function Book() {
         if (width < 1024) return 600;
         return 1000;
     };
+
+    if (!book) return <h1>Chargement...</h1>;
 
     return (
         <div className="book-container">
@@ -208,8 +193,6 @@ export default function Book() {
                     onChange={handleFileChange}
                 />
                 <button onClick={handleUpload}>Envoyer les images</button>
-
-                {/* Affichage UX */}
                 {selectedFiles.length > 0 && (
                     <p>{selectedFiles.length} fichier(s) sélectionné(s)</p>
                 )}
@@ -230,7 +213,6 @@ export default function Book() {
                 {isGridView ? "🔍 Affichage normal" : "🖼️ Vue grille"}
             </button>
 
-            {/* ✅ Bouton pour ouvrir la modal */}
             <button
                 onClick={() => setShowModal(true)}
                 style={{
@@ -245,7 +227,6 @@ export default function Book() {
                 Partager le book
             </button>
 
-            {/* ✅ Modal d'invitation */}
             {showModal && (
                 <div className="modal">
                     <h3>Inviter un utilisateur</h3>
@@ -261,7 +242,6 @@ export default function Book() {
                 </div>
             )}
 
-            {/* ✅ Affichage des images */}
             <div
                 className={isGridView ? "image-grid" : "image-list"}
                 style={{
@@ -285,7 +265,7 @@ export default function Book() {
                         <div
                             style={{
                                 width: "100%",
-                                aspectRatio: isGridView ? "1 / 1" : "auto", // ✅ carré en grid
+                                aspectRatio: isGridView ? "1 / 1" : "auto",
                                 overflow: "hidden",
                                 borderRadius: "4px",
                             }}

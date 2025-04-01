@@ -2,6 +2,9 @@ import express, { Request, Response, NextFunction } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { getConnection } from "../dbconfig"; // Vérifie que le chemin est bon
 import { verifyToken } from "../middleware/authMiddleware";
+import path from "path";
+import fs from "fs";
+import sharp from "sharp";
 
 const router = express.Router();
 
@@ -138,6 +141,36 @@ router.post("/books", verifyToken as any, async (req: AuthRequest, res: Response
     res.status(500).json({ error: "Erreur serveur" });
   }
 });
+
+router.get("/image/:bookId/:filename", async (req: AuthRequest, res: Response): Promise<void> => {
+  const { bookId, filename } = req.params;
+  const width = parseInt(req.query.w as string);
+  const imagePath = path.join(__dirname, "..", "uploads", bookId, filename);
+
+  // 🔍 Vérifie que le fichier existe
+  if (!fs.existsSync(imagePath)) {
+    console.error("⛔ Image introuvable :", imagePath);
+    res.status(404).send("Image not found");
+    return
+  }
+
+  try {
+    if (width) {
+      // 📐 Redimensionner à la volée avec Sharp
+      const resizedStream = sharp(imagePath).resize({ width });
+      res.type(`image/${path.extname(filename).slice(1)}`);
+      resizedStream.pipe(res);
+      return
+    } else {
+      // 📦 Retourner l'image telle quelle
+      return res.sendFile(imagePath);
+    }
+  } catch (error) {
+    console.error("❌ Erreur Sharp :", error);
+    res.status(500).send("Erreur serveur");
+  }
+});
+
 
 export default router;
 // Assurez-vous d'avoir installé uuid : npm install uuid

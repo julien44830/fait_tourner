@@ -5,6 +5,10 @@
     },
     "devDependencies": {
         "@types/node": "^22.13.10",
+        "@types/sharp": "^0.31.1",
         "concurrently": "^9.1.2"
+    },
+    "dependencies": {
+        "sharp": "^0.33.5"
     }
 }
