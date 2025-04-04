@@ -79,5 +79,6 @@ Le backend et la base de données MySQL sont déployés sur Railway. Après conf
     -   Suppression d'un book par son auteur.
 -   **Interactions :**
     -   Possibilité de commenter et de liker les images partagées.
+    -   Possibilité de télécharger les photos
 -   **Fil d'actualité :**
     -   Sur la page principale, visualisation des dernières photos partagées dans les books auxquels nous sommes associés.

@@ -1,11 +1,20 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Footer() {
     const navigate = useNavigate();
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    useEffect(() => {
+        // Vérifie si un token est présent dans le localStorage
+        const token = localStorage.getItem("token");
+        setIsAuthenticated(!!token); // Convertit en booléen
+    }, []);
+
     const handleLogout = () => {
         // Supprime le token d'authentification
-        localStorage.removeItem("token"); // Ou sessionStorage.removeItem("token")
-        localStorage.removeItem("name"); // Ou sessionStorage.removeItem("name")
+        localStorage.removeItem("token");
+        localStorage.removeItem("name");
         // Redirige vers la page de connexion
         navigate("/connexion");
     };
@@ -32,8 +41,14 @@ export default function Footer() {
     return (
         <footer>
             <p>© 2025 - Mon Application</p>
-            <button onClick={handleLogout}>Déconnexion</button>
-            <button onClick={handleDeleteRequest}>supprimé votre compte</button>
+            {isAuthenticated && (
+                <>
+                    <button onClick={handleLogout}>Déconnexion</button>
+                    <button onClick={handleDeleteRequest}>
+                        Supprimer votre compte
+                    </button>
+                </>
+            )}
         </footer>
     );
 }

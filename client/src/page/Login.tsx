@@ -1,20 +1,21 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { NavLink } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
 import GoogleConnexion from "../component/GoogleConnexion";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const navigate = useNavigate(); // Redirection après connexion
+
+    const navigate = useNavigate();
+    const { login } = useAuth();
 
     const handleLogin = async (e: React.FormEvent) => {
-        // ✅ Correction de la typo
         e.preventDefault();
 
         try {
             const response = await fetch(
-                `https://faittourner-production.up.railway.app/api/login`,
+                "https://faittourner-production.up.railway.app/api/login",
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -22,15 +23,14 @@ export default function Login() {
                 }
             );
 
-            if (!response.ok) {
-                throw new Error("Échec de la connexion");
-            }
+            if (!response.ok) throw new Error("Échec de la connexion");
 
             const data = await response.json();
-            localStorage.setItem("token", data.token);
+
+            login(data.token);
             localStorage.setItem("name", data.name);
 
-            setTimeout(() => navigate("/accueil"), 3000);
+            navigate("/accueil");
         } catch (error) {
             console.error("❌ Erreur de connexion :", error);
         }
@@ -42,7 +42,6 @@ export default function Login() {
                 className="form-group-connexion"
                 onSubmit={handleLogin}
             >
-                {" "}
                 <h2>Connexion</h2>
                 <label htmlFor="email">
                     <fieldset>
@@ -50,7 +49,6 @@ export default function Login() {
                         <input
                             type="email"
                             id="email"
-                            name="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
@@ -63,7 +61,6 @@ export default function Login() {
                         <input
                             type="password"
                             id="password"
-                            name="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
