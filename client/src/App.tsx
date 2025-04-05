@@ -17,77 +17,79 @@ export default function App() {
     }, [token]);
     if (!isReady) return <div>Chargement...</div>; // ou un loader
     return (
-        <div>
-            <Routes>
-                <Route
-                    path="/"
-                    element={
-                        isAuthenticated ? (
+        <div className="app-container">
+            <main className="main-content">
+                <Routes>
+                    <Route
+                        path="/"
+                        element={
+                            isAuthenticated ? (
+                                <Navigate
+                                    to="/accueil"
+                                    replace
+                                />
+                            ) : (
+                                <Navigate
+                                    to="/connexion"
+                                    replace
+                                />
+                            )
+                        }
+                    />
+                    <Route
+                        path="/accueil"
+                        element={
+                            isAuthenticated ? (
+                                <Home />
+                            ) : (
+                                <Navigate
+                                    to="/connexion"
+                                    replace
+                                />
+                            )
+                        }
+                    />
+                    <Route
+                        path="/connexion"
+                        element={
+                            isAuthenticated ? (
+                                <Navigate
+                                    to="/accueil"
+                                    replace
+                                />
+                            ) : (
+                                <Login />
+                            )
+                        }
+                    />
+                    <Route
+                        path="/inscription"
+                        element={<Registration />}
+                    />
+                    <Route
+                        path="/book/:id"
+                        element={
+                            isAuthenticated ? (
+                                <Book />
+                            ) : (
+                                <Navigate
+                                    to="/connexion"
+                                    replace
+                                />
+                            )
+                        }
+                    />
+                    <Route
+                        path="*"
+                        element={
                             <Navigate
-                                to="/accueil"
+                                to={isAuthenticated ? "/accueil" : "/connexion"}
                                 replace
                             />
-                        ) : (
-                            <Navigate
-                                to="/connexion"
-                                replace
-                            />
-                        )
-                    }
-                />
-                <Route
-                    path="/accueil"
-                    element={
-                        isAuthenticated ? (
-                            <Home />
-                        ) : (
-                            <Navigate
-                                to="/connexion"
-                                replace
-                            />
-                        )
-                    }
-                />
-                <Route
-                    path="/connexion"
-                    element={
-                        isAuthenticated ? (
-                            <Navigate
-                                to="/accueil"
-                                replace
-                            />
-                        ) : (
-                            <Login />
-                        )
-                    }
-                />
-                <Route
-                    path="/inscription"
-                    element={<Registration />}
-                />
-                <Route
-                    path="/book/:id"
-                    element={
-                        isAuthenticated ? (
-                            <Book />
-                        ) : (
-                            <Navigate
-                                to="/connexion"
-                                replace
-                            />
-                        )
-                    }
-                />
-                <Route
-                    path="*"
-                    element={
-                        <Navigate
-                            to={isAuthenticated ? "/accueil" : "/connexion"}
-                            replace
-                        />
-                    }
-                />
-            </Routes>
+                        }
+                    />
+                </Routes>
+            </main>
             <Footer />
         </div>
     );

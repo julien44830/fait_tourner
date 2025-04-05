@@ -16,8 +16,10 @@
 
     position: relative;
     width: 100%;
-    max-width: 400px; /* ← largeur un peu plus grande */
+    max-width: 320px; /* ← largeur un peu plus grande */
     background-color: white;
+
+    margin: 0 auto;
 }
 
 .form-group-connexion legend {
@@ -35,7 +37,7 @@
     border: none;
     height: 15px; /* Hauteur plus fine et raisonnable */
     font-size: 0.9rem;
-    padding: 0px 5px;
+    padding: 4px 6px;
     width: 100%;
     box-sizing: border-box;
 }
@@ -105,4 +107,44 @@
         height: 20px;
         width: 20px;
     }
+}
+
+/* Conteneur du champ de mot de passe */
+.password-input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.password-input {
+    width: 100%;
+    padding-right: 36px; /* espace pour l’œil */
+    height: 28px;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+}
+
+/* Icone œil */
+.toggle-password-icon {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 20px;
+    width: 20px;
+    cursor: pointer;
+}
+
+/* Message d'erreur sous un input */
+.password-error {
+    color: red;
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+    margin-bottom: -0.3rem;
+    width: 100%;
+    max-width: 320px;
+    padding: 0 8px;
+
+    word-wrap: break-word;
+    word-break: break-word;
+    line-height: 1.2;
 }

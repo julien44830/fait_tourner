@@ -2,6 +2,7 @@
 @import "./style/book.css";
 @import "./style/home.css";
 @import "./style/footer.css";
+@import "./style/alert.css";
 
 * {
     margin: 0;

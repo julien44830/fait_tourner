@@ -6,7 +6,6 @@ interface PasswordInputProps {
     value: string;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     required?: boolean;
-    error?: string;
 }
 
 export default function PasswordInput({
@@ -15,7 +14,6 @@ export default function PasswordInput({
     value,
     onChange,
     required = true,
-    error,
 }: PasswordInputProps) {
     const [showPassword, setShowPassword] = useState(false);
 
@@ -23,7 +21,7 @@ export default function PasswordInput({
         <label htmlFor={name}>
             <fieldset>
                 <legend>{label}</legend>
-                <div style={{ position: "relative" }}>
+                <div className="password-input-wrapper">
                     <input
                         type={showPassword ? "text" : "password"}
                         id={name}
@@ -31,7 +29,7 @@ export default function PasswordInput({
                         value={value}
                         onChange={onChange}
                         required={required}
-                        style={{ paddingRight: "36px", width: "100%" }}
+                        className="password-input"
                     />
                     <img
                         src={
@@ -45,22 +43,10 @@ export default function PasswordInput({
                                 : "Afficher le mot de passe"
                         }
                         onClick={() => setShowPassword(!showPassword)}
-                        style={{
-                            position: "absolute",
-                            right: "8px",
-                            top: "50%",
-                            transform: "translateY(-50%)",
-                            height: "20px",
-                            width: "20px",
-                            cursor: "pointer",
-                            userSelect: "none",
-                        }}
+                        className="toggle-password-icon"
                     />
                 </div>
             </fieldset>
-            {error && (
-                <p style={{ color: "red", marginTop: "0.25rem" }}>{error}</p>
-            )}
         </label>
     );
 }

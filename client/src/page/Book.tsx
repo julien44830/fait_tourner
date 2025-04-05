@@ -288,9 +288,6 @@ export default function Book() {
                                 }}
                             />
                         </div>
-                        <p style={{ marginTop: "5px", textAlign: "center" }}>
-                            {picture.picture_name}
-                        </p>
                     </div>
                 ))}
             </div>
