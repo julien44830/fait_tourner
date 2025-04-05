@@ -38,5 +38,17 @@ export default function GoogleConnexion() {
         },
     });
 
-    return <button onClick={() => login()}>Connexion avec Google</button>;
+    return (
+        <button
+            onClick={() => login()}
+            className="connexion-google"
+        >
+            <img
+                src="/images/google.png"
+                alt="Google"
+                className="google-logo"
+            />
+            Connexion avec Google
+        </button>
+    );
 }

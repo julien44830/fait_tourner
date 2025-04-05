@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import GoogleConnexion from "../component/GoogleConnexion";
 import { useAuth } from "../context/AuthContext";
+import PasswordInput from "../component/PasswordInput";
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -42,6 +43,11 @@ export default function Login() {
                 className="form-group-connexion"
                 onSubmit={handleLogin}
             >
+                <img
+                    className="logo-connexion"
+                    src="/images/logo.png"
+                    alt=""
+                />
                 <h2>Connexion</h2>
                 <label htmlFor="email">
                     <fieldset>
@@ -55,25 +61,22 @@ export default function Login() {
                         />
                     </fieldset>
                 </label>
-                <label htmlFor="password">
-                    <fieldset>
-                        <legend>Mot de passe</legend>
-                        <input
-                            type="password"
-                            id="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                    </fieldset>
-                </label>
+                <PasswordInput
+                    label="Mot de passe"
+                    name="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />{" "}
                 <button className="form-btn-connexion">Connexion</button>
                 <p>
                     Pas encore inscrit ?{" "}
                     <NavLink to="/inscription">Créer un compte</NavLink>
                 </p>
             </form>
-            <GoogleConnexion />
+            <section className="connexion-google-wrapper">
+                <p className="ou-texte">ou</p>
+                <GoogleConnexion />
+            </section>{" "}
         </>
     );
 }

@@ -40,7 +40,7 @@ export default function Footer() {
 
     return (
         <footer>
-            <p>© 2025 - Mon Application</p>
+            <p>© 2025 PictEvent</p>
             {isAuthenticated && (
                 <>
                     <button onClick={handleLogout}>Déconnexion</button>

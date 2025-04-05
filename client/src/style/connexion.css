@@ -2,36 +2,107 @@
     padding: 10px;
     display: flex;
     flex-direction: column;
-    max-width: 95wh;
-
+    max-width: 95vw;
     align-items: center;
     gap: 1rem;
+}
 
-    label {
-        font-size: 1.2em;
-        font-weight: bold;
-        width: 90%;
+.form-group-connexion fieldset {
+    border: 1px solid #ccc;
+    border-radius: 10px;
 
-        legend {
-            padding: 10px;
-            margin-left: 1rem;
-            font-weight: bold;
-        }
+    /* RÉDUCTION de la hauteur */
+    padding: 0.8rem 1rem 0.6rem; /* ← moins de padding vertical */
 
-        input {
-            border: none;
-            height: 50px;
-            font-size: 1rem;
-            margin: 0 10px 10px 10px;
-            padding: 5px;
-            width: 95%;
-        }
-        input:focus {
-            outline: none;
-        }
-    }
-    button {
-        padding: 10px;
-        font-size: 2rem;
+    position: relative;
+    width: 100%;
+    max-width: 400px; /* ← largeur un peu plus grande */
+    background-color: white;
+}
+
+.form-group-connexion legend {
+    font-weight: 600; /* un peu moins gras */
+    font-size: 0.85rem; /* texte plus petit */
+    padding: 0 6px;
+    background-color: white;
+    position: absolute;
+    top: -0.7rem; /* ajusté si le texte est plus petit */
+    left: 1rem;
+    line-height: 1; /* éviter qu'il prenne trop de hauteur */
+}
+
+.form-group-connexion input {
+    border: none;
+    height: 15px; /* Hauteur plus fine et raisonnable */
+    font-size: 0.9rem;
+    padding: 0px 5px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-group-connexion input:focus {
+    outline: none;
+}
+
+.form-group-connexion button {
+    padding: 10px 20px;
+    font-size: 2rem;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Logo en haut */
+.logo-connexion {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    text-decoration: none;
+    border-radius: 5px;
+    background-color: #ffffff;
+    padding: 10px 20px;
+    width: 150px;
+}
+
+/* Wrapper autour de "ou" et du bouton Google */
+.connexion-google-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+/* Texte "ou" */
+.ou-texte {
+    font-size: 1rem;
+    color: #333;
+    margin: 0;
+}
+
+/* Bouton Connexion avec Google */
+.connexion-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 10px 20px;
+    width: 300px;
+    font-size: 1rem;
+    font-weight: bold;
+    background-color: #ffffff;
+    color: #000000;
+    cursor: pointer;
+    text-decoration: none;
+
+    .google-logo {
+        height: 20px;
+        width: 20px;
     }
 }
