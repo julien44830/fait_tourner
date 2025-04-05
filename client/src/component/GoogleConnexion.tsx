@@ -22,7 +22,13 @@ export default function GoogleConnexion() {
 
                 localStorage.setItem("token", res.data.token);
                 localStorage.setItem("name", res.data.user.name);
-                setTimeout(() => navigate("/accueil"), 1000);
+                console.log("%c⧭", "color: #8c0038", localStorage);
+                navigate("/accueil");
+                console.log(
+                    "log afficher après la redirection  : ",
+                    res.data.token,
+                    navigate
+                );
             } catch (err) {
                 console.error("❌ Erreur de login Google :", err);
             }
@@ -32,5 +38,17 @@ export default function GoogleConnexion() {
         },
     });
 
-    return <button onClick={() => login()}>Connexion avec Google</button>;
+    return (
+        <button
+            onClick={() => login()}
+            className="connexion-google"
+        >
+            <img
+                src="/images/google.png"
+                alt="Google"
+                className="google-logo"
+            />
+            Connexion avec Google
+        </button>
+    );
 }

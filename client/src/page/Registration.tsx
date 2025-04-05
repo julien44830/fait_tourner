@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation, NavLink } from "react-router-dom";
 import { jwtDecode } from "jwt-decode"; // Assure-toi d'installer jwt-decode via `npm install jwt-decode`
 import GoogleConnexion from "../component/GoogleConnexion";
+import PasswordInput from "../component/PasswordInput"; // Assure-toi d'avoir ce composant pour le mot de passe
 
 export default function Registration() {
     const [formData, setFormData] = useState({
@@ -103,6 +104,12 @@ export default function Registration() {
                 className="form-group-connexion"
                 onSubmit={handleSubmit}
             >
+                <img
+                    className="logo-connexion"
+                    src="/images/logo.png"
+                    alt=""
+                />
+
                 <h2>Inscription</h2>
 
                 {error && <p style={{ color: "red" }}>{error}</p>}
@@ -150,36 +157,20 @@ export default function Registration() {
                     </fieldset>
                 </label>
 
-                <label htmlFor="password">
-                    <fieldset>
-                        <legend>Mot de passe</legend>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
-                        />
-                    </fieldset>
-                    {passwordError && (
-                        <p style={{ color: "red" }}>{passwordError}</p>
-                    )}
-                </label>
+                <PasswordInput
+                    label="Mot de passe"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    error={passwordError ?? undefined}
+                />
 
-                <label htmlFor="confirmPassword">
-                    <fieldset>
-                        <legend>Confirmation du mot de passe</legend>
-                        <input
-                            type="password"
-                            id="confirmPassword"
-                            name="confirmPassword"
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            required
-                        />
-                    </fieldset>
-                </label>
+                <PasswordInput
+                    label="Confirmation du mot de passe"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                />
 
                 <button
                     className="form-btn-connexion"
@@ -192,7 +183,10 @@ export default function Registration() {
                     <NavLink to="/connexion">Connecte toi</NavLink>
                 </p>
             </form>
-            <GoogleConnexion />
+            <section className="connexion-google-wrapper">
+                <p className="ou-texte">ou</p>
+                <GoogleConnexion />
+            </section>{" "}
         </>
     );
 }
