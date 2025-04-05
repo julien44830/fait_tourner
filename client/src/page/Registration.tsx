@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation, NavLink } from "react-router-dom";
-import { jwtDecode } from "jwt-decode"; // Assure-toi d'installer jwt-decode via `npm install jwt-decode`
+import { jwtDecode } from "jwt-decode";
 import GoogleConnexion from "../component/GoogleConnexion";
-import PasswordInput from "../component/PasswordInput"; // Assure-toi d'avoir ce composant pour le mot de passe
+import PasswordInput from "../component/PasswordInput";
+import Alert from "../component/Alert";
 
 export default function Registration() {
     const [formData, setFormData] = useState({
@@ -100,6 +101,13 @@ export default function Registration() {
 
     return (
         <>
+            {passwordError && (
+                <Alert
+                    type="error"
+                    message={passwordError}
+                    onClose={() => setPasswordError(null)}
+                />
+            )}
             <form
                 className="form-group-connexion"
                 onSubmit={handleSubmit}
