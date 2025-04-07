@@ -8,6 +8,7 @@ interface Book {
 
 export default function Home() {
     const [books, setBooks] = useState<Book[]>([]);
+    const [isLoading, setIsLoading] = useState(true); // ✅ nouvel état
     const [name, setName] = useState<string>("");
     const [showModal, setShowModal] = useState(false);
     const [newBookName, setNewBookName] = useState("");
@@ -19,6 +20,7 @@ export default function Home() {
             if (storedName) setName(storedName);
             if (!token) {
                 console.error("❌ Aucun token trouvé, accès refusé.");
+                setIsLoading(false); // ✅ stoppe quand même le chargement
                 return;
             }
 
@@ -40,11 +42,14 @@ export default function Home() {
 
                 const data = await response.json();
                 setBooks(data);
+                console.log("✅ Books récupérés :", data);
             } catch (error) {
                 console.error(
                     "❌ Erreur lors de la récupération des books :",
                     error
                 );
+            } finally {
+                setIsLoading(false); // ✅ on arrête le loader quoi qu'il arrive
             }
         };
 
@@ -96,7 +101,6 @@ export default function Home() {
         <div className="home-container">
             <h2>Bonjour, {name}</h2>
 
-            {/* ✅ Bouton pour ouvrir la modale */}
             <button
                 className="create-book-btn"
                 onClick={() => setShowModal(true)}
@@ -105,8 +109,18 @@ export default function Home() {
             </button>
 
             <h3>📚 Mes Books :</h3>
+
             <div className="books-list">
-                {books.length > 0 ? (
+                {isLoading ? (
+                    <p className="loader">
+                        Chargement de vos books
+                        <span className="dot-animation">
+                            <span>.</span>
+                            <span>.</span>
+                            <span>.</span>
+                        </span>
+                    </p>
+                ) : books.length > 0 ? (
                     books.map((b) => (
                         <NavLink
                             key={b.id}
