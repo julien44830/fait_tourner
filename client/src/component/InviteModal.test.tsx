@@ -36,7 +36,7 @@ describe("InviteModal", () => {
 
         // Simulation de saisie && clic
         fireEvent.change(emailInput, { target: { value: fakeEmail } });
-        console.log("📧 Email saisi :", emailInput.getAttribute("value"));
+        console.info("📧 Email saisi :", emailInput.getAttribute("value"));
 
         fireEvent.click(submitButton);
 
@@ -46,7 +46,7 @@ describe("InviteModal", () => {
                 screen.getByText(/invitation envoyée avec succès/i)
             ).toBeInTheDocument()
         );
-        console.log("✅ Message de confirmation affiché");
+        console.info("✅ Message de confirmation affiché");
 
         // Vérification que fetch a bien été appelé
         expect(fetch).toHaveBeenCalled();
@@ -65,9 +65,9 @@ describe("InviteModal", () => {
         const body = JSON.parse(options.body);
         const token = options.headers.Authorization;
 
-        console.log("🔗 URL appelée :", url);
-        console.log("📦 Données envoyées à l'API :", body);
-        console.log("🪪 Token envoyé :", token);
+        console.info("🔗 URL appelée :", url);
+        console.info("📦 Données envoyées à l'API :", body);
+        console.info("🪪 Token envoyé :", token);
 
         // ✅ Vérifications finales
         expect(url).toBe(
@@ -79,7 +79,7 @@ describe("InviteModal", () => {
     });
 
     it("affiche un message d'erreur si l'API échoue", async () => {
-        console.log("test en cas d'erreur");
+        console.info("test en cas d'erreur");
         const bookId = 42;
         const fakeEmail = "erreur@test.com";
 
@@ -103,10 +103,10 @@ describe("InviteModal", () => {
 
         // 🖱️ Simulation de la saisie + clic
         fireEvent.change(emailInput, { target: { value: fakeEmail } });
-        console.log("📧 Email saisi :", emailInput.getAttribute("value"));
+        console.info("📧 Email saisi :", emailInput.getAttribute("value"));
 
         fireEvent.click(submitButton);
-        console.log("🚀 Requête envoyée au clic du bouton");
+        console.info("🚀 Requête envoyée au clic du bouton");
 
         // ✅ Vérifie que le message d'erreur s'affiche
         await waitFor(() =>
@@ -114,7 +114,7 @@ describe("InviteModal", () => {
                 screen.getByText(/erreur personnalisée depuis l'api/i)
             ).toBeInTheDocument()
         );
-        console.log("❌ Message d'erreur affiché avec succès");
+        console.info("❌ Message d'erreur affiché avec succès");
 
         // ✅ Vérifie que fetch a été appelé avec les bons paramètres
         expect(fetch).toHaveBeenCalled();
@@ -131,8 +131,8 @@ describe("InviteModal", () => {
         const body = JSON.parse(options.body);
         const token = options.headers.Authorization;
 
-        console.log("🔗 URL appelée :", url);
-        console.log("📦 Données envoyées à l'API :", body);
-        console.log("🪪 Token envoyé :", token);
+        console.info("🔗 URL appelée :", url);
+        console.info("📦 Données envoyées à l'API :", body);
+        console.info("🪪 Token envoyé :", token);
     });
 });
