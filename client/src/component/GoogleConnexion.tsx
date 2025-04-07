@@ -1,14 +1,17 @@
 import { useGoogleLogin } from "@react-oauth/google";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "../context/AuthContext"; // ✅ Utilise le contexte
 
 export default function GoogleConnexion() {
     const navigate = useNavigate();
     const location = useLocation();
     const params = new URLSearchParams(location.search);
-    const invitationToken = params.get("token"); // 🔥 Récupère le token d'invitation s'il existe
+    const invitationToken = params.get("token");
 
-    const login = useGoogleLogin({
+    const { login } = useAuth(); // ✅ Appel au contexte
+
+    const googleLogin = useGoogleLogin({
         flow: "implicit",
         onSuccess: async (tokenResponse) => {
             try {
@@ -16,19 +19,21 @@ export default function GoogleConnexion() {
                     "https://faittourner-production.up.railway.app/api/auth/google/token",
                     {
                         access_token: tokenResponse.access_token,
-                        token: invitationToken, // 🔥 Envoie aussi le token d'invitation
+                        token: invitationToken,
                     }
                 );
 
-                localStorage.setItem("token", res.data.token);
+                // ✅ Appelle login() pour mettre à jour le contexte (pas seulement localStorage)
+                login(res.data.token);
                 localStorage.setItem("name", res.data.user.name);
-                console.log("%c⧭", "color: #8c0038", localStorage);
-                navigate("/accueil");
+
                 console.log(
-                    "log afficher après la redirection  : ",
-                    res.data.token,
-                    navigate
+                    "✅ Stockage terminé, redirection vers /accueil dans 100ms"
                 );
+
+                setTimeout(() => {
+                    navigate("/accueil");
+                }, 100);
             } catch (err) {
                 console.error("❌ Erreur de login Google :", err);
             }
@@ -40,7 +45,7 @@ export default function GoogleConnexion() {
 
     return (
         <button
-            onClick={() => login()}
+            onClick={() => googleLogin()}
             className="connexion-google"
         >
             <img

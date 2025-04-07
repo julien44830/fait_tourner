@@ -23,6 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // ✅ Initialiser le token depuis le localStorage AU PREMIER MONTAGE
     useEffect(() => {
         const storedToken = localStorage.getItem("token");
+        console.log("🔐 Lecture du token depuis localStorage :", storedToken);
         if (storedToken) {
             setToken(storedToken);
         }
