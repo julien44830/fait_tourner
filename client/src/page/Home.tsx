@@ -170,7 +170,7 @@ export default function Home() {
                                     setShowDeleteModal(true);
                                 }}
                                 style={{
-                                    backgroundColor: "#e63946",
+                                    backgroundColor: "#fff",
                                     color: "white",
                                     border: "none",
                                     padding: "6px 10px",
@@ -179,7 +179,14 @@ export default function Home() {
                                     marginLeft: "10px",
                                 }}
                             >
-                                🗑️
+                                <img
+                                    src="/images/delete.png"
+                                    alt="corbeille"
+                                    style={{
+                                        width: "20px",
+                                        height: "20px",
+                                    }}
+                                />
                             </button>
                         </div>
                     ))
