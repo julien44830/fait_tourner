@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
+import Loader from "../component/Loader"; // ⚠️ ajuste le chemin selon ton projet
+import ConfirmModal from "../component/ConfirmModal"; // ⚠️ idem
 
 interface Book {
     id: number;
@@ -8,10 +10,13 @@ interface Book {
 
 export default function Home() {
     const [books, setBooks] = useState<Book[]>([]);
-    const [isLoading, setIsLoading] = useState(true); // ✅ nouvel état
+    const [isLoading, setIsLoading] = useState(true);
     const [name, setName] = useState<string>("");
-    const [showModal, setShowModal] = useState(false);
+    const [showCreateModal, setShowCreateModal] = useState(false);
     const [newBookName, setNewBookName] = useState("");
+
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [bookToDelete, setBookToDelete] = useState<Book | null>(null);
 
     useEffect(() => {
         const fetchBooks = async () => {
@@ -19,8 +24,8 @@ export default function Home() {
             const storedName = localStorage.getItem("name");
             if (storedName) setName(storedName);
             if (!token) {
-                console.error("❌ Aucun token trouvé, accès refusé.");
-                setIsLoading(false); // ✅ stoppe quand même le chargement
+                console.error("❌ Aucun token trouvé.");
+                setIsLoading(false);
                 return;
             }
 
@@ -36,29 +41,23 @@ export default function Home() {
                     }
                 );
 
-                if (!response.ok) {
+                if (!response.ok)
                     throw new Error(`Erreur HTTP ${response.status}`);
-                }
 
                 const data = await response.json();
                 setBooks(data);
-                console.log("✅ Books récupérés :", data);
             } catch (error) {
-                console.error(
-                    "❌ Erreur lors de la récupération des books :",
-                    error
-                );
+                console.error("❌ Erreur récupération books :", error);
             } finally {
-                setIsLoading(false); // ✅ on arrête le loader quoi qu'il arrive
+                setIsLoading(false);
             }
         };
 
         fetchBooks();
     }, []);
 
-    // ✅ Fonction pour créer un book
     const handleCreateBook = async () => {
-        if (!newBookName) {
+        if (!newBookName.trim()) {
             alert("Veuillez entrer un nom pour le book.");
             return;
         }
@@ -87,13 +86,40 @@ export default function Home() {
             if (response.ok) {
                 setBooks([...books, { id: data.bookId, name: newBookName }]);
                 setNewBookName("");
-                setShowModal(false);
+                setShowCreateModal(false);
             } else {
                 alert(`❌ Erreur : ${data.error}`);
             }
         } catch (error) {
-            console.error("❌ Erreur lors de la création du book :", error);
+            console.error("❌ Erreur création book :", error);
             alert("Erreur serveur.");
+        }
+    };
+
+    const handleDeleteBook = async (bookId: number) => {
+        const token = localStorage.getItem("token");
+        if (!token) return alert("Vous devez être connecté.");
+
+        try {
+            const response = await fetch(
+                `https://faittourner-production.up.railway.app/api/book/${bookId}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error || "Erreur serveur");
+            }
+
+            setBooks((prev) => prev.filter((b) => b.id !== bookId));
+        } catch (error) {
+            console.error("❌ Erreur suppression :", error);
+            alert("Erreur lors de la suppression du book.");
         }
     };
 
@@ -103,7 +129,7 @@ export default function Home() {
 
             <button
                 className="create-book-btn"
-                onClick={() => setShowModal(true)}
+                onClick={() => setShowCreateModal(true)}
             >
                 Créer un nouveau book
             </button>
@@ -112,23 +138,50 @@ export default function Home() {
 
             <div className="books-list">
                 {isLoading ? (
-                    <p className="loader">
-                        Chargement de vos books
-                        <span className="dot-animation">
-                            <span>.</span>
-                            <span>.</span>
-                            <span>.</span>
-                        </span>
-                    </p>
+                    <Loader text="Chargement des books" />
                 ) : books.length > 0 ? (
                     books.map((b) => (
-                        <NavLink
+                        <div
                             key={b.id}
-                            to={`/book/${b.id}`}
-                            className="book-link"
+                            style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                padding: "10px 15px",
+                                backgroundColor: "#fff",
+                                borderRadius: "8px",
+                                boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+                                marginBottom: "10px",
+                            }}
                         >
-                            {b.name}
-                        </NavLink>
+                            <NavLink
+                                to={`/book/${b.id}`}
+                                style={{
+                                    textDecoration: "none",
+                                    color: "#333",
+                                    flexGrow: 1,
+                                }}
+                            >
+                                {b.name}
+                            </NavLink>
+                            <button
+                                onClick={() => {
+                                    setBookToDelete(b);
+                                    setShowDeleteModal(true);
+                                }}
+                                style={{
+                                    backgroundColor: "#e63946",
+                                    color: "white",
+                                    border: "none",
+                                    padding: "6px 10px",
+                                    borderRadius: "4px",
+                                    cursor: "pointer",
+                                    marginLeft: "10px",
+                                }}
+                            >
+                                🗑️
+                            </button>
+                        </div>
                     ))
                 ) : (
                     <p className="no-books">
@@ -138,7 +191,7 @@ export default function Home() {
             </div>
 
             {/* ✅ Modale de création */}
-            {showModal && (
+            {showCreateModal && (
                 <div className="modal-overlay">
                     <div className="modal-content">
                         <h3>Créer un book</h3>
@@ -156,7 +209,7 @@ export default function Home() {
                                 Valider
                             </button>
                             <button
-                                onClick={() => setShowModal(false)}
+                                onClick={() => setShowCreateModal(false)}
                                 className="cancel-btn"
                             >
                                 Annuler
@@ -165,6 +218,26 @@ export default function Home() {
                     </div>
                 </div>
             )}
+
+            {/* ✅ Modale de confirmation suppression */}
+            <ConfirmModal
+                isOpen={showDeleteModal}
+                title="Supprimer ce book"
+                message={`Voulez-vous vraiment supprimer "${bookToDelete?.name}" ?`}
+                onCancel={() => {
+                    setShowDeleteModal(false);
+                    setBookToDelete(null);
+                }}
+                onConfirm={async () => {
+                    if (bookToDelete) {
+                        await handleDeleteBook(bookToDelete.id);
+                        setShowDeleteModal(false);
+                        setBookToDelete(null);
+                    }
+                }}
+                confirmLabel="Supprimer"
+                cancelLabel="Annuler"
+            />
         </div>
     );
 }
