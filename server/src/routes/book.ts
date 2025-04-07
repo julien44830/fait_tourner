@@ -132,5 +132,53 @@ router.post("/books", verifyToken as any, async (req: AuthRequest, res: Response
   }
 });
 
+// 📘 Route DELETE pour supprimer un book
+router.delete("/book/:id", verifyToken as any, async (req: AuthRequest, res: Response): Promise<void> => {
+  const bookId = req.params.id;
+  const userId = req.user?.id;
+
+  if (!userId) {
+    res.status(401).json({ error: "Non autorisé." });
+    return;
+  }
+
+  try {
+    const connection = await getConnection();
+
+    // Vérifier si l'utilisateur est propriétaire du book
+    const [ownerRows]: any = await connection.execute(
+      `SELECT * FROM users_book WHERE user_id = ? AND book_id = ? AND is_owner = true`,
+      [userId, bookId]
+    );
+
+    if (ownerRows.length === 0) {
+      res.status(403).json({ error: "Accès refusé : vous n'êtes pas le propriétaire." });
+      return;
+    }
+
+    // Supprimer les tags liés aux images
+    await connection.execute(
+      `DELETE pt FROM picture_tag pt
+       JOIN picture p ON pt.picture_id = p.id
+       WHERE p.book_id = ?`,
+      [bookId]
+    );
+
+    // Supprimer les images du book
+    await connection.execute(`DELETE FROM picture WHERE book_id = ?`, [bookId]);
+
+    // Supprimer les relations users_book
+    await connection.execute(`DELETE FROM users_book WHERE book_id = ?`, [bookId]);
+
+    // Supprimer le book
+    await connection.execute(`DELETE FROM book WHERE id = ?`, [bookId]);
+
+    res.status(200).json({ message: "📕 Book supprimé avec succès" });
+  } catch (error) {
+    console.error("❌ Erreur lors de la suppression du book :", error);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
 export default router;
 // Assurez-vous d'avoir installé uuid : npm install uuid
