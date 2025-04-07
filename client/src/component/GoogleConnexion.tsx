@@ -26,14 +26,7 @@ export default function GoogleConnexion() {
                 // ✅ Appelle login() pour mettre à jour le contexte (pas seulement localStorage)
                 login(res.data.token);
                 localStorage.setItem("name", res.data.user.name);
-
-                console.log(
-                    "✅ Stockage terminé, redirection vers /accueil dans 100ms"
-                );
-
-                setTimeout(() => {
-                    navigate("/accueil");
-                }, 100);
+                navigate("/accueil");
             } catch (err) {
                 console.error("❌ Erreur de login Google :", err);
             }
