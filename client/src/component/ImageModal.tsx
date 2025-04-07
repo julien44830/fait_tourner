@@ -32,6 +32,29 @@ export default function ImageModal({
             className="modal-overlay"
             onClick={onClose}
         >
+            {/* ❌ Bouton de fermeture */}
+            <button
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onClose();
+                }}
+                style={{
+                    position: "absolute",
+                    top: "20px",
+                    right: "20px",
+                    background: "transparent",
+                    border: "none",
+                    color: "#fff",
+                    fontSize: "2rem",
+                    cursor: "pointer",
+                    zIndex: 10001,
+                }}
+                aria-label="Fermer la modale"
+                title="Fermer"
+            >
+                ❌
+            </button>
+
             <button
                 className="nav-button nav-left"
                 onClick={(e) => {
