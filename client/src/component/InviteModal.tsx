@@ -45,7 +45,12 @@ export default function InviteModal({ bookId }: { bookId: number }) {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                 />
-                <button type="submit">Envoyer l'invitation</button>
+                <button
+                    className="button"
+                    type="submit"
+                >
+                    Envoyer l'invitation
+                </button>
             </form>
             {message && <p>{message}</p>}
         </div>
