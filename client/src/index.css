@@ -4,6 +4,7 @@
 @import "./style/footer.css";
 @import "./style/alert.css";
 @import "./style/imageModal.css";
+@import "./style/inviteModal.css";
 
 * {
     margin: 0;
