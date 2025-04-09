@@ -15,49 +15,39 @@ const router = express.Router();
 // 📌 Route pour uploader une image vers un book
 router.post(
   "/upload/:bookId",
-  // Middleware personnalisé pour capturer les erreurs Multer (comme type invalide)
+  verifyToken as any,
   (req, res, next) => {
-    upload.array("images", 10)(req, res, function (err) {
+    const uploadMiddleware = upload.array("images", 10);
+    uploadMiddleware(req, res, function (err) {
       if (err) {
-        if (err.message.includes("Type de fichier non autorisé")) {
+        if (err instanceof multer.MulterError || err.message.includes("Type de fichier non autorisé")) {
           return res.status(400).json({ error: err.message });
         }
-        if (err instanceof multer.MulterError) {
-          return res.status(400).json({ error: err.message });
-        }
-        console.error("❌ Erreur multer inconnue :", err);
+        console.error("❌ Erreur multer :", err);
         return res.status(500).json({ error: "Erreur serveur lors de l'upload." });
       }
       next();
     });
   },
-  verifyToken as any,
   async (req: Request, res: Response): Promise<void> => {
     const authReq = req as AuthRequest;
     const userId = authReq.user?.id;
+    const bookId = req.params.bookId;
+    const files = req.files as Express.Multer.File[];
 
     if (!userId) {
       res.status(401).json({ error: "Utilisateur non authentifié." });
       return;
     }
 
-    const bookId = req.params.bookId;
-    const files = req.files as Express.Multer.File[];
-
     if (!files || files.length === 0) {
-      res.status(400).json({ error: "Aucun fichier envoyé." });
-      return;
-    }
-
-    if (files.length > 10) {
-      res.status(400).json({ error: "Trop de fichiers (10 max)." });
+      res.status(400).json({ error: "Aucun fichier accepté." });
       return;
     }
 
     try {
       const connection = await getConnection();
 
-      // 🔍 Vérifie si l'utilisateur a accès au book
       const [bookAccess]: any = await connection.execute(
         `SELECT * FROM users_book WHERE user_id = ? AND book_id = ?`,
         [userId, bookId]
@@ -87,14 +77,17 @@ router.post(
       }
 
       res.status(200).json({
-        message: "✅ Images uploadées avec succès !",
+        message: "✅ Upload terminé.",
         pictures: uploadedPictures,
       });
+      return
     } catch (error) {
       console.error("❌ Erreur lors de l'upload :", error);
       res.status(500).json({ error: "Erreur serveur." });
+      return
     }
   }
 );
+
 
 export default router;
