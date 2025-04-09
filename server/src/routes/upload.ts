@@ -1,4 +1,5 @@
 import express, { Request, Response } from "express";
+import multer from "multer";
 import upload from "../service/uploadService";
 import { v4 as uuidv4 } from "uuid";
 
@@ -12,71 +13,88 @@ interface AuthRequest extends Request {
 const router = express.Router();
 
 // 📌 Route pour uploader une image vers un book
-router.post("/upload/:bookId", upload.array("images", 10), verifyToken as any, async (req: Request, res: Response): Promise<void> => {
-  const authReq = req as AuthRequest;
-  let userId = authReq.user?.id;
+router.post(
+  "/upload/:bookId",
+  // Middleware personnalisé pour capturer les erreurs Multer (comme type invalide)
+  (req, res, next) => {
+    upload.array("images", 10)(req, res, function (err) {
+      if (err) {
+        if (err.message.includes("Type de fichier non autorisé")) {
+          return res.status(400).json({ error: err.message });
+        }
+        if (err instanceof multer.MulterError) {
+          return res.status(400).json({ error: err.message });
+        }
+        console.error("❌ Erreur multer inconnue :", err);
+        return res.status(500).json({ error: "Erreur serveur lors de l'upload." });
+      }
+      next();
+    });
+  },
+  verifyToken as any,
+  async (req: Request, res: Response): Promise<void> => {
+    const authReq = req as AuthRequest;
+    const userId = authReq.user?.id;
 
-  if (!userId) {
-    res.status(401).json({ error: "Utilisateur non authentifié." });
-    return
-  }
-
-  const bookId = req.params.bookId;
-  const files = req.files as Express.Multer.File[];
-
-  if (!files || files.length === 0) {
-    res.status(400).json({ error: "Aucun fichier envoyé." });
-    return
-  }
-
-  if (files.length > 10) {
-    res.status(400).json({ error: "Trop de fichiers (10 max)." });
-    return
-  }
-
-  try {
-    const connection = await getConnection();
-
-    // 🔍 Vérifie si l'utilisateur a accès au book
-    const [bookAccess]: any = await connection.execute(
-      `SELECT * FROM users_book WHERE user_id = ? AND book_id = ?`,
-      [userId, bookId]
-    );
-
-    if (bookAccess.length === 0) {
-      res.status(403).json({ error: "Vous n'avez pas accès à ce book." });
-      return
+    if (!userId) {
+      res.status(401).json({ error: "Utilisateur non authentifié." });
+      return;
     }
 
-    const uploadedPictures = [];
+    const bookId = req.params.bookId;
+    const files = req.files as Express.Multer.File[];
 
-    for (const file of files) {
-      const imagePath = `/uploads/${bookId}/${file.filename}`;
-      const pictureId = uuidv4();
+    if (!files || files.length === 0) {
+      res.status(400).json({ error: "Aucun fichier envoyé." });
+      return;
+    }
 
-      await connection.execute(
-        `INSERT INTO picture (id, name, path, book_id, user_id, is_private) VALUES (?, ?, ?, ?, ?, ?)`,
-        [pictureId, file.originalname, imagePath, bookId, userId, false]
+    if (files.length > 10) {
+      res.status(400).json({ error: "Trop de fichiers (10 max)." });
+      return;
+    }
+
+    try {
+      const connection = await getConnection();
+
+      // 🔍 Vérifie si l'utilisateur a accès au book
+      const [bookAccess]: any = await connection.execute(
+        `SELECT * FROM users_book WHERE user_id = ? AND book_id = ?`,
+        [userId, bookId]
       );
 
-      uploadedPictures.push({
-        picture_id: pictureId,
-        path: imagePath,
-        name: file.originalname,
+      if (bookAccess.length === 0) {
+        res.status(403).json({ error: "Vous n'avez pas accès à ce book." });
+        return;
+      }
+
+      const uploadedPictures = [];
+
+      for (const file of files) {
+        const imagePath = `/uploads/${bookId}/${file.filename}`;
+        const pictureId = uuidv4();
+
+        await connection.execute(
+          `INSERT INTO picture (id, name, path, book_id, user_id, is_private) VALUES (?, ?, ?, ?, ?, ?)`,
+          [pictureId, file.originalname, imagePath, bookId, userId, false]
+        );
+
+        uploadedPictures.push({
+          picture_id: pictureId,
+          path: imagePath,
+          name: file.originalname,
+        });
+      }
+
+      res.status(200).json({
+        message: "✅ Images uploadées avec succès !",
+        pictures: uploadedPictures,
       });
+    } catch (error) {
+      console.error("❌ Erreur lors de l'upload :", error);
+      res.status(500).json({ error: "Erreur serveur." });
     }
-
-    res.status(200).json({
-      message: "✅ Images uploadées avec succès !",
-      pictures: uploadedPictures,
-    });
-    return
-  } catch (error) {
-    console.error("❌ Erreur lors de l'upload :", error);
-    res.status(500).json({ error: "Erreur serveur." });
-    return
   }
-});
-
+);
 
 export default router;
