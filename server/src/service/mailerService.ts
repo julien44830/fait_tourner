@@ -45,7 +45,7 @@ export const sendDeleteAccountEmail = async (email: string, link: string) => {
                 <li>Les images qu'ils contiennent seront supprimées</li>
                 <li>Vos ami(e)s ne pourront plus accéder à vos books</li>
                 <li>Les books de vos ami(e)s et les images que vous avez partagées ne vous seront plus accessibles</li>
-                <li>Les images partagées dans les books de vos ami(e)s ne seront pas supprimées</li>
+                <li>Les images partagées dans les books de vos ami(e)s seront supprimées</li>
               </ul>
             <p>Si vous souhaitez supprimer définitivement votre compte, cliquez sur le lien ci-dessous :</p>
             <a href="${link}">Confirmer la suppression de mon compte</a>

@@ -23,6 +23,7 @@ export default function Book() {
     const [isLoadingPictures, setIsLoadingPictures] = useState(true);
     const [email, setEmail] = useState("");
     const [message, setMessage] = useState("");
+    const [uploadMessage, setUploadMessage] = useState("");
     const [showModal, setShowModal] = useState(false);
     const [isGridView, setIsGridView] = useState(true);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -130,14 +131,18 @@ export default function Book() {
     };
 
     const handleUpload = async () => {
+        setUploadMessage("");
+
         if (selectedFiles.length === 0) {
-            alert("Sélectionnez au moins une image.");
+            setUploadMessage("Veuillez sélectionner au moins une image.");
             return;
         }
 
         const token = localStorage.getItem("token");
         if (!token) {
-            alert("Connectez-vous pour envoyer des images.");
+            setUploadMessage(
+                "Vous devez être connecté pour envoyer des images."
+            );
             return;
         }
 
@@ -169,10 +174,18 @@ export default function Book() {
                         tags: null,
                     });
                 } else {
-                    console.warn("Image ignorée car `path` manquant :", data);
+                    setUploadMessage(
+                        (prev) =>
+                            prev +
+                            `\n❌ Erreur pour ${file.name} : ${data.error}`
+                    );
                 }
             } catch (error) {
-                alert(`Erreur serveur pour le fichier ${file.name}`);
+                setUploadMessage(
+                    (prev) =>
+                        prev +
+                        `\n❌ Erreur serveur pour le fichier ${file.name}`
+                );
             }
         }
 
@@ -181,7 +194,6 @@ export default function Book() {
         setShowUploadModal(false);
         await refreshBookPictures();
     };
-
     const refreshBookPictures = async () => {
         const token = localStorage.getItem("token");
         if (!token) return;
@@ -232,84 +244,90 @@ export default function Book() {
             </div>
 
             {showUploadModal && (
-                <div className="modal">
-                    <h3>Ajouter des images</h3>
-                    <input
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        onChange={handleFileChange}
-                    />
-                    {selectedFiles.length > 0 && (
-                        <>
-                            <p>
-                                {selectedFiles.length} fichier(s) sélectionné(s)
-                            </p>
-                            <div
-                                style={{
-                                    display: "flex",
-                                    flexWrap: "wrap",
-                                    gap: "10px",
-                                    marginTop: "10px",
-                                }}
-                            >
-                                {selectedFiles.map((file, index) => (
-                                    <div
-                                        key={index}
-                                        style={{ position: "relative" }}
-                                    >
-                                        <img
-                                            src={URL.createObjectURL(file)}
-                                            alt={`preview-${index}`}
-                                            style={{
-                                                width: "80px",
-                                                height: "80px",
-                                                objectFit: "cover",
-                                                borderRadius: "6px",
-                                                border: "1px solid #ccc",
-                                            }}
-                                        />
-                                        <button
-                                            onClick={() =>
-                                                handleRemoveSelectedFile(index)
-                                            }
-                                            style={{
-                                                position: "absolute",
-                                                top: "-8px",
-                                                right: "-8px",
-                                                backgroundColor: "#ff4d4d",
-                                                border: "none",
-                                                borderRadius: "50%",
-                                                width: "20px",
-                                                height: "20px",
-                                                color: "white",
-                                                cursor: "pointer",
-                                                fontSize: "12px",
-                                            }}
+                <div className="modal-overlay">
+                    <div className="modal ">
+                        <h3>Ajouter des images</h3>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={handleFileChange}
+                        />
+                        {selectedFiles.length > 0 && (
+                            <>
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        flexWrap: "wrap",
+                                        gap: "10px",
+                                        marginTop: "10px",
+                                    }}
+                                >
+                                    {selectedFiles.map((file, index) => (
+                                        <div
+                                            key={index}
+                                            style={{ position: "relative" }}
                                         >
-                                            ×
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        </>
-                    )}
-                    <div className="modal-buttons">
-                        <button
-                            onClick={handleUpload}
-                            className="create-btn"
-                        >
-                            Envoyer
-                        </button>
-                        <button
-                            onClick={() => {
-                                setShowUploadModal(false);
-                                setSelectedFiles([]);
-                            }}
-                            className="cancel-btn"
-                        >
-                            Annuler
-                        </button>
+                                            <img
+                                                src={URL.createObjectURL(file)}
+                                                alt={`preview-${index}`}
+                                                style={{
+                                                    width: "80px",
+                                                    height: "80px",
+                                                    objectFit: "cover",
+                                                    borderRadius: "6px",
+                                                    border: "1px solid #ccc",
+                                                }}
+                                            />
+                                            <button
+                                                onClick={() =>
+                                                    handleRemoveSelectedFile(
+                                                        index
+                                                    )
+                                                }
+                                                style={{
+                                                    position: "absolute",
+                                                    top: "-8px",
+                                                    right: "-8px",
+                                                    backgroundColor: "#ff4d4d",
+                                                    border: "none",
+                                                    borderRadius: "50%",
+                                                    width: "20px",
+                                                    height: "20px",
+                                                    color: "white",
+                                                    cursor: "pointer",
+                                                    fontSize: "12px",
+                                                }}
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
+                        )}
+                        {uploadMessage && (
+                            <p style={{ marginTop: "10px", color: "#c00" }}>
+                                {uploadMessage}
+                            </p>
+                        )}
+                        <div className="modal-buttons">
+                            <button
+                                onClick={handleUpload}
+                                className="create-btn"
+                            >
+                                Envoyer
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setShowUploadModal(false);
+                                    setSelectedFiles([]);
+                                }}
+                                className="cancel-btn"
+                            >
+                                Annuler
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
@@ -329,17 +347,34 @@ export default function Book() {
             </button>
 
             {showModal && (
-                <div className="modal">
-                    <h3>Inviter un utilisateur</h3>
-                    <input
-                        type="email"
-                        placeholder="Email de l'utilisateur"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                    <button onClick={handleShare}>Envoyer l'invitation</button>
-                    <button onClick={() => setShowModal(false)}>Annuler</button>
-                    {message && <p>{message}</p>}
+                <div className="modal-overlay">
+                    <div className="modal">
+                        <h3>Inviter un utilisateur</h3>
+                        <input
+                            type="email"
+                            placeholder="Email de l'utilisateur"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+
+                        {message && (
+                            <p style={{ marginTop: "10px" }}>{message}</p>
+                        )}
+                        <div className="modal-buttons">
+                            <button
+                                className="create-btn"
+                                onClick={handleShare}
+                            >
+                                Envoyer l'invitation
+                            </button>
+                            <button
+                                className="cancel-btn"
+                                onClick={() => setShowModal(false)}
+                            >
+                                Annuler
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
 
