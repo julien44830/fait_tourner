@@ -187,7 +187,7 @@ export default function Home() {
                                     alt="corbeille"
                                     style={{
                                         width: "20px",
-                                        height: "20px",
+                                        height: "24px",
                                     }}
                                 />
                             </button>
