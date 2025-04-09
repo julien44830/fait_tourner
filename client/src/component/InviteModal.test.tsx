@@ -1,14 +1,11 @@
-// src/component/InviteModal.test.tsx
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import InviteModal from "./InviteModal";
 
-// 🧹 Avant chaque test : on remet un token simulé dans le localStorage
 beforeEach(() => {
     localStorage.setItem("token", "fake-token");
 });
 
-// 🧼 Après chaque test : on reset les mocks
 afterEach(() => {
     jest.resetAllMocks();
 });

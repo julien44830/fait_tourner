@@ -17,6 +17,7 @@ export default function Home() {
 
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [bookToDelete, setBookToDelete] = useState<Book | null>(null);
+    const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
         const fetchBooks = async () => {
@@ -57,14 +58,16 @@ export default function Home() {
     }, []);
 
     const handleCreateBook = async () => {
+        setErrorMessage("");
+
         if (!newBookName.trim()) {
-            alert("Veuillez entrer un nom pour le book.");
+            setErrorMessage("Veuillez entrer un nom pour le book.");
             return;
         }
 
         const token = localStorage.getItem("token");
         if (!token) {
-            alert("Vous devez être connecté.");
+            setErrorMessage("Vous devez être connecté.");
             return;
         }
 
@@ -88,11 +91,11 @@ export default function Home() {
                 setNewBookName("");
                 setShowCreateModal(false);
             } else {
-                alert(`❌ Erreur : ${data.error}`);
+                setErrorMessage(`❌ ${data.error}`);
             }
         } catch (error) {
             console.error("❌ Erreur création book :", error);
-            alert("Erreur serveur.");
+            setErrorMessage("Erreur serveur.");
         }
     };
 
@@ -208,6 +211,12 @@ export default function Home() {
                             value={newBookName}
                             onChange={(e) => setNewBookName(e.target.value)}
                         />
+                        {errorMessage && (
+                            <p style={{ color: "red", marginTop: "8px" }}>
+                                {errorMessage}
+                            </p>
+                        )}
+
                         <div className="modal-buttons">
                             <button
                                 onClick={handleCreateBook}

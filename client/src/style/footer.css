@@ -16,11 +16,27 @@ footer p {
     padding-left: 10px;
 }
 
-footer button {
-    background-color: red;
+footer .button-delete {
+    background-color: red !important;
     color: white;
     padding: 5px 10px;
     border: none;
     cursor: pointer;
     margin-right: 10px;
+}
+
+.ul-footer {
+    margin: 15px;
+
+    .li-footer {
+        margin: 10 10px;
+        margin-top: 5px;
+    }
+}
+
+.p-footer {
+    margin: 0;
+    padding: 0;
+    font-size: 13px;
+    font-weight: bold;
 }
