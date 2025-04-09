@@ -146,53 +146,55 @@ export default function Book() {
             return;
         }
 
-        const uploadedPictures: Picture[] = [];
-
-        for (const file of selectedFiles) {
-            const formData = new FormData();
+        const formData = new FormData();
+        selectedFiles.forEach((file) => {
             formData.append("images", file);
+        });
 
-            try {
-                const response = await fetch(
-                    `https://faittourner-production.up.railway.app/api/upload/${id}`,
-                    {
-                        method: "POST",
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                        body: formData,
-                    }
-                );
-
-                const data = await response.json();
-
-                if (response.ok && data.path) {
-                    uploadedPictures.push({
-                        picture_id: data.picture_id || Date.now(),
-                        picture_name: file.name,
-                        path: data.path,
-                        tags: null,
-                    });
-                } else {
-                    setUploadMessage(
-                        (prev) =>
-                            prev +
-                            `\n❌ Erreur pour ${file.name} : ${data.error}`
-                    );
+        try {
+            const response = await fetch(
+                `https://faittourner-production.up.railway.app/api/upload/${id}`,
+                {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: formData,
                 }
-            } catch (error) {
-                setUploadMessage(
-                    (prev) =>
-                        prev +
-                        `\n❌ Erreur serveur pour le fichier ${file.name}`
-                );
-            }
-        }
+            );
 
-        setPictures((prev) => [...prev, ...uploadedPictures]);
-        setSelectedFiles([]);
-        setShowUploadModal(false);
-        await refreshBookPictures();
+            const data = await response.json();
+
+            if (!response.ok) {
+                const errorMsg =
+                    data?.error || "Erreur inconnue lors de l'envoi.";
+                setUploadMessage(`❌ ${errorMsg}`);
+                return;
+            }
+
+            const uploadedPictures = Array.isArray(data.pictures)
+                ? data.pictures.map(
+                      (pic: { picture_id: any; name: any; path: any }) => ({
+                          picture_id: pic.picture_id || Date.now(),
+                          picture_name: pic.name,
+                          path: pic.path,
+                          tags: null,
+                      })
+                  )
+                : [];
+
+            if (uploadedPictures.length > 0) {
+                setPictures((prev) => [...prev, ...uploadedPictures]);
+                await refreshBookPictures();
+                setShowUploadModal(false);
+                setSelectedFiles([]);
+            } else {
+                setUploadMessage("❌ Aucune image n'a été enregistrée.");
+            }
+        } catch (error: any) {
+            console.error("❌ Erreur réseau ou serveur :", error);
+            setUploadMessage("❌ Erreur lors de l'envoi des images.");
+        }
     };
     const refreshBookPictures = async () => {
         const token = localStorage.getItem("token");
