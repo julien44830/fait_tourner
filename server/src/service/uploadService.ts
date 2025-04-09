@@ -29,7 +29,27 @@ const storage = multer.diskStorage({
   },
 });
 
-// 📌 Configuration de Multer
-const upload = multer({ storage });
+// ✅ Vérification du type de fichier autorisé
+const fileFilter = (req: any, file: Express.Multer.File, cb: any) => {
+  const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
 
-export default upload; // 🔥 Exporter `upload` pour l'utiliser ailleurs
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true); // ✅ Autorisé
+  } else {
+    cb(
+      new Error(
+        "❌ Type de fichier non autorisé. Seuls les fichiers JPEG, PNG et WEBP sont acceptés."
+      ),
+      false
+    );
+  }
+};
+
+// 📌 Configuration de Multer avec fileFilter
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 }, // facultatif : 5 Mo max
+});
+
+export default upload;
