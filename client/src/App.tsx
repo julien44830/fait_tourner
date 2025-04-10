@@ -1,6 +1,7 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import { useAuth } from "./context/AuthContext"; // ✅
-import Home from "./page/Home";
+import { useEffect, useState } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
+import Accueil from "./page/accueil";
 import Login from "./page/Login";
 import Book from "./page/Book";
 import Registration from "./page/Registration";
@@ -9,41 +10,64 @@ import Footer from "./layout/Footer";
 export default function App() {
     const { token, isReady } = useAuth();
     const isAuthenticated = !!token;
+    const location = useLocation(); // 👈 pour savoir sur quelle route on est
 
-    if (!isReady) return <div>Chargement...</div>; // ou un loader
+    const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
+
+    useEffect(() => {
+        const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+    // ⏳ Affichage temporaire pendant le chargement de l'auth
+    if (!isReady) return <div>Chargement...</div>;
+
+    // 🔒 Composant wrapper pour les routes protégées
+    const RequireAuth = ({ children }: { children: JSX.Element }) =>
+        isAuthenticated ? (
+            children
+        ) : (
+            <Navigate
+                to="/connexion"
+                replace
+            />
+        );
+
     return (
         <div className="app-container">
             <main className="main-content">
                 <Routes>
+                    {/* ✅ Redirection page d'accueil */}
                     <Route
                         path="/"
                         element={
-                            isAuthenticated ? (
-                                <Navigate
-                                    to="/accueil"
-                                    replace
-                                />
-                            ) : (
-                                <Navigate
-                                    to="/connexion"
-                                    replace
-                                />
-                            )
+                            <Navigate
+                                to={isAuthenticated ? "/accueil" : "/connexion"}
+                                replace
+                            />
                         }
                     />
+
+                    {/* 🔒 Routes protégées */}
                     <Route
                         path="/accueil"
                         element={
-                            isAuthenticated ? (
-                                <Home />
-                            ) : (
-                                <Navigate
-                                    to="/connexion"
-                                    replace
-                                />
-                            )
+                            <RequireAuth>
+                                <Accueil />
+                            </RequireAuth>
                         }
                     />
+                    <Route
+                        path="/book/:id"
+                        element={
+                            <RequireAuth>
+                                <Book />
+                            </RequireAuth>
+                        }
+                    />
+
+                    {/* 🔓 Routes publiques */}
                     <Route
                         path="/connexion"
                         element={
@@ -61,19 +85,8 @@ export default function App() {
                         path="/inscription"
                         element={<Registration />}
                     />
-                    <Route
-                        path="/book/:id"
-                        element={
-                            isAuthenticated ? (
-                                <Book />
-                            ) : (
-                                <Navigate
-                                    to="/connexion"
-                                    replace
-                                />
-                            )
-                        }
-                    />
+
+                    {/* 🚨 Catch-all : redirection */}
                     <Route
                         path="*"
                         element={
@@ -85,7 +98,9 @@ export default function App() {
                     />
                 </Routes>
             </main>
-            <Footer />
+
+            {/* ✅ Affiche le footer UNIQUEMENT si on n’est PAS dans le dashboard */}
+            {(location.pathname !== "/accueil" || !isDesktop) && <Footer />}
         </div>
     );
 }
