@@ -1,7 +1,12 @@
+// src/page/Book.tsx
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Loader from "../component/Loader";
 import ImageModal from "../component/ImageModal";
+
+interface Props {
+    id?: string;
+}
 
 interface Book {
     id: string;
@@ -15,8 +20,10 @@ interface Picture {
     tags: string | null;
 }
 
-export default function Book() {
-    const { id } = useParams<{ id: string }>();
+export default function Book({ id }: Props) {
+    const routeParams = useParams<{ id: string }>();
+    const bookId = id || routeParams.id;
+
     const [book, setBook] = useState<Book | null>(null);
     const [pictures, setPictures] = useState<Picture[]>([]);
     const [isLoadingBook, setIsLoadingBook] = useState(true);
@@ -35,14 +42,11 @@ export default function Book() {
     useEffect(() => {
         const fetchBook = async () => {
             const token = localStorage.getItem("token");
-            if (!token) {
-                console.error("❌ Aucun token trouvé.");
-                return;
-            }
+            if (!token || !bookId) return;
 
             try {
                 const response = await fetch(
-                    `https://faittourner-production.up.railway.app/api/book/${id}`,
+                    `https://faittourner-production.up.railway.app/api/book/${bookId}`,
                     {
                         method: "GET",
                         headers: {
@@ -52,27 +56,23 @@ export default function Book() {
                     }
                 );
 
-                if (!response.ok) {
+                if (!response.ok)
                     throw new Error(`Erreur HTTP ${response.status}`);
-                }
 
                 const data = await response.json();
-
+                console.log("%c⧭", "color: #99614d", data);
                 setBook(data.book);
-                setIsLoadingBook(false);
                 setPictures(data.pictures || []);
-
-                setTimeout(() => {
-                    setIsLoadingPictures(false);
-                }, 2000);
             } catch (error) {
                 console.error("❌ Erreur lors de la récupération :", error);
-                setIsLoadingPictures(false);
+            } finally {
+                setIsLoadingBook(false);
+                setTimeout(() => setIsLoadingPictures(false), 2000);
             }
         };
 
-        if (id) fetchBook();
-    }, [id]);
+        fetchBook();
+    }, [bookId]);
 
     const handleShare = async () => {
         if (!email || !book?.id) {
@@ -111,97 +111,13 @@ export default function Book() {
         }
     };
 
-    const MAX_FILES = 10;
-
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files) {
-            const filesArray = Array.from(event.target.files);
-            if (filesArray.length > MAX_FILES) {
-                alert(`❌ Maximum ${MAX_FILES} images.`);
-                return;
-            }
-            setSelectedFiles(filesArray);
-        }
-    };
-
-    const handleRemoveSelectedFile = (indexToRemove: number) => {
-        setSelectedFiles((prevFiles) =>
-            prevFiles.filter((_, index) => index !== indexToRemove)
-        );
-    };
-
-    const handleUpload = async () => {
-        setUploadMessage("");
-
-        if (selectedFiles.length === 0) {
-            setUploadMessage("Veuillez sélectionner au moins une image.");
-            return;
-        }
-
-        const token = localStorage.getItem("token");
-        if (!token) {
-            setUploadMessage(
-                "Vous devez être connecté pour envoyer des images."
-            );
-            return;
-        }
-
-        const formData = new FormData();
-        selectedFiles.forEach((file) => {
-            formData.append("images", file);
-        });
-
-        try {
-            const response = await fetch(
-                `https://faittourner-production.up.railway.app/api/upload/${id}`,
-                {
-                    method: "POST",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: formData,
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                const errorMsg =
-                    data?.error || "Erreur inconnue lors de l'envoi.";
-                setUploadMessage(`❌ ${errorMsg}`);
-                return;
-            }
-
-            const uploadedPictures = Array.isArray(data.pictures)
-                ? data.pictures.map(
-                      (pic: { picture_id: any; name: any; path: any }) => ({
-                          picture_id: pic.picture_id || Date.now(),
-                          picture_name: pic.name,
-                          path: pic.path,
-                          tags: null,
-                      })
-                  )
-                : [];
-
-            if (uploadedPictures.length > 0) {
-                setPictures((prev) => [...prev, ...uploadedPictures]);
-                await refreshBookPictures();
-                setShowUploadModal(false);
-                setSelectedFiles([]);
-            } else {
-                setUploadMessage("❌ Aucune image n'a été enregistrée.");
-            }
-        } catch (error: any) {
-            console.error("❌ Erreur réseau ou serveur :", error);
-            setUploadMessage("❌ Erreur lors de l'envoi des images.");
-        }
-    };
     const refreshBookPictures = async () => {
         const token = localStorage.getItem("token");
-        if (!token) return;
+        if (!token || !bookId) return;
+
         try {
             const response = await fetch(
-                `https://faittourner-production.up.railway.app/api/book/${id}`,
+                `https://faittourner-production.up.railway.app/api/book/${bookId}`,
                 {
                     method: "GET",
                     headers: {
@@ -247,66 +163,77 @@ export default function Book() {
 
             {showUploadModal && (
                 <div className="modal-overlay">
-                    <div className="modal ">
+                    <div className="modal">
                         <h3>Ajouter des images</h3>
                         <input
                             type="file"
                             accept="image/*"
                             multiple
-                            onChange={handleFileChange}
+                            onChange={(e) => {
+                                if (e.target.files) {
+                                    const filesArray = Array.from(
+                                        e.target.files
+                                    );
+                                    if (filesArray.length > 10) {
+                                        alert("❌ Maximum 10 images.");
+                                        return;
+                                    }
+                                    setSelectedFiles(filesArray);
+                                }
+                            }}
                         />
                         {selectedFiles.length > 0 && (
-                            <>
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        flexWrap: "wrap",
-                                        gap: "10px",
-                                        marginTop: "10px",
-                                    }}
-                                >
-                                    {selectedFiles.map((file, index) => (
-                                        <div
-                                            key={index}
-                                            style={{ position: "relative" }}
-                                        >
-                                            <img
-                                                src={URL.createObjectURL(file)}
-                                                alt={`preview-${index}`}
-                                                style={{
-                                                    width: "80px",
-                                                    height: "80px",
-                                                    objectFit: "cover",
-                                                    borderRadius: "6px",
-                                                    border: "1px solid #ccc",
-                                                }}
-                                            />
-                                            <button
-                                                onClick={() =>
-                                                    handleRemoveSelectedFile(
-                                                        index
+                            <div
+                                style={{
+                                    display: "flex",
+                                    flexWrap: "wrap",
+                                    gap: "10px",
+                                    marginTop: "10px",
+                                }}
+                            >
+                                {selectedFiles.map((file, index) => (
+                                    <div
+                                        key={index}
+                                        style={{ position: "relative" }}
+                                    >
+                                        <img
+                                            src={URL.createObjectURL(file)}
+                                            alt={`preview-${index}`}
+                                            style={{
+                                                width: "80px",
+                                                height: "80px",
+                                                objectFit: "cover",
+                                                borderRadius: "6px",
+                                                border: "1px solid #ccc",
+                                            }}
+                                        />
+                                        <button
+                                            onClick={() =>
+                                                setSelectedFiles((prev) =>
+                                                    prev.filter(
+                                                        (_, i) => i !== index
                                                     )
-                                                }
-                                                style={{
-                                                    position: "absolute",
-                                                    top: "-8px",
-                                                    right: "-8px",
-                                                    backgroundColor: "#ff4d4d",
-                                                    border: "none",
-                                                    borderRadius: "50%",
-                                                    width: "20px",
-                                                    height: "20px",
-                                                    color: "white",
-                                                    cursor: "pointer",
-                                                    fontSize: "12px",
-                                                }}
-                                            >
-                                                ×
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            </>
+                                                )
+                                            }
+                                            style={{
+                                                position: "absolute",
+                                                top: "-8px",
+                                                right: "-8px",
+                                                backgroundColor: "#ff4d4d",
+                                                border: "none",
+                                                borderRadius: "50%",
+                                                width: "20px",
+                                                height: "20px",
+                                                color: "white",
+                                                cursor: "pointer",
+                                                fontSize: "12px",
+                                            }}
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
                         )}
                         {uploadMessage && (
                             <p style={{ marginTop: "10px", color: "#c00" }}>
@@ -315,7 +242,78 @@ export default function Book() {
                         )}
                         <div className="modal-buttons">
                             <button
-                                onClick={handleUpload}
+                                onClick={async () => {
+                                    setUploadMessage("");
+                                    if (selectedFiles.length === 0) {
+                                        setUploadMessage(
+                                            "Veuillez sélectionner au moins une image."
+                                        );
+                                        return;
+                                    }
+                                    const token = localStorage.getItem("token");
+                                    if (!token || !bookId) {
+                                        setUploadMessage(
+                                            "Vous devez être connecté."
+                                        );
+                                        return;
+                                    }
+                                    const formData = new FormData();
+                                    selectedFiles.forEach((file) =>
+                                        formData.append("images", file)
+                                    );
+                                    try {
+                                        const response = await fetch(
+                                            `https://faittourner-production.up.railway.app/api/upload/${bookId}`,
+                                            {
+                                                method: "POST",
+                                                headers: {
+                                                    Authorization: `Bearer ${token}`,
+                                                },
+                                                body: formData,
+                                            }
+                                        );
+                                        const data = await response.json();
+                                        if (!response.ok) {
+                                            setUploadMessage(
+                                                `❌ ${
+                                                    data?.error ||
+                                                    "Erreur inconnue"
+                                                }`
+                                            );
+                                            return;
+                                        }
+                                        const uploadedPictures = Array.isArray(
+                                            data.pictures
+                                        )
+                                            ? data.pictures.map((pic: any) => ({
+                                                  picture_id:
+                                                      pic.picture_id ||
+                                                      Date.now(),
+                                                  picture_name: pic.name,
+                                                  path: pic.path,
+                                                  tags: null,
+                                              }))
+                                            : [];
+                                        if (uploadedPictures.length > 0) {
+                                            setPictures((prev) => [
+                                                ...prev,
+                                                ...uploadedPictures,
+                                            ]);
+                                            await refreshBookPictures();
+                                            setShowUploadModal(false);
+                                            setSelectedFiles([]);
+                                        } else {
+                                            setUploadMessage(
+                                                "❌ Aucune image n'a été enregistrée."
+                                            );
+                                        }
+                                    } catch (err) {
+                                        console.error("Erreur d'envoi:", err);
+                                        setUploadMessage(
+                                            "❌ Erreur lors de l'envoi des images."
+                                        );
+                                    }
+                                }}
                                 className="create-btn"
                             >
                                 Envoyer
@@ -358,7 +356,6 @@ export default function Book() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         />
-
                         {message && (
                             <p style={{ marginTop: "10px" }}>{message}</p>
                         )}
@@ -444,7 +441,9 @@ export default function Book() {
                         </div>
                     ))
                 ) : (
-                    <p>Aucune image pour ce book.</p>
+                    <p>{`Le book ${
+                        book?.name || ""
+                    } ne contient aucune image`}</p>
                 )}
 
                 {selectedImageIndex !== null && (
