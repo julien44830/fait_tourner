@@ -42,7 +42,7 @@ export default function Dashboard() {
 
             try {
                 const res = await fetch(
-                    `https://faittourner-production.up.railway.app/api/books`,
+                    `${import.meta.env.VITE_API_URL}/api/books`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -80,7 +80,7 @@ export default function Dashboard() {
 
         try {
             const response = await fetch(
-                `https://faittourner-production.up.railway.app/api/books`,
+                `${import.meta.env.VITE_API_URL}/api/books`,
                 {
                     method: "POST",
                     headers: {
@@ -112,7 +112,7 @@ export default function Dashboard() {
 
         try {
             const response = await fetch(
-                `https://faittourner-production.up.railway.app/api/book/${bookId}`,
+                `${import.meta.env.VITE_API_URL}/api/book/${bookId}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -144,7 +144,7 @@ export default function Dashboard() {
         try {
             console.log;
             const res = await fetch(
-                "https://faittourner-production.up.railway.app/request-delete",
+                `${import.meta.env.VITE_API_URL}/request-delete`,
                 {
                     method: "POST",
                     headers: {

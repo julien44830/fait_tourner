@@ -46,7 +46,7 @@ export default function Book({ id }: Props) {
 
             try {
                 const response = await fetch(
-                    `https://faittourner-production.up.railway.app/api/book/${bookId}`,
+                    `${import.meta.env.VITE_API_URL}/api/book/${bookId}`,
                     {
                         method: "GET",
                         headers: {
@@ -428,14 +428,6 @@ export default function Book({ id }: Props) {
                                             )
                                         )
                                     }
-                                    style={{
-                                        width: "100%",
-                                        height: "100%",
-                                        objectFit: isGridView
-                                            ? "cover"
-                                            : "contain",
-                                        cursor: "pointer",
-                                    }}
                                 />
                             </div>
                         </div>

@@ -32,7 +32,7 @@ export default function Home() {
 
             try {
                 const response = await fetch(
-                    `https://faittourner-production.up.railway.app/api/books`,
+                    `${import.meta.env.VITE_API_URL}/api/books`,
                     {
                         method: "GET",
                         headers: {
@@ -73,7 +73,7 @@ export default function Home() {
 
         try {
             const response = await fetch(
-                `https://faittourner-production.up.railway.app/api/books`,
+                `${import.meta.env.VITE_API_URL}/api/books`,
                 {
                     method: "POST",
                     headers: {
@@ -105,7 +105,7 @@ export default function Home() {
 
         try {
             const response = await fetch(
-                `https://faittourner-production.up.railway.app/api/book/${bookId}`,
+                `${import.meta.env.VITE_API_URL}/api/book/${bookId}`,
                 {
                     method: "DELETE",
                     headers: {

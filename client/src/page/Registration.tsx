@@ -78,7 +78,7 @@ export default function Registration() {
         }
 
         const response = await fetch(
-            `https://faittourner-production.up.railway.app/api/register`,
+            `${import.meta.env.VITE_API_URL}/api/register`,
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

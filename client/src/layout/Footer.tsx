@@ -23,7 +23,7 @@ export default function Footer() {
         try {
             console.log;
             const res = await fetch(
-                "https://faittourner-production.up.railway.app/request-delete",
+                `${import.meta.env.VITE_API_URL}/request-delete`,
                 {
                     method: "POST",
                     headers: {
