@@ -29,11 +29,15 @@ router.post(
       next();
     });
   },
+
   async (req: Request, res: Response): Promise<void> => {
     const authReq = req as AuthRequest;
     const userId = authReq.user?.id;
     const bookId = req.params.bookId;
     const files = req.files as Express.Multer.File[];
+
+
+    console.log('%c⧭', 'color: #00736b', userId);
 
     if (!userId) {
       res.status(401).json({ error: "Utilisateur non authentifié." });
@@ -47,6 +51,8 @@ router.post(
 
     try {
       const connection = await getConnection();
+      console.log("🧪 Vérif accès : user_id =", userId, "book_id =", bookId);
+
 
       const [bookAccess]: any = await connection.execute(
         `SELECT * FROM users_book WHERE user_id = ? AND book_id = ?`,
@@ -54,6 +60,7 @@ router.post(
       );
 
       if (bookAccess.length === 0) {
+        console.log('%c⧭', 'color: #d0bfff', "Upload route appeller !");
         res.status(403).json({ error: "Vous n'avez pas accès à ce book." });
         return;
       }
