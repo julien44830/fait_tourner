@@ -35,6 +35,7 @@ export default function Dashboard() {
     useEffect(() => {
         const fetchBooks = async () => {
             const token = localStorage.getItem("token");
+            console.log("🔐 Token envoyé :", token);
             const storedName = localStorage.getItem("name") || "Utilisateur";
             setUserName(storedName);
 

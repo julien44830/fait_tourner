@@ -1,6 +1,6 @@
+import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import bookRoutes from "./routes/book";
 import authRoutes from "./routes/auth";
 import share from "./routes/share";
@@ -12,6 +12,14 @@ import "./service/passport";
 dotenv.config();
 
 const app = express();
+
+// 🔒 Vérification des variables d'environnement nécessaires
+const requiredEnvs = ["SECRET_KEY", "PORT"];
+requiredEnvs.forEach((key) => {
+  if (!process.env[key]) {
+    throw new Error(`❌ Variable d'environnement manquante : ${key}`);
+  }
+});
 
 const allowedOrigins = [
   "http://localhost:5173",            // pour le dev local

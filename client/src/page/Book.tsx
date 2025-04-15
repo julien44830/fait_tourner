@@ -84,7 +84,7 @@ export default function Book({ id }: Props) {
             const token = localStorage.getItem("token");
 
             const response = await fetch(
-                `https://faittourner-production.up.railway.app/api/invite`,
+                `${import.meta.env.VITE_API_URL}/api/invite`,
                 {
                     method: "POST",
                     headers: {
@@ -117,7 +117,7 @@ export default function Book({ id }: Props) {
 
         try {
             const response = await fetch(
-                `https://faittourner-production.up.railway.app/api/book/${bookId}`,
+                `${import.meta.env.VITE_API_URL}/api/book/${bookId}`,
                 {
                     method: "GET",
                     headers: {

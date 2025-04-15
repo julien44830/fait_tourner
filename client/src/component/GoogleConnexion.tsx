@@ -16,7 +16,7 @@ export default function GoogleConnexion() {
         onSuccess: async (tokenResponse) => {
             try {
                 const res = await axios.post(
-                    "https://faittourner-production.up.railway.app/api/auth/google/token",
+                    `${import.meta.env.VITE_API_URL}/api/auth/google/token`,
                     {
                         access_token: tokenResponse.access_token,
                         token: invitationToken,
