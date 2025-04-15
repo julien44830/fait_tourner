@@ -263,7 +263,9 @@ export default function Book({ id }: Props) {
                                     );
                                     try {
                                         const response = await fetch(
-                                            `https://faittourner-production.up.railway.app/api/upload/${bookId}`,
+                                            `   ${
+                                                import.meta.env.VITE_API_URL
+                                            }${bookId}`,
                                             {
                                                 method: "POST",
                                                 headers: {
@@ -417,7 +419,9 @@ export default function Book({ id }: Props) {
                                 }}
                             >
                                 <img
-                                    src={`https://faittourner-production.up.railway.app${picture.path}`}
+                                    src={`${import.meta.env.VITE_API_URL}${
+                                        picture.path
+                                    }`}
                                     alt={picture.picture_name}
                                     onClick={() =>
                                         setSelectedImageIndex(
@@ -441,8 +445,7 @@ export default function Book({ id }: Props) {
                 {selectedImageIndex !== null && (
                     <ImageModal
                         images={pictures.map(
-                            (p) =>
-                                `https://faittourner-production.up.railway.app${p.path}`
+                            (p) => `${import.meta.env.VITE_API_URL}${p.path}`
                         )}
                         currentIndex={selectedImageIndex}
                         onClose={() => setSelectedImageIndex(null)}
