@@ -40,8 +40,11 @@ router.post(
     req.query.access_token = req.body.token;
     next();
   },
+
   passport.authenticate("google-token", { session: false }),
+
   async (req, res, next) => {
+
     try {
       if (!req.user) {
         console.error("❌ Échec d'authentification Google");
@@ -68,8 +71,6 @@ router.post(
             bookId: string;
             email: string;
           };
-
-          console.log("📨 Token d'invitation reçu et décodé :", decoded);
 
           const connection = await getConnection();
 

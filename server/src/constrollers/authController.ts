@@ -38,6 +38,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       SECRET_KEY,
       { expiresIn: "2h" }
     );
+    console.log("📩 Token dans login :", token);
+
 
     res.json({ token, userId: user.id, name: user.name, lastname: user.lastname });
   } catch (error) {
@@ -47,6 +49,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const register = async (req: Request, res: Response): Promise<void> => {
+
   try {
     const { name, email, password, token } = req.body;
     const connection = await getConnection();
@@ -79,6 +82,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     // ✅ Si un token d'invitation est présent, ajouter l'utilisateur au book
     // ✅ Ajout de l'utilisateur au book après inscription
     if (token) {
+      console.log("📩 Token d'invitation reçu dans register :", token);
       try {
         const decoded = jwt.verify(token, process.env.SECRET_KEY as string) as { bookId: number, email: string };
 

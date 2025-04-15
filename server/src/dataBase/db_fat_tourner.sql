@@ -1,3 +1,6 @@
+CREATE DATABASE fait_tourner_db;
+USE fait_tourner_db;
+
 -- Table des utilisateurs
 CREATE TABLE user (
     id VARCHAR(36) NOT NULL PRIMARY KEY, -- UUID
