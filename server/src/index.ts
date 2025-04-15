@@ -14,7 +14,7 @@ dotenv.config();
 const app = express();
 
 // 🔒 Vérification des variables d'environnement nécessaires
-const requiredEnvs = ["SECRET_KEY", "PORT"];
+const requiredEnvs = ["SECRET_KEY", "PORT", "FRONT_BASE_URL"];
 requiredEnvs.forEach((key) => {
   if (!process.env[key]) {
     throw new Error(`❌ Variable d'environnement manquante : ${key}`);

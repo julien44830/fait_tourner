@@ -13,6 +13,8 @@ interface AuthRequest extends Request {
 // 📨 Route pour inviter un utilisateur à rejoindre un book
 router.post("/invite", verifyToken, async (req: Request, res: Response): Promise<void> => {
   const userId = (req as AuthRequest).user?.id;
+  console.log("📦 FRONT_BASE_URL:", process.env.FRONT_BASE_URL);
+
 
   if (!userId) {
     console.warn("🚫 Utilisateur non authentifié !");
