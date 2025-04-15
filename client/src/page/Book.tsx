@@ -432,6 +432,14 @@ export default function Book({ id }: Props) {
                                             )
                                         )
                                     }
+                                    style={{
+                                        width: "100%",
+                                        height: "100%",
+                                        objectFit: "cover",
+                                        objectPosition: "center",
+                                        display: "block",
+                                        borderRadius: "4px",
+                                    }}
                                 />
                             </div>
                         </div>
