@@ -265,7 +265,7 @@ export default function Book({ id }: Props) {
                                         const response = await fetch(
                                             `   ${
                                                 import.meta.env.VITE_API_URL
-                                            }${bookId}`,
+                                            }/api/upload/${bookId}`,
                                             {
                                                 method: "POST",
                                                 headers: {
