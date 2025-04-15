@@ -81,13 +81,13 @@ router.post("/invite", verifyToken, async (req: Request, res: Response): Promise
       inviteToken = jwt.sign({ bookId, email }, process.env.SECRET_KEY as string, {
         expiresIn: "7d",
       });
-      inviteLink = `https://www.pictevent.fr/accepter-invitation?token=${inviteToken}`;
+      inviteLink = `${process.env.FRONT_BASE_URL}/accepter-invitation?token=${inviteToken}`;
     } else {
       // Générer le token pour un nouvel utilisateur
       inviteToken = jwt.sign({ email, bookId }, process.env.SECRET_KEY as string, {
         expiresIn: "7d",
       });
-      inviteLink = `https://www.pictevent.fr/inscription?token=${inviteToken}`;
+      inviteLink = `${process.env.FRONT_BASE_URL}/inscription?token=${inviteToken}`;
     }
 
     // ✉️ Envoi de l'email
