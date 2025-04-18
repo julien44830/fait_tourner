@@ -69,6 +69,7 @@ export default function UploadModal({ onClose, onUpload }: UploadModalProps) {
                 accept="image/*"
                 multiple
                 onChange={handleFileChange}
+                aria-label="zone de téléchargement"
             />
 
             {selectedFiles.length > 0 && (

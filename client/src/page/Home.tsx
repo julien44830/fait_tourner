@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import Loader from "../component/Loader"; // ⚠️ ajuste le chemin selon ton projet
-import ConfirmModal from "../component/ConfirmModal"; // ⚠️ idem
+import Loader from "../component/Loader";
+import ConfirmModal from "../component/modals/ConfirmModal";
 
 interface Book {
     id: number;
@@ -236,24 +236,24 @@ export default function Home() {
             )}
 
             {/* ✅ Modale de confirmation suppression */}
-            <ConfirmModal
-                isOpen={showDeleteModal}
-                title="Supprimer ce book"
-                message={`Voulez-vous vraiment supprimer "${bookToDelete?.name}" ?`}
-                onCancel={() => {
-                    setShowDeleteModal(false);
-                    setBookToDelete(null);
-                }}
-                onConfirm={async () => {
-                    if (bookToDelete) {
+            {showDeleteModal && bookToDelete && (
+                <ConfirmModal
+                    isOpen={showDeleteModal}
+                    title="Supprimer ce book"
+                    message={`Voulez-vous vraiment supprimer "${bookToDelete.name}" ?`}
+                    onCancel={() => {
+                        setShowDeleteModal(false);
+                        setBookToDelete(null);
+                    }}
+                    onConfirm={async () => {
                         await handleDeleteBook(bookToDelete.id);
                         setShowDeleteModal(false);
                         setBookToDelete(null);
-                    }
-                }}
-                confirmLabel="Supprimer"
-                cancelLabel="Annuler"
-            />
+                    }}
+                    confirmLabel="Supprimer"
+                    cancelLabel="Annuler"
+                />
+            )}
         </div>
     );
 }

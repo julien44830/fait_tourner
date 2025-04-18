@@ -2,39 +2,45 @@
 
 import { useState } from "react";
 import GenericModal from "./GenericModal";
+import { getEnvApiUrl } from "../../utils/getEnvApiUrl";
 
 interface InviteModalProps {
     bookId: string;
     onClose: () => void;
+    apiUrl?: string;
 }
 
-export default function InviteModal({ bookId, onClose }: InviteModalProps) {
+export default function InviteModal({
+    bookId,
+    onClose,
+    apiUrl,
+}: InviteModalProps) {
     const [email, setEmail] = useState("");
     const [message, setMessage] = useState("");
 
-    const handleInvite = async () => {
+    const handleShare = async () => {
         if (!email || !bookId) {
             setMessage("Email ou ID du book manquant.");
             return;
         }
 
+        const baseUrl = apiUrl ?? getEnvApiUrl();
+
         try {
             const token = localStorage.getItem("token");
-            const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/api/invite`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({ email, bookId }),
-                }
-            );
+
+            const response = await fetch(`${baseUrl}/api/invite`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ email, bookId }),
+            });
 
             const data = await response.json();
             if (response.ok) {
-                setMessage("✅ Invitation envoyée !");
+                setMessage("✅ Invitation envoyée avec succès !");
                 setTimeout(() => {
                     setEmail("");
                     setMessage("");
@@ -56,9 +62,9 @@ export default function InviteModal({ bookId, onClose }: InviteModalProps) {
                 <div className="modal-buttons">
                     <button
                         className="create-btn"
-                        onClick={handleInvite}
+                        onClick={handleShare}
                     >
-                        Envoyer
+                        Envoyer l'invitation
                     </button>
                     <button
                         className="cancel-btn"
