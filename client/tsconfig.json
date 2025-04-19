@@ -1,7 +1,13 @@
+//tsconfig.json
+
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+    "files": [],
+    "references": [
+        { "path": "./tsconfig.app.json" },
+        { "path": "./tsconfig.node.json" }
+    ],
+    "compilerOptions": {
+        "types": ["node", "vite/client"]
+    },
+    "typeRoots": ["./node_modules/@types", "./types"]
 }

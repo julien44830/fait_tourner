@@ -10,7 +10,7 @@ import ConfirmModal from "../component/modals/ConfirmModal";
 import DeleteAccountModal from "../component/modals/DeleteAccountModal";
 import CreateBookModal from "../component/modals/CreateBookModal";
 import { useAuth } from "../context/AuthContext";
-import "../style/dashboard.css";
+import { getEnvApiUrl } from "../utils/getEnvApiUrl";
 
 interface BookType {
     id: string;
@@ -18,7 +18,7 @@ interface BookType {
 }
 
 export default function Dashboard() {
-    // État des books et de la sélection
+    const API_URL = getEnvApiUrl(); // État des books et de la sélection
     const [books, setBooks] = useState<BookType[]>([]);
     const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
 
@@ -28,7 +28,6 @@ export default function Dashboard() {
 
     // État de la création de book
     const [showCreateModal, setShowCreateModal] = useState(false);
-    const [newBookName, setNewBookName] = useState("");
 
     // État de la suppression de book
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -58,12 +57,9 @@ export default function Dashboard() {
             if (!token) return navigate("/connexion");
 
             try {
-                const res = await fetch(
-                    `${import.meta.env.VITE_API_URL}/api/books`,
-                    {
-                        headers: { Authorization: `Bearer ${token}` },
-                    }
-                );
+                const res = await fetch(`${API_URL}/api/books`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
                 const data = await res.json();
 
                 if (Array.isArray(data)) {
@@ -86,17 +82,14 @@ export default function Dashboard() {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("Vous devez être connecté.");
 
-        const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/api/books`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({ title: bookName }),
-            }
-        );
+        const response = await fetch(`${API_URL}/api/books`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ title: bookName }),
+        });
 
         const data = await response.json();
 
@@ -113,13 +106,10 @@ export default function Dashboard() {
         if (!token) return alert("Vous devez être connecté.");
 
         try {
-            const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/api/book/${bookId}`,
-                {
-                    method: "DELETE",
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
+            const response = await fetch(`${API_URL}/api/book/${bookId}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` },
+            });
 
             if (!response.ok) {
                 const err = await response.json();
@@ -143,16 +133,13 @@ export default function Dashboard() {
         }
 
         try {
-            const res = await fetch(
-                `${import.meta.env.VITE_API_URL}/request-delete`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+            const res = await fetch(`${API_URL}/request-delete`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            });
 
             const data = await res.json();
             setMessage(data.message);

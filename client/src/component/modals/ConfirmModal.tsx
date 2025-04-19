@@ -1,10 +1,11 @@
 import GenericModal from "./GenericModal";
 
 interface ConfirmModalProps {
+    isOpen: boolean;
     title: string;
-    message?: string;
-    onConfirm: () => void;
-    onClose: () => void;
+    message: string;
+    onCancel: () => void;
+    onConfirm: () => void | Promise<void>;
     confirmLabel?: string;
     cancelLabel?: string;
 }
@@ -13,14 +14,14 @@ export default function ConfirmModal({
     title,
     message,
     onConfirm,
-    onClose,
+    onCancel,
     confirmLabel = "Confirmer",
     cancelLabel = "Annuler",
 }: ConfirmModalProps) {
     return (
         <GenericModal
             title={title}
-            onClose={onClose}
+            onClose={onCancel}
             footer={
                 <div className="modal-buttons">
                     <button
@@ -31,7 +32,7 @@ export default function ConfirmModal({
                     </button>
                     <button
                         className="cancel-btn"
-                        onClick={onClose}
+                        onClick={onCancel}
                     >
                         {cancelLabel}
                     </button>

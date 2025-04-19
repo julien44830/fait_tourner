@@ -1,9 +1,15 @@
+// Book.tsx
+// ============================
+// Composant d'affichage d'un book (album photo)
+// Gère la récupération des données, l'affichage des images, les modales d'invitation et d'ajout d'image
+
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Loader from "../component/Loader";
 import ImageModal from "../component/modals/ImageModal";
 import InviteModal from "../component/modals/InviteModal";
 import UploadModal from "../component/modals/UploadModal";
+import { getEnvApiUrl } from "../utils/getEnvApiUrl";
 
 interface Props {
     id?: string;
@@ -22,9 +28,11 @@ interface Picture {
 }
 
 export default function Book({ id }: Props) {
+    const API_URL = getEnvApiUrl();
     const routeParams = useParams<{ id: string }>();
     const bookId = id || routeParams.id;
 
+    // États du composant
     const [book, setBook] = useState<Book | null>(null);
     const [pictures, setPictures] = useState<Picture[]>([]);
     const [isLoadingBook, setIsLoadingBook] = useState(true);
@@ -36,22 +44,20 @@ export default function Book({ id }: Props) {
     );
     const [isGridView, setIsGridView] = useState(true);
 
+    // 📥 Récupération des données du book au chargement
     useEffect(() => {
         const fetchBook = async () => {
             const token = localStorage.getItem("token");
             if (!token || !bookId) return;
 
             try {
-                const response = await fetch(
-                    `${import.meta.env.VITE_API_URL}/api/book/${bookId}`,
-                    {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
+                const response = await fetch(`${API_URL}/api/book/${bookId}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
 
                 if (!response.ok)
                     throw new Error(`Erreur HTTP ${response.status}`);
@@ -70,20 +76,18 @@ export default function Book({ id }: Props) {
         fetchBook();
     }, [bookId]);
 
+    // 🔁 Rafraîchit les images d'un book (utilisé après upload)
     const refreshBookPictures = async () => {
         const token = localStorage.getItem("token");
         if (!token || !bookId) return;
 
         try {
-            const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/api/book/${bookId}`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+            const response = await fetch(`${API_URL}/api/book/${bookId}`, {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             const data = await response.json();
             setPictures(data.pictures || []);
         } catch (err) {
@@ -91,6 +95,7 @@ export default function Book({ id }: Props) {
         }
     };
 
+    // 📤 Gestion de l'upload d'image via formulaire
     const handleUpload = async (files: File[]) => {
         const token = localStorage.getItem("token");
         if (!token || !bookId) throw new Error("Utilisateur non connecté.");
@@ -98,22 +103,16 @@ export default function Book({ id }: Props) {
         const formData = new FormData();
         files.forEach((file) => formData.append("images", file));
 
-        const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/api/upload/${bookId}`,
-            {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-                body: formData,
-            }
-        );
+        const response = await fetch(`${API_URL}/api/upload/${bookId}`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            body: formData,
+        });
 
         const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data?.error || "Erreur inconnue");
-        }
+        if (!response.ok) throw new Error(data?.error || "Erreur inconnue");
 
         const uploadedPictures = Array.isArray(data.pictures)
             ? data.pictures.map((pic: any) => ({
@@ -138,6 +137,7 @@ export default function Book({ id }: Props) {
         <div className="book-container">
             <h2>{book?.name}</h2>
 
+            {/* 🔁 Bouton de switch de vue grille/liste */}
             <div className="toggle-container">
                 <label>
                     {isGridView ? "Vue grille" : "Affichage normal"}
@@ -152,6 +152,7 @@ export default function Book({ id }: Props) {
                 </label>
             </div>
 
+            {/* 📤 Bouton pour ajouter des images */}
             <div className="upload-section">
                 <button
                     className="button"
@@ -161,6 +162,7 @@ export default function Book({ id }: Props) {
                 </button>
             </div>
 
+            {/* 📩 Bouton pour inviter un utilisateur */}
             <button
                 onClick={() => setShowInviteModal(true)}
                 style={{
@@ -175,6 +177,7 @@ export default function Book({ id }: Props) {
                 Partager le book
             </button>
 
+            {/* 📤 Modale d'upload d'image */}
             {showUploadModal && (
                 <UploadModal
                     onClose={() => setShowUploadModal(false)}
@@ -182,6 +185,7 @@ export default function Book({ id }: Props) {
                 />
             )}
 
+            {/* 📩 Modale d'invitation */}
             {showInviteModal && bookId && (
                 <InviteModal
                     bookId={bookId}
@@ -189,6 +193,7 @@ export default function Book({ id }: Props) {
                 />
             )}
 
+            {/* 🖼️ Liste des images (vue grille ou liste) */}
             <div
                 className={isGridView ? "image-grid" : "image-list"}
                 style={{
@@ -229,9 +234,7 @@ export default function Book({ id }: Props) {
                                 }}
                             >
                                 <img
-                                    src={`${import.meta.env.VITE_API_URL}${
-                                        picture.path
-                                    }`}
+                                    src={`${API_URL}${picture.path}`}
                                     alt={picture.picture_name}
                                     onClick={() =>
                                         setSelectedImageIndex(
@@ -260,11 +263,10 @@ export default function Book({ id }: Props) {
                     } ne contient aucune image`}</p>
                 )}
 
+                {/* 🔍 Modale de visualisation plein écran */}
                 {selectedImageIndex !== null && (
                     <ImageModal
-                        images={pictures.map(
-                            (p) => `${import.meta.env.VITE_API_URL}${p.path}`
-                        )}
+                        images={pictures.map((p) => `${API_URL}${p.path}`)}
                         currentIndex={selectedImageIndex}
                         onClose={() => setSelectedImageIndex(null)}
                         onPrev={() =>
