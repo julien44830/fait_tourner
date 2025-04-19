@@ -15,7 +15,15 @@
         "noEmit": true,
 
         "jsx": "react-jsx",
-        "types": ["jest", "@testing-library/jest-dom", "react", "react-dom"],
+        "types": [
+            "jest",
+            "@testing-library/jest-dom",
+            "react",
+            "react-dom",
+            "node",
+            "vite/client"
+        ],
+        "typeRoots": ["./node_modules/@types", "./types"],
 
         /* Linting */
         "strict": true,

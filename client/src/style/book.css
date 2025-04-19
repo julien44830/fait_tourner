@@ -47,7 +47,7 @@
     display: grid;
     gap: 10px;
     padding: 10px;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(100%, 1fr));
 }
 
 /* 📌 Cartes des images */

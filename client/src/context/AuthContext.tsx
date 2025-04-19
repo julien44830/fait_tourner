@@ -62,3 +62,5 @@ export function useAuth() {
     }
     return context;
 }
+
+export { AuthContext };

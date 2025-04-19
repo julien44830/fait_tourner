@@ -5,6 +5,7 @@
 @import "./style/alert.css";
 @import "./style/imageModal.css";
 @import "./style/inviteModal.css";
+@import "./style/dashboard.css";
 
 * {
     margin: 0;

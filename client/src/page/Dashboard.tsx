@@ -1,9 +1,16 @@
+// Dashboard.tsx
+// ============================
+// Composant principal de l'espace utilisateur authentifié
+// Affiche les books de l'utilisateur, permet d'en créer ou supprimer, et gérer son compte
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Book from "./Book";
-import ConfirmModal from "../component/ConfirmModal";
+import ConfirmModal from "../component/modals/ConfirmModal";
+import DeleteAccountModal from "../component/modals/DeleteAccountModal";
+import CreateBookModal from "../component/modals/CreateBookModal";
 import { useAuth } from "../context/AuthContext";
-import "../style/dashboard.css";
+import { getEnvApiUrl } from "../utils/getEnvApiUrl";
 
 interface BookType {
     id: string;
@@ -11,46 +18,50 @@ interface BookType {
 }
 
 export default function Dashboard() {
+    const API_URL = getEnvApiUrl(); // État des books et de la sélection
     const [books, setBooks] = useState<BookType[]>([]);
     const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
+
+    // État utilisateur et vue
     const [userName, setUserName] = useState<string>("");
+    const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
+
+    // État de la création de book
     const [showCreateModal, setShowCreateModal] = useState(false);
-    const [newBookName, setNewBookName] = useState("");
+
+    // État de la suppression de book
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [bookToDelete, setBookToDelete] = useState<BookType | null>(null);
-    const [errorMessage, setErrorMessage] = useState("");
+
+    // État de la suppression de compte
     const [showAccountModal, setShowAccountModal] = useState(false);
     const [message, setMessage] = useState("");
-    const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
 
     const { logout } = useAuth();
     const navigate = useNavigate();
 
+    // 📊 Détection du redimensionnement pour adapter le rendu
     useEffect(() => {
         const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
+    // 📚 Récupération des books utilisateur au chargement
     useEffect(() => {
         const fetchBooks = async () => {
             const token = localStorage.getItem("token");
-            console.log("🔐 Token envoyé :", token);
             const storedName = localStorage.getItem("name") || "Utilisateur";
             setUserName(storedName);
 
             if (!token) return navigate("/connexion");
 
             try {
-                const res = await fetch(
-                    `${import.meta.env.VITE_API_URL}/api/books`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
+                const res = await fetch(`${API_URL}/api/books`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
                 const data = await res.json();
+
                 if (Array.isArray(data)) {
                     setBooks(data);
                     if (data.length > 0) setSelectedBookId(data[0].id);
@@ -66,61 +77,39 @@ export default function Dashboard() {
         fetchBooks();
     }, [navigate]);
 
-    const handleCreateBook = async () => {
-        setErrorMessage("");
-        if (!newBookName.trim()) {
-            setErrorMessage("Veuillez entrer un nom pour le book.");
-            return;
-        }
-
+    // ➕ Création d'un nouveau book
+    const handleCreateBook = async (bookName: string) => {
         const token = localStorage.getItem("token");
-        if (!token) {
-            setErrorMessage("Vous devez être connecté.");
-            return;
+        if (!token) throw new Error("Vous devez être connecté.");
+
+        const response = await fetch(`${API_URL}/api/books`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ title: bookName }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Erreur serveur");
         }
 
-        try {
-            const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/api/books`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({ title: newBookName }),
-                }
-            );
-
-            const data = await response.json();
-
-            if (response.ok) {
-                setBooks([...books, { id: data.bookId, name: newBookName }]);
-                setNewBookName("");
-                setShowCreateModal(false);
-            } else {
-                setErrorMessage(`❌ ${data.error}`);
-            }
-        } catch (error) {
-            console.error("❌ Erreur création book :", error);
-            setErrorMessage("Erreur serveur.");
-        }
+        setBooks((prev) => [...prev, { id: data.bookId, name: bookName }]);
     };
 
+    // ❌ Suppression d'un book
     const handleDeleteBook = async (bookId: string) => {
         const token = localStorage.getItem("token");
         if (!token) return alert("Vous devez être connecté.");
 
         try {
-            const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/api/book/${bookId}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+            const response = await fetch(`${API_URL}/api/book/${bookId}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` },
+            });
 
             if (!response.ok) {
                 const err = await response.json();
@@ -130,11 +119,12 @@ export default function Dashboard() {
             setBooks((prev) => prev.filter((b) => b.id !== bookId));
             if (selectedBookId === bookId) setSelectedBookId(null);
         } catch (error) {
-            console.error("❌ Erreur suppression :", error);
+            console.error("Erreur suppression :", error);
             alert("Erreur lors de la suppression du book.");
         }
     };
 
+    // ⚠️ Demande de suppression de compte utilisateur
     const handleConfirmDelete = async () => {
         const token = localStorage.getItem("token");
         if (!token) {
@@ -143,28 +133,23 @@ export default function Dashboard() {
         }
 
         try {
-            console.log;
-            const res = await fetch(
-                `${import.meta.env.VITE_API_URL}/request-delete`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+            const res = await fetch(`${API_URL}/request-delete`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            });
 
             const data = await res.json();
             setMessage(data.message);
 
-            // ✅ Fermer la modale après 3 secondes
             setTimeout(() => {
-                setShowDeleteModal(false);
+                setShowAccountModal(false);
                 setMessage("");
             }, 3000);
         } catch (error) {
-            console.error("Erreur lors de la demande de suppression :", error);
+            console.error("Erreur demande suppression :", error);
             setMessage("Erreur lors de l'envoi de la demande.");
         }
     };
@@ -172,6 +157,7 @@ export default function Dashboard() {
     return (
         <>
             <div className="dashboard-container">
+                {/* 🌐 Sidebar avec liste des books */}
                 <aside className="sidebar">
                     <div className="sidebar-header">
                         <p className="user-info">
@@ -213,6 +199,7 @@ export default function Dashboard() {
                         + Nouveau Book
                     </button>
 
+                    {/* 📅 Footer uniquement en desktop */}
                     {isDesktop && (
                         <div className="dashboard-footer">
                             <button
@@ -232,6 +219,7 @@ export default function Dashboard() {
                     )}
                 </aside>
 
+                {/* 🔍 Affichage du book ou message */}
                 <main className="dashboard-content">
                     {selectedBookId ? (
                         isDesktop ? (
@@ -248,126 +236,44 @@ export default function Dashboard() {
                 </main>
             </div>
 
+            {/* 🖋️ Modale de création de book */}
             {showCreateModal && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
-                        <h3>Créer un book</h3>
-                        <input
-                            type="text"
-                            placeholder="Nom du book"
-                            value={newBookName}
-                            onChange={(e) => setNewBookName(e.target.value)}
-                        />
-                        {errorMessage && (
-                            <p style={{ color: "red", marginTop: "8px" }}>
-                                {errorMessage}
-                            </p>
-                        )}
-
-                        <div className="modal-buttons">
-                            <button
-                                onClick={handleCreateBook}
-                                className="create-btn"
-                            >
-                                Valider
-                            </button>
-                            <button
-                                onClick={() => setShowCreateModal(false)}
-                                className="cancel-btn"
-                            >
-                                Annuler
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <CreateBookModal
+                    onClose={() => setShowCreateModal(false)}
+                    onCreate={handleCreateBook}
+                />
             )}
 
-            {/* ✅ Modale de confirmation suppression */}
-            <ConfirmModal
-                isOpen={showDeleteModal}
-                title="Supprimer ce book"
-                message={`Voulez-vous vraiment supprimer "${bookToDelete?.name}" ?`}
-                onCancel={() => {
-                    setShowDeleteModal(false);
-                    setBookToDelete(null);
-                }}
-                onConfirm={async () => {
-                    if (bookToDelete) {
+            {/* ❌ Modale de confirmation de suppression de book */}
+            {showDeleteModal && bookToDelete && (
+                <ConfirmModal
+                    isOpen={true}
+                    title="Supprimer ce book"
+                    message={`Voulez-vous vraiment supprimer "${bookToDelete.name}" ?`}
+                    onCancel={() => {
+                        setShowDeleteModal(false);
+                        setBookToDelete(null);
+                    }}
+                    onConfirm={async () => {
                         await handleDeleteBook(bookToDelete.id);
                         setShowDeleteModal(false);
                         setBookToDelete(null);
-                    }
-                }}
-                confirmLabel="Supprimer"
-                cancelLabel="Annuler"
-            />
-
-            {showAccountModal && (
-                <div className="modal-overlay">
-                    <div
-                        className="modal-content"
-                        style={{ textAlign: "left" }}
-                    >
-                        <h2>Suppression de votre compte</h2>
-                        <p className="p-footer">
-                            <strong>Conséquences de la suppression :</strong>
-                        </p>
-                        <ul className="ul-footer">
-                            <li className="li-footer">
-                                Tous vos books seront supprimés
-                            </li>
-                            <li className="li-footer">
-                                Les images qu’ils contiennent seront supprimées
-                            </li>
-                            <li className="li-footer">
-                                Vos ami(e)s ne pourront plus accéder à vos books
-                            </li>
-                            <li className="li-footer">
-                                Les books de vos ami(e)s et les images que vous
-                                avez partagées ne vous seront plus accessibles
-                            </li>
-                            <li className="li-footer">
-                                Les images partagées dans les books de vos
-                                ami(e)s seront supprimées
-                            </li>
-                        </ul>
-                        <p className="p-footer">
-                            <strong>
-                                Souhaitez-vous vraiment supprimer votre compte ?
-                            </strong>
-                        </p>
-
-                        {message && (
-                            <p
-                                style={{
-                                    color: "red",
-                                    marginTop: "8px",
-                                }}
-                            >
-                                {message}
-                            </p>
-                        )}
-
-                        <div className="modal-buttons">
-                            <button
-                                className="create-btn button-delete"
-                                onClick={handleConfirmDelete}
-                            >
-                                Confirmer
-                            </button>
-                            <button
-                                className="cancel-btn"
-                                onClick={() => {
-                                    setShowAccountModal(false);
-                                    setMessage("");
-                                }}
-                            >
-                                Fermer
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                    }}
+                    confirmLabel="Supprimer"
+                    cancelLabel="Annuler"
+                />
             )}
+
+            {/* ⚠️ Modale de suppression de compte */}
+            <DeleteAccountModal
+                isOpen={showAccountModal}
+                onClose={() => {
+                    setShowAccountModal(false);
+                    setMessage("");
+                }}
+                onConfirm={handleConfirmDelete}
+                message={message}
+            />
         </>
     );
 }
