@@ -6,6 +6,7 @@ interface PasswordInputProps {
     value: string;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     required?: boolean;
+    error?: string;
 }
 
 export default function PasswordInput({
