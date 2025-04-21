@@ -1,12 +1,10 @@
-import '@testing-library/jest-dom';// vitest.setup.ts
+import '@testing-library/jest-dom';
+import { TextEncoder, TextDecoder } from 'util';
 
-// 🩹 Patch pour TextEncoder (nécessaire pour certains modules ex: react-router-dom)
-import { TextEncoder, TextDecoder } from "util";
-
-if (typeof global.TextEncoder === "undefined") {
-  global.TextEncoder = TextEncoder;
+if (typeof global.TextEncoder === 'undefined') {
+  global.TextEncoder = TextEncoder; // ✅ constructor
 }
 
-if (typeof global.TextDecoder === "undefined") {
-  global.TextDecoder = TextDecoder;
+if (typeof global.TextDecoder === 'undefined') {
+  global.TextDecoder = TextDecoder as any; // ✅ constructor
 }
