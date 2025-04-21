@@ -9,6 +9,7 @@ lerna-debug.log*
 
 .env
 .env.production
+.env.*  
 node_modules
 server/uploads/
 

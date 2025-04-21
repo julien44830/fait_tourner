@@ -6,6 +6,7 @@
     "scripts": {
         "dev": "vite --host",
         "build": "tsc -b && vite build",
+        "build:prod": "cross-env VITE_API_URL=https://faittourner-production.up.railway.app vite build --mode production",
         "lint": "eslint .",
         "preview": "vite preview",
         "start": "vite preview",
@@ -32,6 +33,7 @@
         "@types/react-dom": "^19.1.2",
         "@types/testing-library__jest-dom": "^5.14.9",
         "@vitejs/plugin-react": "^4.3.4",
+        "cross-env": "^7.0.3",
         "eslint": "^9.21.0",
         "eslint-plugin-react-hooks": "^5.1.0",
         "eslint-plugin-react-refresh": "^0.4.19",
