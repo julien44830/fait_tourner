@@ -24,7 +24,7 @@ export default function App() {
     if (!isReady) return <div>Chargement...</div>;
 
     // 🔒 Composant wrapper pour les routes protégées
-    const RequireAuth = ({ children }: { children: JSX.Element }) =>
+    const RequireAuth = ({ children }: { children: React.ReactNode }) =>
         isAuthenticated ? (
             children
         ) : (
