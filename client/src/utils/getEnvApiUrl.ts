@@ -1,20 +1,14 @@
 export const getEnvApiUrl = (): string => {
-  try {
-    const viteEnvGetter = new Function("return import.meta.env.VITE_API_URL");
-    const viteEnv = viteEnvGetter();
-    if (viteEnv) return viteEnv;
+  const viteEnv = import.meta.env.VITE_API_URL;
 
-    const viteModeGetter = new Function("return import.meta.env.MODE");
-    const viteMode = viteModeGetter();
-    if (viteMode === "production") {
+  if (!viteEnv) {
+    if (import.meta.env.MODE === "production") {
       throw new Error("❌ VITE_API_URL non définie en production !");
     }
-  } catch (_) { }
 
-  if (typeof process !== "undefined" && process.env?.VITE_API_URL) {
-    return process.env.VITE_API_URL;
+    // fallback uniquement pour le dev local
+    return "http://localhost:4000";
   }
 
-  // Fallback uniquement en dev local
-  return "http://localhost:4000";
+  return viteEnv;
 };
