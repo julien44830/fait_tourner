@@ -1,4 +1,4 @@
-# Logs
+# === LOGS ===
 logs
 *.log
 npm-debug.log*
@@ -7,29 +7,68 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-.env
-.env.production
-.env.*  
-node_modules
-server/uploads/
 
-dist-ssr
+# === ENV FILES ===
+# fichier principal d'environnement
+.environnement
+
+# env spécifique à la prod
+.env.production
+
+# tous les autres fichiers .env (ex : .env.dev, .env.local)
+.env
+.env.*
+
+
+# === NODE ===
+# dépendances Node
+node_modules/
+
+
+# === UPLOADS ===
+# fichiers envoyés côté backend, souvent ignorés
+server/uploads/    
+
+
+# === BUILD OUTPUT ===
+# frontend Vite ou autre build
+dist/
+
+# backend buildé (si applicable)
+server/dist/
+
+# rendu côté serveur Vite (SSR)
+dist-ssr/
+
+
+# === LOCAUX / SYSTEME ===
+# fichiers locaux divers
 *.local
 
-# Editor directories and files
-.vscode/*
+
+# === IDE / EDITEURS ===
+# configuration utilisateur VS Code
+.vscode/
+
+# on garde cette config utile pour l'équipe
 !.vscode/extensions.json
-.idea
+
+# WebStorm/IntelliJ
+.idea/
+
+# macOS
 .DS_Store
+
+# Visual Studio
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
+
+# fichiers temporaires
 *.sw?
 
-.vercel
-.next
+# === DEPLOIEMENT ===
+# fichiers Vercel
+.vercel/
 
-# Build output
-/dist
-/server/dist
