@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import ImageModal from "./ImageModal";
+import { logTestSuccess, flushSuccessLogs } from "../../utils/logTestSuccess"; // ✅ Logger centralisé
 
 describe("ImageModal", () => {
     const images = ["img1.jpg", "img2.jpg", "img3.jpg"];
@@ -10,6 +11,10 @@ describe("ImageModal", () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+    });
+
+    afterAll(() => {
+        flushSuccessLogs(); // ✅ Affiche les logs une seule fois après tous les tests
     });
 
     it("affiche l'image en fonction de l'index", () => {
@@ -22,9 +27,12 @@ describe("ImageModal", () => {
                 onNext={mockOnNext}
             />
         );
+
         const img = screen.getByRole("img");
         expect(img).toHaveAttribute("src", "img2.jpg");
         expect(img).toHaveAttribute("alt", "Image 2");
+
+        logTestSuccess("Affichage correct de l'image selon l'index");
     });
 
     it("ferme la modale au clic sur le bouton ❌", () => {
@@ -37,8 +45,11 @@ describe("ImageModal", () => {
                 onNext={mockOnNext}
             />
         );
+
         fireEvent.click(screen.getByLabelText("Fermer la modale"));
         expect(mockOnClose).toHaveBeenCalled();
+
+        logTestSuccess("Fermeture de la modale déclenchée avec succès");
     });
 
     it("navigue avec les boutons ◀ et ▶", () => {
@@ -57,6 +68,8 @@ describe("ImageModal", () => {
 
         expect(mockOnPrev).toHaveBeenCalled();
         expect(mockOnNext).toHaveBeenCalled();
+
+        logTestSuccess("Navigation via les boutons ◀ ▶ fonctionnelle");
     });
 
     it("réagit aux touches clavier Escape, ArrowLeft, ArrowRight", () => {
@@ -77,5 +90,7 @@ describe("ImageModal", () => {
         expect(mockOnClose).toHaveBeenCalled();
         expect(mockOnPrev).toHaveBeenCalled();
         expect(mockOnNext).toHaveBeenCalled();
+
+        logTestSuccess("Navigation clavier Escape, ← et → gérée avec succès");
     });
 });

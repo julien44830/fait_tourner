@@ -2,6 +2,7 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext"; // ✅ Utilise le contexte
+import { getEnvApiUrl } from "../utils/getEnvApiUrl"; // ✅ Ajout de l'import utilitaire
 
 export default function GoogleConnexion() {
     const navigate = useNavigate();
@@ -16,7 +17,7 @@ export default function GoogleConnexion() {
         onSuccess: async (tokenResponse) => {
             try {
                 const res = await axios.post(
-                    `${import.meta.env.VITE_API_URL}/api/auth/google/token`,
+                    `${getEnvApiUrl()}/api/auth/google/token`, // ✅ Utilisation de la fonction
                     {
                         access_token: tokenResponse.access_token,
                         token: invitationToken,
