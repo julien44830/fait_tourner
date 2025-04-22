@@ -1,13 +1,14 @@
+// Login.tsx (mis à jour pour utiliser getEnvApiUrl)
 import { useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import GoogleConnexion from "../component/GoogleConnexion";
 import { useAuth } from "../context/AuthContext";
 import PasswordInput from "../component/PasswordInput";
+import { getEnvApiUrl } from "../utils/getEnvApiUrl";
 
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-
     const navigate = useNavigate();
     const { login } = useAuth();
 
@@ -15,22 +16,17 @@ export default function Login() {
         e.preventDefault();
 
         try {
-            const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/api/login`,
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email, password }),
-                }
-            );
+            const response = await fetch(`${getEnvApiUrl()}/api/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
+            });
 
             if (!response.ok) throw new Error("Échec de la connexion");
 
             const data = await response.json();
-
             login(data.token);
             localStorage.setItem("name", data.name);
-
             navigate("/accueil");
         } catch (error) {
             console.error("❌ Erreur de connexion :", error);
@@ -66,17 +62,17 @@ export default function Login() {
                     name="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                />{" "}
+                />
                 <button className="form-btn-connexion">Connexion</button>
-                <p>
+                <div>
                     Pas encore inscrit ?{" "}
                     <NavLink to="/inscription">Créer un compte</NavLink>
-                </p>
+                </div>
             </form>
             <section className="connexion-google-wrapper">
                 <p className="ou-texte">ou</p>
                 <GoogleConnexion />
-            </section>{" "}
+            </section>
         </>
     );
 }
