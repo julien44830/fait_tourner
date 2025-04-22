@@ -1,21 +1,23 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import InviteModal from "./InviteModal";
+import { logTestSuccess, flushSuccessLogs } from "../../utils/logTestSuccess";
 
 // ✅ Mock de la fonction d’environnement
 jest.mock("../../utils/getEnvApiUrl", () => ({
-    getEnvApiUrl: () => "https://fake.api", // remplace import.meta.env.VITE_API_URL
+    getEnvApiUrl: () => "https://fake.api",
 }));
 
 beforeEach(() => {
     localStorage.setItem("token", "fake-token");
-});
-
-afterEach(() => {
     jest.resetAllMocks();
 });
 
 describe("InviteModal", () => {
+    afterAll(() => {
+        flushSuccessLogs(); // ✅ Un seul affichage à la fin
+    });
+
     it("envoie une invitation avec le bon bookId, email et token", async () => {
         const bookId = "42";
         const fakeEmail = "invite@test.com";
@@ -32,7 +34,7 @@ describe("InviteModal", () => {
                 bookId={bookId}
                 onClose={() => {}}
             />
-        ); // ✅ sans apiUrl
+        );
 
         const emailInput = screen.getByPlaceholderText(
             "Email de l'utilisateur"
@@ -48,9 +50,7 @@ describe("InviteModal", () => {
             expect(screen.getByText(/invitation envoyée/i)).toBeInTheDocument()
         );
 
-        const fetchArgs = (fetch as jest.Mock).mock.calls[0];
-        const url = fetchArgs[0];
-        const options = fetchArgs[1];
+        const [url, options] = (fetch as jest.Mock).mock.calls[0];
         const body = JSON.parse(options.body);
         const token = options.headers.Authorization;
 
@@ -58,6 +58,10 @@ describe("InviteModal", () => {
         expect(body.email).toBe(fakeEmail);
         expect(body.bookId).toBe(bookId);
         expect(token).toBe("Bearer fake-token");
+
+        logTestSuccess(
+            "Invitation envoyée avec succès avec les bons paramètres"
+        );
     });
 
     it("affiche un message d'erreur si l'API échoue", async () => {
@@ -98,5 +102,6 @@ describe("InviteModal", () => {
         );
 
         expect(fetch).toHaveBeenCalled();
+        logTestSuccess("Message d’erreur affiché correctement si l’API échoue");
     });
 });

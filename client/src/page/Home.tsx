@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import Loader from "../component/Loader";
 import ConfirmModal from "../component/modals/ConfirmModal";
+import { getEnvApiUrl } from "../utils/getEnvApiUrl"; // ✅ Ajouté
 
 interface Book {
     id: number;
@@ -31,16 +32,13 @@ export default function Home() {
             }
 
             try {
-                const response = await fetch(
-                    `${import.meta.env.VITE_API_URL}/api/books`,
-                    {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
+                const response = await fetch(`${getEnvApiUrl()}/api/books`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
 
                 if (!response.ok)
                     throw new Error(`Erreur HTTP ${response.status}`);
@@ -72,17 +70,14 @@ export default function Home() {
         }
 
         try {
-            const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/api/books`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({ title: newBookName }),
-                }
-            );
+            const response = await fetch(`${getEnvApiUrl()}/api/books`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ title: newBookName }),
+            });
 
             const data = await response.json();
 
@@ -105,7 +100,7 @@ export default function Home() {
 
         try {
             const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/api/book/${bookId}`,
+                `${getEnvApiUrl()}/api/book/${bookId}`,
                 {
                     method: "DELETE",
                     headers: {

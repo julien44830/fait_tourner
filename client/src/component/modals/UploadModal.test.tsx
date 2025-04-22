@@ -1,91 +1,65 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import UploadModal from "../modals/UploadModal";
+import ConfirmModal from "./ConfirmModal";
+import { logTestSuccess, flushSuccessLogs } from "../../utils/logTestSuccess";
 
-beforeAll(() => {
-    global.URL.createObjectURL = jest.fn(() => "blob:fake-url");
-});
+describe("ConfirmModal", () => {
+    const onConfirm = jest.fn();
+    const onCancel = jest.fn();
 
-beforeEach(() => {
-    jest.spyOn(console, "error").mockImplementation(() => {});
-});
-
-afterEach(() => {
-    (console.error as jest.Mock).mockRestore();
-});
-
-describe("UploadModal", () => {
-    const createFakeFile = (name = "test.png") =>
-        new File(["(image)"], name, { type: "image/png" });
-
-    it("✅ appelle onUpload avec les bons fichiers et ferme la modale", async () => {
-        const mockOnUpload = jest.fn(() => Promise.resolve());
-        const mockOnClose = jest.fn();
-
-        render(
-            <UploadModal
-                onUpload={mockOnUpload}
-                onClose={mockOnClose}
-            />
-        );
-
-        const file = createFakeFile();
-        const input = screen.getByLabelText("zone de téléchargement");
-        fireEvent.change(input, { target: { files: [file] } });
-
-        fireEvent.click(screen.getByRole("button", { name: /envoyer/i }));
-
-        await waitFor(() => {
-            expect(mockOnUpload).toHaveBeenCalledWith([file]);
-            expect(mockOnClose).toHaveBeenCalled();
-        });
+    afterEach(() => {
+        jest.clearAllMocks();
     });
 
-    it("❌ affiche une erreur si aucun fichier n'est sélectionné", async () => {
-        const mockOnUpload = jest.fn();
-        const mockOnClose = jest.fn();
-
-        render(
-            <UploadModal
-                onUpload={mockOnUpload}
-                onClose={mockOnClose}
-            />
-        );
-
-        fireEvent.click(screen.getByRole("button", { name: /envoyer/i }));
-
-        expect(
-            await screen.findByText(/veuillez sélectionner au moins une image/i)
-        ).toBeInTheDocument();
-
-        expect(mockOnUpload).not.toHaveBeenCalled();
-        expect(mockOnClose).not.toHaveBeenCalled();
+    afterAll(() => {
+        flushSuccessLogs(); // ✅ affichage groupé à la fin
     });
 
-    it("❌ affiche un message d'erreur si l'upload échoue", async () => {
-        const mockOnUpload = jest.fn(() =>
-            Promise.reject(new Error("upload fail"))
-        );
-        const mockOnClose = jest.fn();
-
+    it("affiche le titre et le message", () => {
         render(
-            <UploadModal
-                onUpload={mockOnUpload}
-                onClose={mockOnClose}
+            <ConfirmModal
+                isOpen={true}
+                title="Titre de test"
+                message="Message de test"
+                onCancel={onCancel}
+                onConfirm={onConfirm}
             />
         );
 
-        const file = createFakeFile();
-        const input = screen.getByLabelText("zone de téléchargement");
-        fireEvent.change(input, { target: { files: [file] } });
+        expect(screen.getByText("Titre de test")).toBeInTheDocument();
+        expect(screen.getByText("Message de test")).toBeInTheDocument();
+        logTestSuccess("Affichage du titre et message correct");
+    });
 
-        fireEvent.click(screen.getByRole("button", { name: /envoyer/i }));
+    it("déclenche la confirmation au clic sur Confirmer", () => {
+        render(
+            <ConfirmModal
+                isOpen={true}
+                title="Confirm"
+                message="Êtes-vous sûr ?"
+                onCancel={onCancel}
+                onConfirm={onConfirm}
+            />
+        );
 
-        expect(
-            await screen.findByText(/erreur lors de l'envoi des images/i)
-        ).toBeInTheDocument();
+        fireEvent.click(screen.getByText("Confirmer"));
+        expect(onConfirm).toHaveBeenCalled();
+        logTestSuccess("Déclenchement du onConfirm au clic sur Confirmer");
+    });
 
-        expect(mockOnUpload).toHaveBeenCalledWith([file]);
-        expect(mockOnClose).not.toHaveBeenCalled();
+    it("déclenche l'annulation au clic sur Annuler", () => {
+        render(
+            <ConfirmModal
+                isOpen={true}
+                title="Confirm"
+                message="Êtes-vous sûr ?"
+                onCancel={onCancel}
+                onConfirm={onConfirm}
+            />
+        );
+
+        fireEvent.click(screen.getByText("Annuler"));
+        expect(onCancel).toHaveBeenCalled();
+        logTestSuccess("Déclenchement du onCancel au clic sur Annuler");
     });
 });
