@@ -1,15 +1,38 @@
+/**
+ * 🏠 Composant `Home`
+ *
+ * 🎯 Rôle :
+ * Composant d'accueil pour les utilisateurs connectés sur **vue mobile**.
+ * Il permet de :
+ * - Afficher la liste des books (albums)
+ * - Créer un nouveau book
+ * - Supprimer un book existant
+ *
+ * ---
+ *
+ * ⚙️ Fonctionnalités principales :
+ * - 🔐 Utilise le token stocké dans `localStorage` pour effectuer les appels sécurisés à l’API
+ * - 📡 Effectue un `GET /api/books` à l’initialisation pour récupérer les books
+ * - ➕ Effectue un `POST /api/books` pour créer un nouveau book
+ * - ❌ Effectue un `DELETE /api/book/:id` pour supprimer un book
+ *
+ **/
+
+// Import des hooks React, navigation, loader et modale
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import Loader from "../component/Loader";
 import ConfirmModal from "../component/modals/ConfirmModal";
-import { getEnvApiUrl } from "../utils/getEnvApiUrl"; // ✅ Ajouté
+import { getEnvApiUrl } from "../utils/getEnvApiUrl";
 
+// Interface TypeScript représentant un book
 interface Book {
     id: number;
     name: string;
 }
 
 export default function Home() {
+    // ⬇️ Déclaration des états du composant
     const [books, setBooks] = useState<Book[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [name, setName] = useState<string>("");
@@ -20,11 +43,12 @@ export default function Home() {
     const [bookToDelete, setBookToDelete] = useState<Book | null>(null);
     const [errorMessage, setErrorMessage] = useState("");
 
+    // 📦 Récupération des books au montage
     useEffect(() => {
         const fetchBooks = async () => {
             const token = localStorage.getItem("token");
             const storedName = localStorage.getItem("name");
-            if (storedName) setName(storedName);
+            if (storedName) setName(storedName); // Affiche le nom utilisateur
             if (!token) {
                 console.error("❌ Aucun token trouvé.");
                 setIsLoading(false);
@@ -55,6 +79,7 @@ export default function Home() {
         fetchBooks();
     }, []);
 
+    // ➕ Créer un nouveau book
     const handleCreateBook = async () => {
         setErrorMessage("");
 
@@ -94,6 +119,7 @@ export default function Home() {
         }
     };
 
+    // ❌ Supprimer un book
     const handleDeleteBook = async (bookId: number) => {
         const token = localStorage.getItem("token");
         if (!token) return alert("Vous devez être connecté.");
@@ -135,6 +161,7 @@ export default function Home() {
             <h3>📚 Mes Books :</h3>
 
             <div className="books-list">
+                {/* Loader pendant chargement */}
                 {isLoading ? (
                     <Loader text="Chargement des books" />
                 ) : books.length > 0 ? (
@@ -195,7 +222,7 @@ export default function Home() {
                 )}
             </div>
 
-            {/* ✅ Modale de création */}
+            {/* 🧾 Modale création */}
             {showCreateModal && (
                 <div className="modal-overlay">
                     <div className="modal-content">
@@ -230,7 +257,7 @@ export default function Home() {
                 </div>
             )}
 
-            {/* ✅ Modale de confirmation suppression */}
+            {/* 🧾 Modale suppression */}
             {showDeleteModal && bookToDelete && (
                 <ConfirmModal
                     isOpen={showDeleteModal}

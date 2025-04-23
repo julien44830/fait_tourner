@@ -1,7 +1,42 @@
-// Dashboard.tsx
-// ============================
-// Composant principal de l'espace utilisateur authentifié
-// Affiche les books de l'utilisateur, permet d'en créer ou supprimer, et gérer son compte
+/**
+ * 📊 Composant `Dashboard`
+ *
+ * 🎯 Objectif :
+ * Ce composant est le **point central de l’espace utilisateur authentifié** sur la version desktop.
+ * Il permet à l’utilisateur de visualiser ses **books (albums photo)**, d’en créer, supprimer,
+ * et de **gérer son compte (déconnexion ou suppression)**.
+ *
+ * ---
+ *
+ * ⚙️ Fonctionnalités :
+ * - 📚 Récupère tous les books de l'utilisateur via l'API `/api/books`
+ * - ➕ Permet de créer un book (modale `CreateBookModal`)
+ * - ❌ Permet de supprimer un book (modale `ConfirmModal`)
+ * - ⚠️ Permet d'envoyer une demande de suppression de compte (modale `DeleteAccountModal`)
+ * - 🔀 Redirige automatiquement en mobile vers `/book/:id` au lieu de charger le composant inline
+ * - 🖥️ Affichage conditionnel en fonction de la largeur d'écran (mobile vs desktop)
+ *
+ * ---
+ *
+ * 🧱 Composants utilisés :
+ * - `Book` : affichage des images d’un book sélectionné
+ * - `CreateBookModal` : formulaire de création de book
+ * - `ConfirmModal` : confirmation de suppression d’un book
+ * - `DeleteAccountModal` : confirmation de suppression de compte
+ *
+ * ---
+ *
+ * 🔐 Prérequis :
+ * - Le token d’authentification doit être présent dans le `localStorage`.
+ * - En cas d’absence de token → redirection vers `/connexion`.
+ *
+ * 🧪 États principaux :
+ * - `books` : liste des books récupérés
+ * - `selectedBookId` : book actuellement sélectionné
+ * - `userName` : nom de l’utilisateur récupéré du localStorage
+ * - `showCreateModal`, `showDeleteModal`, `showAccountModal` : affichage conditionnel des modales
+ *
+ */
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";

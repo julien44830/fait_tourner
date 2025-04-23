@@ -1,7 +1,38 @@
-// Book.tsx
-// ============================
-// Composant d'affichage d'un book (album photo)
-// Gère la récupération des données, l'affichage des images, les modales d'invitation et d'ajout d'image
+/**
+ * 📘 Composant `Book`
+ *
+ * 🔍 Objectif :
+ * Ce composant est responsable de l'affichage **d'un album photo** (appelé "book").
+ * Il gère la **récupération des données du book**, **l'affichage des images**, ainsi que
+ * les **modales d'ajout** et de **partage** du book.
+ *
+ * ---
+ *
+ * ⚙️ Fonctionnalités principales :
+ * - 🔁 **Récupère les données du book** (titre + images) à partir de l'`API`.
+ * - 📤 **Permet d'ajouter des images** via une modale `UploadModal`.
+ * - 📩 **Permet de partager le book** avec d'autres utilisateurs via `InviteModal`.
+ * - 🔍 Affiche les images du book, avec possibilité de les voir en **plein écran** (`ImageModal`).
+ * - 🔄 Affiche en **grille** ou **liste** grâce à `isGridView`.
+ * - 🧪 Gère les **états de chargement** (`isLoadingBook`, `isLoadingPictures`).
+ *
+ * ---
+ *
+ * 🧠 Comportement :
+ * - Si `id` est fourni via `props`, il est utilisé, sinon le composant utilise `useParams()`.
+ * - Les appels API nécessitent un token présent dans le `localStorage`.
+ * - Les erreurs sont loggées dans la console.
+ * - Le **switch de vue** permet à l’utilisateur de changer l’affichage des images.
+ *
+ * ---
+ *
+ * 🧱 Composants utilisés :
+ * - `Loader` : indicateur de chargement
+ * - `ImageModal` : modale de visualisation d'image en plein écran
+ * - `InviteModal` : modale d'invitation d'utilisateur
+ * - `UploadModal` : modale d'ajout d'image
+ *
+ */
 
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
