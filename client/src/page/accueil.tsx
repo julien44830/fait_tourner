@@ -1,4 +1,21 @@
-// src/page/Accueil.tsx
+/**
+ * 🏠 Composant `Accueil`
+ *
+ * 🔍 Rôle :
+ * Ce composant détecte si l'utilisateur accède à l'application depuis un écran **desktop** ou **mobile**,
+ * et affiche dynamiquement l'interface appropriée :
+ *
+ *   - 💻 `Dashboard` pour les écrans larges (desktop ≥ 1024px)
+ *   - 📱 `Home` pour les écrans mobiles
+ *
+ * 🧠 Utilise un `useEffect` avec un listener `resize` pour mettre à jour l'état `isDesktop`
+ * à chaque redimensionnement de la fenêtre.
+ *
+ * ⚠️ Pendant l'initialisation (`isDesktop === null`), un message de chargement est affiché.
+ *
+ * ➕ Tu peux ajuster facilement le seuil (`1024px`) en fonction de ta stratégie responsive.
+ */
+
 import { useEffect, useState } from "react";
 import Dashboard from "./Dashboard";
 import Home from "./Home";

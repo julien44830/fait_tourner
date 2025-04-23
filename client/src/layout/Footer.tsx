@@ -1,3 +1,21 @@
+/**
+ * Composant `Footer`
+ *
+ * ✅ Ce composant affiche un pied de page en version mobile.
+ * ✅ S'il y a un utilisateur connecté (isAuthenticated), il affiche :
+ *   - Un bouton de déconnexion
+ *   - Un bouton pour demander la suppression du compte (qui ouvre une modale)
+ *
+ * ✉️ Lorsqu’un utilisateur demande la suppression :
+ *   - un email de confirmation est envoyé automatiquement
+ *   - le compte n’est pas supprimé immédiatement : il est supprimé **après validation du lien reçu par email**
+ *   - L’objectif ici est de **lancer le processus de suppression** côté serveur, tout en laissant le contrôle à l’utilisateur.
+ *
+ * 🧠 Il utilise le contexte d'authentification pour accéder à :
+ *   - l'état de connexion (`isAuthenticated`)
+ *   - la méthode de déconnexion (`logout`)
+ */
+
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
@@ -5,14 +23,17 @@ import { useState } from "react";
 export default function Footer() {
     const navigate = useNavigate();
     const { isAuthenticated, isReady, logout } = useAuth();
+
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [message, setMessage] = useState("");
 
+    // 🔐 Déconnexion et redirection vers /connexion
     const handleLogout = () => {
         logout();
         navigate("/connexion");
     };
 
+    // 🧨 Envoie une requête POST pour demander la suppression du compte
     const handleConfirmDelete = async () => {
         const token = localStorage.getItem("token");
         if (!token) {
@@ -21,7 +42,6 @@ export default function Footer() {
         }
 
         try {
-            console.log;
             const res = await fetch(
                 `${import.meta.env.VITE_API_URL}/request-delete`,
                 {
@@ -36,7 +56,7 @@ export default function Footer() {
             const data = await res.json();
             setMessage(data.message);
 
-            // ✅ Fermer la modale après 3 secondes
+            // ✅ Ferme la modale automatiquement après 3 secondes
             setTimeout(() => {
                 setShowDeleteModal(false);
                 setMessage("");
@@ -50,6 +70,8 @@ export default function Footer() {
     return (
         <footer>
             <p>© 2025 PictEvent</p>
+
+            {/* ✅ Affiche les boutons uniquement si l'app est prête et que l'utilisateur est connecté */}
             {isReady && isAuthenticated && (
                 <>
                     <button
@@ -58,6 +80,7 @@ export default function Footer() {
                     >
                         Déconnexion
                     </button>
+
                     <button
                         className="button-delete"
                         onClick={() => setShowDeleteModal(true)}
@@ -65,6 +88,7 @@ export default function Footer() {
                         Supprimer votre compte
                     </button>
 
+                    {/* 🧾 Modale de confirmation de suppression */}
                     {showDeleteModal && (
                         <div className="modal-overlay">
                             <div
@@ -106,6 +130,7 @@ export default function Footer() {
                                     </strong>
                                 </p>
 
+                                {/* 🛑 Message d'erreur éventuel */}
                                 {message && (
                                     <p
                                         style={{
@@ -117,6 +142,7 @@ export default function Footer() {
                                     </p>
                                 )}
 
+                                {/* ✅ Boutons d'action */}
                                 <div className="modal-buttons">
                                     <button
                                         className="create-btn button-delete"
