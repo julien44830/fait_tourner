@@ -126,7 +126,7 @@ export default function Home() {
 
         try {
             const response = await fetch(
-                `${getEnvApiUrl()}/api/book/${bookId}`,
+                `${getEnvApiUrl()}/api/books/${bookId}`,
                 {
                     method: "DELETE",
                     headers: {

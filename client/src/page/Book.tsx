@@ -82,7 +82,7 @@ export default function Book({ id }: Props) {
             if (!token || !bookId) return;
 
             try {
-                const response = await fetch(`${API_URL}/api/book/${bookId}`, {
+                const response = await fetch(`${API_URL}/api/books/${bookId}`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -113,7 +113,7 @@ export default function Book({ id }: Props) {
         if (!token || !bookId) return;
 
         try {
-            const response = await fetch(`${API_URL}/api/book/${bookId}`, {
+            const response = await fetch(`${API_URL}/api/books/${bookId}`, {
                 method: "GET",
                 headers: {
                     Authorization: `Bearer ${token}`,
