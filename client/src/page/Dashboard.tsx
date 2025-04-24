@@ -141,7 +141,7 @@ export default function Dashboard() {
         if (!token) return alert("Vous devez être connecté.");
 
         try {
-            const response = await fetch(`${API_URL}/api/book/${bookId}`, {
+            const response = await fetch(`${API_URL}/api/books/${bookId}`, {
                 method: "DELETE",
                 headers: { Authorization: `Bearer ${token}` },
             });
