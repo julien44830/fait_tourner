@@ -43,7 +43,7 @@ interface User {
   email: string;
 }
 
-import { getConnection } from "../dbconfig"; // adapte le chemin selon ton projet
+import { getConnection } from "../db/dbconfig"; // adapte le chemin selon ton projet
 
 async function findOrCreateUserFromGoogle(profile: Profile): Promise<User> {
   const id = profile.id;

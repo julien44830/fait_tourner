@@ -1,4 +1,4 @@
-import { getConnection } from "../dbconfig";
+import { getConnection } from "../db/dbconfig";
 
 async function resetDatabase() {
     console.log("🔄 Réinitialisation de la base de données...");

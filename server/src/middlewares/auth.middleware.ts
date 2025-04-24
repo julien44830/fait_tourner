@@ -1,7 +1,5 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
 import jwt from "jsonwebtoken";
-import { AuthRequest } from "../types/AuthRequest";
-
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const SECRET_KEY = process.env.SECRET_KEY as string;
@@ -32,7 +30,7 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction): vo
 
   try {
     const decoded = jwt.verify(token, SECRET_KEY!) as { userId: string, email: string };
-    (req as AuthRequest).user = {
+    req.user = {
       id: decoded.userId,
       email: decoded.email,
     };
