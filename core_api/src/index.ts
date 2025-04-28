@@ -5,7 +5,7 @@ dotenv.config();
 
 import app from "./app";
 import { getConnection } from "./db/dbconfig";
-import "./service/passport"; // configure Passport
+import "./services/passport"; // configure Passport
 
 // ✅ Vérification des variables d'environnement
 const requiredEnvs = ["SECRET_KEY", "PORT", "FRONT_BASE_URL"];

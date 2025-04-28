@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { getConnection } from "../db/dbconfig";
-import { sendInvitationEmail } from "../service/mailerService";
+import { sendInvitationEmail } from "../services/mailerService";
 
 
 

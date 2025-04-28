@@ -1,7 +1,7 @@
 {
     "scripts": {
-        "dev": "concurrently \"npm run dev --prefix client\" \"npm run dev --prefix server\"",
-        "seed": "concurrently \"npm run seed --prefix server\""
+        "dev": "concurrently \"npm run dev --prefix client\" \"npm run dev --prefix core_api\" \"npm run dev --prefix mail_service\" \"npm run dev --prefix upload_service\"",
+        "seed": "concurrently \"npm run seed --prefix core_api\""
     },
     "devDependencies": {
         "@types/node": "^22.13.10",

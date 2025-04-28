@@ -134,6 +134,10 @@ export default function Book({ id }: Props) {
         const formData = new FormData();
         files.forEach((file) => formData.append("images", file));
 
+        formData.forEach((value, key) => {
+            console.log(`FormData key=${key}, value=`, value);
+        });
+
         const response = await fetch(`${API_URL}/api/upload/${bookId}`, {
             method: "POST",
             headers: {
