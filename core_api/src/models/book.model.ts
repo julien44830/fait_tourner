@@ -65,8 +65,16 @@ export const getBookDetails = async (bookId: string) => {
   };
 };
 
-export const getAllBooks = async () => {
+export const getAllBooks = async (userId: string) => {
   const connection = await getConnection();
-  const [books]: any = await connection.execute("SELECT * FROM book");
-  return [books];
-}
+  const [books]: any = await connection.execute(
+    `
+    SELECT b.* 
+    FROM book b
+    JOIN users_book ub ON ub.book_id = b.id
+    WHERE ub.user_id = ?
+    `,
+    [userId]
+  );
+  return books;
+};

@@ -1,3 +1,5 @@
+//book.controller.ts
+
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { createBook, findBookById, getBookDetails, getAllBooks } from "../models/book.model";
@@ -58,16 +60,23 @@ export const deleteBookController = async (req: Request, res: Response): Promise
 
 //réccupérer tous les books
 
-export const getAllBooksController = async (req: Request, res: Response): Promise<void> => {
+export const getAllBooksController = async (req: Request, res: Response) => {
   try {
-    const [books] = await getAllBooks()
-    res.status(200).json(books);
+    const user = req.user as { userId: string };
+    console.log("✅ Utilisateur connecté :", req.user);
+
+    if (!user) {
+      res.status(401).json({ error: "Utilisateur non connecté" });
+      return;
+    }
+
+    const books = await getAllBooks(user.userId);
+    res.status(200).json({ books });
   } catch (error) {
-    console.error("❌ Erreur récupération books :", error);
+    console.error("Erreur lors de la récupération des books :", error);
     res.status(500).json({ error: "Erreur serveur" });
   }
 };
-
 // 🔍 Détail d’un book
 export const getBookController = async (req: Request, res: Response): Promise<void> => {
   const bookId = req.params.id;

@@ -6,10 +6,13 @@ import {
   getAllBooksController
 } from "../controllers/book.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
+import { verifyToken } from "../middlewares/auth.middleware";
+
 
 export const bookRouter = Router();
 
-bookRouter.post("/", authMiddleware, createBookController);
-bookRouter.get("/", authMiddleware, getAllBooksController);
-bookRouter.get("/:id", authMiddleware, getBookController);
-bookRouter.delete("/:id", authMiddleware, deleteBookController);
+bookRouter.post("/", verifyToken, authMiddleware, createBookController);
+bookRouter.get("/", verifyToken, authMiddleware, getAllBooksController);
+bookRouter.get("/:id", verifyToken, authMiddleware, getBookController);
+bookRouter.delete("/:id", verifyToken, authMiddleware, deleteBookController);
+

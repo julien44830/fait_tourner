@@ -95,13 +95,13 @@ export default function Dashboard() {
                 const res = await fetch(`${API_URL}/api/books`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                const data = await res.json();
+                const { books } = await res.json();
 
-                if (Array.isArray(data)) {
-                    setBooks(data);
-                    if (data.length > 0) setSelectedBookId(data[0].id);
+                if (Array.isArray(books)) {
+                    setBooks(books);
+                    if (books.length > 0) setSelectedBookId(books[0].id);
                 } else {
-                    console.error("Données inattendues reçues:", data);
+                    console.error("Données inattendues reçues :", books);
                     setBooks([]);
                 }
             } catch (err) {
@@ -111,6 +111,8 @@ export default function Dashboard() {
 
         fetchBooks();
     }, [navigate]);
+
+    console.log("%c⧭", "color: #1d5673", books);
 
     // ➕ Création d'un nouveau book
     const handleCreateBook = async (bookName: string) => {

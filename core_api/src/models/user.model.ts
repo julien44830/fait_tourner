@@ -1,3 +1,4 @@
+//userInfo.model.ts
 import { getConnection } from "../db/dbconfig";
 
 // 📌 Trouve un utilisateur par email
