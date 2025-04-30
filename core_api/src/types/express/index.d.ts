@@ -1,14 +1,14 @@
-import "express";
+// import "express";
 
-declare global {
-  namespace Express {
-    interface User {
-      id: string;
-      email?: string;
-    }
+// declare global {
+//   namespace Express {
+//     interface User {
+//       id: string;
+//       email?: string;
+//     }
 
-    interface Request {
-      user?: User;
-    }
-  }
-}
+//     interface Request {
+//       user?: User;
+//     }
+//   }
+// }

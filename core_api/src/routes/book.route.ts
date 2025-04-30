@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, RequestHandler } from "express";
 import {
   createBookController,
   deleteBookController,
@@ -11,8 +11,8 @@ import { verifyToken } from "../middlewares/auth.middleware";
 
 export const bookRouter = Router();
 
-bookRouter.post("/", verifyToken, authMiddleware, createBookController);
-bookRouter.get("/", verifyToken, authMiddleware, getAllBooksController);
-bookRouter.get("/:id", verifyToken, authMiddleware, getBookController);
-bookRouter.delete("/:id", verifyToken, authMiddleware, deleteBookController);
+bookRouter.post("/", verifyToken, authMiddleware, createBookController as RequestHandler);
+bookRouter.get("/", verifyToken, authMiddleware, getAllBooksController as RequestHandler);
+bookRouter.get("/:id", verifyToken, authMiddleware, getBookController as RequestHandler);
+bookRouter.delete("/:id", verifyToken, authMiddleware, deleteBookController as RequestHandler);
 

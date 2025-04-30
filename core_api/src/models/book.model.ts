@@ -4,7 +4,7 @@ import { getConnection } from "../db/dbconfig";
 export const findBookById = async (bookId: string) => {
   const connection = await getConnection();
   const [books]: any = await connection.execute(
-    "SELECT id FROM book WHERE id = ?",
+    "SELECT owner_id FROM book WHERE id = ?",
     [bookId]
   );
   return books[0];
@@ -17,7 +17,6 @@ export const addUserToBook = async (userId: string, bookId: string) => {
     "INSERT INTO users_book (user_id, book_id, role) VALUES (?, ?, 'viewer')",
     [userId, bookId]
   );
-
 
   return result.affectedRows > 0;
 };

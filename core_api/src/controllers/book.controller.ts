@@ -1,22 +1,27 @@
-//book.controller.ts
+// 📚 Contrôleur pour la gestion des books
 
-import { Request, Response } from "express";
+import { Response } from "express";
+import { AuthenticatedRequest } from "../types/UserRequest"; // ✅
+
 import { v4 as uuidv4 } from "uuid";
 import { createBook, findBookById, getBookDetails, getAllBooks } from "../models/book.model";
-import { findUserById, isUserInBook } from "../models/user.model";
 import { getConnection } from "../db/dbconfig";
 
-
-
-// 📚 Crée un nouveau book
-export const createBookController = async (req: Request, res: Response): Promise<void> => {
+/**
+ * 📚 Crée un nouveau book
+ */
+export const createBookController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    const userId = req.body.userId || (req.user as unknown as { userId: string })?.userId;
+    if (!req.user) {
+      res.status(401).json({ error: "Utilisateur non connecté." });
+      return;
+    }
+    const userId = req.body.userId || req.user.userId;
     const { title } = req.body;
 
     if (!title || !userId) {
       res.status(400).json({ error: "Titre ou utilisateur manquant." });
-      return
+      return;
     }
 
     const bookId = uuidv4();
@@ -29,23 +34,32 @@ export const createBookController = async (req: Request, res: Response): Promise
   }
 };
 
-// 🧹 Supprime un book (uniquement si l'utilisateur est l’auteur)
-export const deleteBookController = async (req: Request, res: Response): Promise<void> => {
+/**
+ * 🧹 Supprime un book
+ */
+export const deleteBookController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-
     const bookId = req.params.id;
-    const userId = req.body.userId || (req.user as { id: string })?.id;
+
+    if (!req.user) {
+      res.status(401).json({ error: "Utilisateur non connecté." });
+      return;
+    }
+    const userId = req.body.userId || req.user.userId;
 
     const book = await findBookById(bookId);
-
+    console.log("📘 owner_id BDD :", book.owner_id);
+    console.log("👤 userId requête :", userId);
     if (!book) {
       res.status(404).json({ error: "Book introuvable." });
-      return
+      return;
     }
 
-    if (book.owner_id !== userId) {
+
+
+    if (String(book.owner_id) !== String(userId)) {
       res.status(403).json({ error: "Vous n'êtes pas l’auteur du book." });
-      return
+      return;
     }
 
     const connection = await getConnection();
@@ -58,35 +72,37 @@ export const deleteBookController = async (req: Request, res: Response): Promise
   }
 };
 
-//réccupérer tous les books
-
-export const getAllBooksController = async (req: Request, res: Response) => {
+/**
+ * 📚 Récupère tous les books de l'utilisateur connecté
+ */
+export const getAllBooksController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    const user = req.user as { userId: string };
-    console.log("✅ Utilisateur connecté :", req.user);
-
-    if (!user) {
-      res.status(401).json({ error: "Utilisateur non connecté" });
+    if (!req.user) {
+      res.status(401).json({ error: "Utilisateur non connecté." });
       return;
     }
+    console.log('%c⧭', 'color: #f200e2', req.user.userId);
 
-    const books = await getAllBooks(user.userId);
+
+    const books = await getAllBooks(req.user.userId);
     res.status(200).json({ books });
   } catch (error) {
-    console.error("Erreur lors de la récupération des books :", error);
-    res.status(500).json({ error: "Erreur serveur" });
+    console.error("❌ Erreur lors de la récupération des books :", error);
+    res.status(500).json({ error: "Erreur serveur." });
   }
 };
-// 🔍 Détail d’un book
-export const getBookController = async (req: Request, res: Response): Promise<void> => {
-  const bookId = req.params.id;
-  const book = await getBookDetails(bookId);
 
+/**
+ * 🔍 Récupère les détails d'un book
+ */
+export const getBookController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
+    const bookId = req.params.id;
+    const book = await getBookDetails(bookId);
 
     if (!book) {
       res.status(404).json({ error: "Book non trouvé." });
-      return
+      return;
     }
 
     res.json(book);
