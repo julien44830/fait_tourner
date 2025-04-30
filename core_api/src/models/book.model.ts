@@ -21,8 +21,6 @@ export const addUserToBook = async (userId: string, bookId: string) => {
   return result.affectedRows > 0;
 };
 
-
-
 // 📌 Crée un nouveau book
 export const createBook = async (bookId: string, title: string, owner_id: string) => {
   const connection = await getConnection();
