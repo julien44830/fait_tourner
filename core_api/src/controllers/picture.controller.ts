@@ -9,8 +9,11 @@ export const deletePicturesController = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    // ✅ Cast local ici seulement
+
+    console.log('%c⧭', 'color: #007300', "route appelée : deletePicturesController");
     const { userId } = (req as AuthenticatedRequest).user ?? {};
+
+    console.log('%c⧭', 'color: #006dcc', req.body);
     const { bookId, pictureIds } = req.body;
 
     if (!userId) {

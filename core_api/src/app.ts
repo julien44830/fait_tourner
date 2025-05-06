@@ -8,6 +8,7 @@ import { authRouter } from "./routes/auth.route";
 import { shareRouter } from "./routes/share.route";
 import { deleteRouter } from "./routes/delete.route";
 import { uploadRouter } from "./routes/upload.route";
+import pictureRouter from "./routes/picture.route";
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use("/api/books", bookRouter);
 app.use("/api", authRouter);
 app.use("/api", shareRouter);
 app.use("/api", uploadRouter);
+app.use("/api/pictures", pictureRouter);
 app.use("/", deleteRouter);
 
 export default app;

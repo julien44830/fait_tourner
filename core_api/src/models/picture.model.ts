@@ -27,14 +27,20 @@ export const insertPicture = async (
 export const deletePicturesByIds = async (pictureIds: string[], userId: string, bookId: string, isOwner: boolean) => {
   const connection = await getConnection();
 
-  // Si l'utilisateur est propriétaire : peut supprimer toutes les images du book
-  // Sinon : ne peut supprimer que les siennes
+  console.log('%c⧭', 'color: #731d6d', pictureIds, userId, bookId, isOwner);
+
+  // Génère une série de placeholders (?, ?, ?)
+  const placeholders = pictureIds.map(() => "?").join(", ");
+
+  // Construit la requête dynamique
   const query = isOwner
-    ? `DELETE FROM picture WHERE id IN (?) AND book_id = ?`
-    : `DELETE FROM picture WHERE id IN (?) AND book_id = ? AND user_id = ?`;
+    ? `DELETE FROM picture WHERE id IN (${placeholders}) AND book_id = ?`
+    : `DELETE FROM picture WHERE id IN (${placeholders}) AND book_id = ? AND user_id = ?`;
 
-  const params = isOwner ? [pictureIds, bookId] : [pictureIds, bookId, userId];
-
+  // Crée le tableau final de paramètres
+  const params = isOwner
+    ? [...pictureIds, bookId]
+    : [...pictureIds, bookId, userId];
   await connection.execute(query, params);
 };
 
