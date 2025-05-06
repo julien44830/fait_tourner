@@ -13,13 +13,13 @@
  * - forwardImagesToUploadService (proxy)
  * - insertPicture (modèle Picture)
  *
- * Auteur : Julien (fait_tourner) 🚀
  */
 
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { forwardImagesToUploadService } from "../services/forwardImagesToUploadService";
 import { insertPicture } from "../models/picture.model";
+import { AuthenticatedRequest } from "../types/UserRequest";
 
 /**
  * 🎯 Gère l'upload d'images en les redirigeant vers upload_service
@@ -29,11 +29,11 @@ import { insertPicture } from "../models/picture.model";
  * @param res - Réponse Express
  */
 export const handleUpload = async (req: Request, res: Response): Promise<void> => {
-  const user = req.user as { id: string };
+  const user = (req as AuthenticatedRequest).user;
   const bookId = req.params.bookId;
 
   // 🔒 Vérification utilisateur
-  if (!user?.id) {
+  if (!user?.userId) {
     res.status(401).json({ error: "Non autorisé." });
     return;
   }
@@ -45,10 +45,10 @@ export const handleUpload = async (req: Request, res: Response): Promise<void> =
   }
 
   try {
-    console.log("📬 Envoi vers forwardImagesToUploadService :", { userId: user.id, bookId });
+    console.log("📬 Envoi vers forwardImagesToUploadService :", { userId: user.userId, bookId });
 
     // 🚀 Redirection des fichiers vers upload_service
-    const uploadResponse = await forwardImagesToUploadService(req, user.id, bookId);
+    const uploadResponse = await forwardImagesToUploadService(req, user.userId, bookId);
 
     if (!uploadResponse?.success || !Array.isArray(uploadResponse.images)) {
       console.error("❌ Upload service a retourné une erreur :", uploadResponse);
@@ -64,7 +64,7 @@ export const handleUpload = async (req: Request, res: Response): Promise<void> =
           image.originalname,                         // 📝 Nom visible
           `/uploads/${bookId}/${image.filename}`,      // 📂 Chemin réel de stockage
           bookId,
-          user.id
+          user.userId
         );
         return {
           id: pictureId,
