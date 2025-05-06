@@ -8,5 +8,5 @@ export interface AuthenticatedUser {
 
 // ✅ Définir une Request avec utilisateur authentifié
 export interface AuthenticatedRequest extends Request {
-  user?: AuthenticatedUser;
+  user: AuthenticatedUser;
 }

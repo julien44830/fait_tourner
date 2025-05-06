@@ -22,3 +22,19 @@ export const insertPicture = async (
     [id, name, path, bookId, userId, false]
   );
 };
+
+// ✅ Supprime plusieurs images de la base
+export const deletePicturesByIds = async (pictureIds: string[], userId: string, bookId: string, isOwner: boolean) => {
+  const connection = await getConnection();
+
+  // Si l'utilisateur est propriétaire : peut supprimer toutes les images du book
+  // Sinon : ne peut supprimer que les siennes
+  const query = isOwner
+    ? `DELETE FROM picture WHERE id IN (?) AND book_id = ?`
+    : `DELETE FROM picture WHERE id IN (?) AND book_id = ? AND user_id = ?`;
+
+  const params = isOwner ? [pictureIds, bookId] : [pictureIds, bookId, userId];
+
+  await connection.execute(query, params);
+};
+

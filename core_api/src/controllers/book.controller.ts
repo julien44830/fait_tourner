@@ -1,8 +1,7 @@
 // 📚 Contrôleur pour la gestion des books
 
-import { Response } from "express";
-import { AuthenticatedRequest } from "../types/UserRequest"; // ✅
-
+import { RequestHandler, Response } from "express";
+import { AuthenticatedRequest } from "../types/UserRequest";
 import { v4 as uuidv4 } from "uuid";
 import { createBook, findBookById, getBookDetails, getAllBooks } from "../models/book.model";
 import { getConnection } from "../db/dbconfig";
@@ -10,17 +9,18 @@ import { getConnection } from "../db/dbconfig";
 /**
  * 📚 Crée un nouveau book
  */
-export const createBookController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const createBookController: RequestHandler = async (req, res) => {
   try {
-    if (!req.user) {
+    const { userId } = (req as AuthenticatedRequest).user ?? {};
+    const { title } = req.body;
+
+    if (!userId) {
       res.status(401).json({ error: "Utilisateur non connecté." });
       return;
     }
-    const userId = req.body.userId || req.user.userId;
-    const { title } = req.body;
 
-    if (!title || !userId) {
-      res.status(400).json({ error: "Titre ou utilisateur manquant." });
+    if (!title) {
+      res.status(400).json({ error: "Titre du book manquant." });
       return;
     }
 
@@ -37,25 +37,21 @@ export const createBookController = async (req: AuthenticatedRequest, res: Respo
 /**
  * 🧹 Supprime un book
  */
-export const deleteBookController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const deleteBookController: RequestHandler = async (req, res) => {
   try {
+    const { userId } = (req as AuthenticatedRequest).user ?? {};
     const bookId = req.params.id;
 
-    if (!req.user) {
+    if (!userId) {
       res.status(401).json({ error: "Utilisateur non connecté." });
       return;
     }
-    const userId = req.body.userId || req.user.userId;
 
     const book = await findBookById(bookId);
-    console.log("📘 owner_id BDD :", book.owner_id);
-    console.log("👤 userId requête :", userId);
     if (!book) {
       res.status(404).json({ error: "Book introuvable." });
       return;
     }
-
-
 
     if (String(book.owner_id) !== String(userId)) {
       res.status(403).json({ error: "Vous n'êtes pas l’auteur du book." });
@@ -75,16 +71,16 @@ export const deleteBookController = async (req: AuthenticatedRequest, res: Respo
 /**
  * 📚 Récupère tous les books de l'utilisateur connecté
  */
-export const getAllBooksController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const getAllBooksController: RequestHandler = async (req, res) => {
   try {
-    if (!req.user) {
+    const { userId } = (req as AuthenticatedRequest).user ?? {};
+
+    if (!userId) {
       res.status(401).json({ error: "Utilisateur non connecté." });
       return;
     }
-    console.log('%c⧭', 'color: #f200e2', req.user.userId);
 
-
-    const books = await getAllBooks(req.user.userId);
+    const books = await getAllBooks(userId);
     res.status(200).json({ books });
   } catch (error) {
     console.error("❌ Erreur lors de la récupération des books :", error);
@@ -95,7 +91,7 @@ export const getAllBooksController = async (req: AuthenticatedRequest, res: Resp
 /**
  * 🔍 Récupère les détails d'un book
  */
-export const getBookController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const getBookController: RequestHandler = async (req, res) => {
   try {
     const bookId = req.params.id;
     const book = await getBookDetails(bookId);

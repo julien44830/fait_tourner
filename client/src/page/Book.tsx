@@ -54,19 +54,28 @@ export default function Book({ id }: Props) {
 
     const confirmDeletion = async () => {
         const token = localStorage.getItem("token");
-        if (!token || !bookId) return;
+        if (!token || !bookId || selectedPictureIds.length === 0) return;
 
         try {
-            await Promise.all(
-                selectedPictureIds.map((id) =>
-                    fetch(`${API_URL}/api/pictures/${id}`, {
-                        method: "DELETE",
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    })
-                )
-            );
+            const response = await fetch(`${API_URL}/api/pictures/delete`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    bookId,
+                    pictureIds: selectedPictureIds,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error("Erreur API : ", data.error);
+                return;
+            }
+
             await refreshBookPictures();
             cancelSelection();
         } catch (err) {
@@ -101,6 +110,8 @@ export default function Book({ id }: Props) {
                 setTimeout(() => setIsLoadingPictures(false), 2000);
             }
         };
+        console.log("book : ", book);
+        console.log("picture :", pictures);
 
         fetchBook();
     }, [bookId]);
