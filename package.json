@@ -1,6 +1,7 @@
 {
     "scripts": {
         "dev": "concurrently \"npm run dev --prefix client\" \"npm run dev --prefix core_api\" \"npm run dev --prefix mail_service\" \"npm run dev --prefix upload_service\"",
+        "test": "concurrently \"npm run test --prefix client\" \"npm run test --prefix core_api\" \"npm run test --prefix mail_service\" \"npm run test --prefix upload_service\"",
         "seed": "concurrently \"npm run seed --prefix core_api\""
     },
     "devDependencies": {
