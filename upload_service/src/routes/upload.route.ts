@@ -80,6 +80,39 @@ function createDynamicUpload(bookId: string) {
   });
 }
 
+
+
+
+router.post("/delete-multiple", (req: Request, res: Response): void => {
+
+  console.log('%c⧭', 'color: #997326', "route /delete-multiple appeller ");
+  const { bookId, files } = req.body;
+  console.log("🔍 Reçu dans delete-multiple :", req.body);
+
+  if (!bookId || !Array.isArray(files)) {
+    res.status(400).json({ success: false, error: "Paramètres invalides" });
+    return
+  }
+
+  const deleted: string[] = [];
+
+  try {
+    files.forEach((file: string) => {
+      // Supprime uniquement le nom de fichier (sécurité)
+      const filePath = path.join(baseUploadPath, bookId, path.basename(file));
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+        deleted.push(file);
+      }
+    });
+
+    res.json({ success: true, deleted });
+  } catch (error) {
+    console.error("❌ Erreur suppression fichiers :", error);
+    res.status(500).json({ success: false, error: "Erreur serveur lors de la suppression" });
+  }
+});
+
 /**
  * 🚀 Route POST /:bookId
  * - Récupère l'ID du book via l'URL
@@ -132,6 +165,8 @@ router.post("/:bookId", (req: Request, res: Response, next) => {
     images: uploaded,
   });
 });
+
+
 
 // 🛫 Export du routeur
 export default router;

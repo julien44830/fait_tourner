@@ -27,7 +27,6 @@ export const insertPicture = async (
 export const deletePicturesByIds = async (pictureIds: string[], userId: string, bookId: string, isOwner: boolean) => {
   const connection = await getConnection();
 
-  console.log('%c⧭', 'color: #731d6d', pictureIds, userId, bookId, isOwner);
 
   // Génère une série de placeholders (?, ?, ?)
   const placeholders = pictureIds.map(() => "?").join(", ");

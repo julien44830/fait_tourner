@@ -70,7 +70,7 @@ export default function Home() {
                     throw new Error(`Erreur HTTP ${response.status}`);
 
                 const { books } = await response.json();
-                console.log(books);
+                books;
                 setBooks(books);
             } catch (error) {
                 console.error("❌ Erreur récupération books :", error);
@@ -81,8 +81,6 @@ export default function Home() {
 
         fetchBooks();
     }, []);
-
-    console.log("%c⧭", "color: #00b300", books);
 
     // ➕ Créer un nouveau book
     const handleCreateBook = async () => {

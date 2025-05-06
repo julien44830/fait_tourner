@@ -27,7 +27,6 @@ export const forwardImagesToUploadService = async (
       }
 
     );
-    console.log('%c⧭', 'color: #d90000', response);
 
     return response.data;
   } catch (error: any) {

@@ -112,8 +112,6 @@ export default function Dashboard() {
         fetchBooks();
     }, [navigate]);
 
-    console.log("%c⧭", "color: #1d5673", books);
-
     // ➕ Création d'un nouveau book
     const handleCreateBook = async (bookName: string) => {
         const token = localStorage.getItem("token");

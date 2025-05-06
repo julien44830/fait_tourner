@@ -17,11 +17,11 @@ app.use("/upload", uploadRoutes);
 // 📂 Servir statiquement tout ce qui est dans /uploads
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
-// 📩 Logger chaque requête
-app.use((req, res, next) => {
-  console.log("📩 Requête reçue dans upload_service :", req.method, req.url);
-  next();
-});
+// // 📩 Logger chaque requête
+// app.use((req, res, next) => {
+//   console.log("📩 Requête reçue dans upload_service :", req.method, req.url);
+//   next();
+// });
 
 // 🚨 CAPTURER les requêtes "nues" qui arrivent après le pathRewrite
 app.use(express.static(path.join(__dirname, "../uploads")));

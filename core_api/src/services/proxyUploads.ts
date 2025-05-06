@@ -13,7 +13,6 @@ export const proxyUploadsMiddleware = createProxyMiddleware({
     "^/uploads": "", // 💥 on enlève '/uploads' pour que l'upload_service comprenne
   },
   onProxyReq: (_proxyReq: any, req: { url: any; }, res: any) => {
-    console.log("🛰️ Proxy request vers upload_service :", req.url);
   },
   onError: (err: any, req: any, res: any) => {
     console.error("❌ Erreur de proxy :", err);

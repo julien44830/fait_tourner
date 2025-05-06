@@ -2,38 +2,48 @@ import { Request, Response, NextFunction } from "express";
 import { AuthenticatedRequest } from "../types/UserRequest";
 import { deletePicturesByIds } from "../models/picture.model";
 import { findBookById } from "../models/book.model";
+import { deletePicturesWithFiles } from "../services/deletePicturesWithFiles";
 
+interface DeletePicturesBody {
+  bookId: string;
+  pictureIds: string[];
+  imagePaths: string[];
+}
+
+/**
+ * Contrôleur pour supprimer des images :
+ * - supprime les fichiers via le microservice d'upload
+ * - supprime les entrées correspondantes en base
+ */
 export const deletePicturesController = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ): Promise<void> => {
   try {
-
-    console.log('%c⧭', 'color: #007300', "route appelée : deletePicturesController");
     const { userId } = (req as AuthenticatedRequest).user ?? {};
+    const { bookId, pictureIds, imagePaths } = req.body;
 
-    console.log('%c⧭', 'color: #006dcc', req.body);
-    const { bookId, pictureIds } = req.body;
+    console.log('%c⧭', 'color: #e57373', bookId, pictureIds, imagePaths);
 
+    // 🔒 Validation des données
     if (!userId) {
       res.status(401).json({ error: "Utilisateur non connecté." });
       return;
     }
 
-    if (!bookId || !Array.isArray(pictureIds) || pictureIds.length === 0) {
-      res.status(400).json({ error: "bookId ou pictureIds manquant." });
+    if (
+      !bookId ||
+      !Array.isArray(pictureIds) ||
+      !Array.isArray(imagePaths) ||
+      pictureIds.length === 0 ||
+      imagePaths.length === 0
+    ) {
+      res.status(400).json({ error: "Paramètres requis manquants ou invalides." });
       return;
     }
 
-    const book = await findBookById(bookId);
-    if (!book) {
-      res.status(404).json({ error: "Book introuvable." });
-      return;
-    }
-
-    const isOwner = book.owner_id === userId;
-    await deletePicturesByIds(pictureIds, userId, bookId, isOwner);
+    // 🔧 Appel du service métier
+    await deletePicturesWithFiles({ userId, bookId, pictureIds, imagePaths });
 
     res.json({ message: "Images supprimées avec succès." });
   } catch (error) {

@@ -55,6 +55,9 @@ export default function Book({ id }: Props) {
     const confirmDeletion = async () => {
         const token = localStorage.getItem("token");
         if (!token || !bookId || selectedPictureIds.length === 0) return;
+        const imagePaths = pictures
+            .filter((pic) => selectedPictureIds.includes(pic.picture_id))
+            .map((pic) => pic.path);
 
         try {
             const response = await fetch(`${API_URL}/api/pictures/delete`, {
@@ -66,6 +69,7 @@ export default function Book({ id }: Props) {
                 body: JSON.stringify({
                     bookId,
                     pictureIds: selectedPictureIds,
+                    imagePaths,
                 }),
             });
 
@@ -110,8 +114,6 @@ export default function Book({ id }: Props) {
                 setTimeout(() => setIsLoadingPictures(false), 2000);
             }
         };
-        console.log("book : ", book);
-        console.log("picture :", pictures);
 
         fetchBook();
     }, [bookId]);

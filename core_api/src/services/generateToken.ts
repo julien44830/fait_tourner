@@ -12,6 +12,6 @@ const secret = process.env.SECRET_KEY || "dev-secret";
 
 const token = jwt.sign(payload, secret, { expiresIn: "1h" });
 
-console.log("🪪 Ton token JWT :\n");
-console.log(token);
+("🪪 Ton token JWT :\n");
+(token);
 
