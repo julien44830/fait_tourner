@@ -1,39 +1,3 @@
-/**
- * 📘 Composant `Book`
- *
- * 🔍 Objectif :
- * Ce composant est responsable de l'affichage **d'un album photo** (appelé "book").
- * Il gère la **récupération des données du book**, **l'affichage des images**, ainsi que
- * les **modales d'ajout** et de **partage** du book.
- *
- * ---
- *
- * ⚙️ Fonctionnalités principales :
- * - 🔁 **Récupère les données du book** (titre + images) à partir de l'`API`.
- * - 📤 **Permet d'ajouter des images** via une modale `UploadModal`.
- * - 📩 **Permet de partager le book** avec d'autres utilisateurs via `InviteModal`.
- * - 🔍 Affiche les images du book, avec possibilité de les voir en **plein écran** (`ImageModal`).
- * - 🔄 Affiche en **grille** ou **liste** grâce à `isGridView`.
- * - 🧪 Gère les **états de chargement** (`isLoadingBook`, `isLoadingPictures`).
- *
- * ---
- *
- * 🧠 Comportement :
- * - Si `id` est fourni via `props`, il est utilisé, sinon le composant utilise `useParams()`.
- * - Les appels API nécessitent un token présent dans le `localStorage`.
- * - Les erreurs sont loggées dans la console.
- * - Le **switch de vue** permet à l’utilisateur de changer l’affichage des images.
- *
- * ---
- *
- * 🧱 Composants utilisés :
- * - `Loader` : indicateur de chargement
- * - `ImageModal` : modale de visualisation d'image en plein écran
- * - `InviteModal` : modale d'invitation d'utilisateur
- * - `UploadModal` : modale d'ajout d'image
- *
- */
-
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Loader from "../component/Loader";
@@ -63,7 +27,6 @@ export default function Book({ id }: Props) {
     const routeParams = useParams<{ id: string }>();
     const bookId = id || routeParams.id;
 
-    // États du composant
     const [book, setBook] = useState<Book | null>(null);
     const [pictures, setPictures] = useState<Picture[]>([]);
     const [isLoadingBook, setIsLoadingBook] = useState(true);
@@ -75,7 +38,55 @@ export default function Book({ id }: Props) {
     );
     const [isGridView, setIsGridView] = useState(true);
 
-    // 📥 Récupération des données du book au chargement
+    const [selectionMode, setSelectionMode] = useState(false);
+    const [selectedPictureIds, setSelectedPictureIds] = useState<string[]>([]);
+
+    const togglePictureSelection = (id: string) => {
+        setSelectedPictureIds((prev) =>
+            prev.includes(id) ? prev.filter((pid) => pid !== id) : [...prev, id]
+        );
+    };
+
+    const cancelSelection = () => {
+        setSelectionMode(false);
+        setSelectedPictureIds([]);
+    };
+
+    const confirmDeletion = async () => {
+        const token = localStorage.getItem("token");
+        if (!token || !bookId || selectedPictureIds.length === 0) return;
+        const imagePaths = pictures
+            .filter((pic) => selectedPictureIds.includes(pic.picture_id))
+            .map((pic) => pic.path);
+
+        try {
+            const response = await fetch(`${API_URL}/api/pictures/delete`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    bookId,
+                    pictureIds: selectedPictureIds,
+                    imagePaths,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error("Erreur API : ", data.error);
+                return;
+            }
+
+            await refreshBookPictures();
+            cancelSelection();
+        } catch (err) {
+            console.error("Erreur lors de la suppression des images :", err);
+        }
+    };
+
     useEffect(() => {
         const fetchBook = async () => {
             const token = localStorage.getItem("token");
@@ -107,7 +118,6 @@ export default function Book({ id }: Props) {
         fetchBook();
     }, [bookId]);
 
-    // 🔁 Rafraîchit les images d'un book (utilisé après upload)
     const refreshBookPictures = async () => {
         const token = localStorage.getItem("token");
         if (!token || !bookId) return;
@@ -126,7 +136,6 @@ export default function Book({ id }: Props) {
         }
     };
 
-    // 📤 Gestion de l'upload d'image via formulaire
     const handleUpload = async (files: File[]) => {
         const token = localStorage.getItem("token");
         if (!token || !bookId) throw new Error("Utilisateur non connecté.");
@@ -145,21 +154,7 @@ export default function Book({ id }: Props) {
         const data = await response.json();
         if (!response.ok) throw new Error(data?.error || "Erreur inconnue");
 
-        const uploadedPictures = Array.isArray(data.pictures)
-            ? data.pictures.map((pic: any) => ({
-                  picture_id: pic.picture_id || Date.now(),
-                  picture_name: pic.name,
-                  path: pic.path,
-                  tags: null,
-              }))
-            : [];
-
-        if (uploadedPictures.length > 0) {
-            setPictures((prev) => [...prev, ...uploadedPictures]);
-            await refreshBookPictures();
-        } else {
-            throw new Error("Aucune image n'a été enregistrée.");
-        }
+        await refreshBookPictures();
     };
 
     if (isLoadingBook) return <Loader text="Chargement du book" />;
@@ -168,7 +163,6 @@ export default function Book({ id }: Props) {
         <div className="book-container">
             <h2>{book?.name}</h2>
 
-            {/* 🔁 Bouton de switch de vue grille/liste */}
             <div className="toggle-container">
                 <label>
                     {isGridView ? "Vue grille" : "Affichage normal"}
@@ -183,7 +177,6 @@ export default function Book({ id }: Props) {
                 </label>
             </div>
 
-            {/* 📤 Bouton pour ajouter des images */}
             <div className="upload-section">
                 <button
                     className="button"
@@ -191,24 +184,55 @@ export default function Book({ id }: Props) {
                 >
                     Ajouter des images
                 </button>
+                <button
+                    style={{
+                        backgroundColor: "green",
+                        color: "white",
+                        padding: "5px 10px",
+                        marginLeft: "10px",
+                    }}
+                    onClick={() => setShowInviteModal(true)}
+                >
+                    Partager le book
+                </button>
+                <button
+                    style={{
+                        backgroundColor: "red",
+                        color: "white",
+                        padding: "5px 10px",
+                        marginLeft: "10px",
+                    }}
+                    onClick={() => setSelectionMode(true)}
+                >
+                    🗑 Supprimer des images
+                </button>
             </div>
 
-            {/* 📩 Bouton pour inviter un utilisateur */}
-            <button
-                onClick={() => setShowInviteModal(true)}
-                style={{
-                    backgroundColor: "green",
-                    color: "white",
-                    padding: "5px 10px",
-                    border: "none",
-                    cursor: "pointer",
-                    marginBottom: "10px",
-                }}
-            >
-                Partager le book
-            </button>
+            {selectionMode && (
+                <div style={{ margin: "10px 0" }}>
+                    <p>
+                        Mode sélection activé – {selectedPictureIds.length}{" "}
+                        image(s) sélectionnée(s)
+                    </p>
+                    <button
+                        onClick={confirmDeletion}
+                        style={{
+                            backgroundColor: "green",
+                            color: "white",
+                            marginRight: "10px",
+                        }}
+                    >
+                        ✅ Valider la suppression
+                    </button>
+                    <button
+                        onClick={cancelSelection}
+                        style={{ backgroundColor: "green", color: "white" }}
+                    >
+                        ❌ Annuler
+                    </button>
+                </div>
+            )}
 
-            {/* 📤 Modale d'upload d'image */}
             {showUploadModal && (
                 <UploadModal
                     onClose={() => setShowUploadModal(false)}
@@ -216,7 +240,6 @@ export default function Book({ id }: Props) {
                 />
             )}
 
-            {/* 📩 Modale d'invitation */}
             {showInviteModal && bookId && (
                 <InviteModal
                     bookId={bookId}
@@ -224,7 +247,6 @@ export default function Book({ id }: Props) {
                 />
             )}
 
-            {/* 🖼️ Liste des images (vue grille ou liste) */}
             <div
                 className={isGridView ? "image-grid" : "image-list"}
                 style={{
@@ -245,7 +267,7 @@ export default function Book({ id }: Props) {
                         <Loader text="Chargement des images" />
                     </div>
                 ) : pictures.length > 0 ? (
-                    pictures.map((picture) => (
+                    pictures.map((picture, index) => (
                         <div
                             key={picture.picture_id}
                             style={{
@@ -254,8 +276,47 @@ export default function Book({ id }: Props) {
                                 borderRadius: "6px",
                                 width: isGridView ? "calc(25% - 10px)" : "100%",
                                 boxSizing: "border-box",
+                                position: "relative",
+                                opacity:
+                                    selectionMode &&
+                                    !selectedPictureIds.includes(
+                                        picture.picture_id
+                                    )
+                                        ? 0.5
+                                        : 1,
+                                filter:
+                                    selectionMode &&
+                                    !selectedPictureIds.includes(
+                                        picture.picture_id
+                                    )
+                                        ? "grayscale(100%)"
+                                        : "none",
+                            }}
+                            onClick={() => {
+                                if (selectionMode)
+                                    togglePictureSelection(picture.picture_id);
+                                else setSelectedImageIndex(index);
                             }}
                         >
+                            {selectionMode && (
+                                <input
+                                    type="checkbox"
+                                    checked={selectedPictureIds.includes(
+                                        picture.picture_id
+                                    )}
+                                    onChange={() =>
+                                        togglePictureSelection(
+                                            picture.picture_id
+                                        )
+                                    }
+                                    style={{
+                                        position: "absolute",
+                                        top: "5px",
+                                        right: "5px",
+                                        zIndex: 10,
+                                    }}
+                                />
+                            )}
                             <div
                                 style={{
                                     width: "100%",
@@ -267,15 +328,6 @@ export default function Book({ id }: Props) {
                                 <img
                                     src={`${API_URL}${picture.path}`}
                                     alt={picture.picture_name}
-                                    onClick={() =>
-                                        setSelectedImageIndex(
-                                            pictures.findIndex(
-                                                (p) =>
-                                                    p.picture_id ===
-                                                    picture.picture_id
-                                            )
-                                        )
-                                    }
                                     style={{
                                         width: "100%",
                                         height: "100%",
@@ -294,7 +346,6 @@ export default function Book({ id }: Props) {
                     } ne contient aucune image`}</p>
                 )}
 
-                {/* 🔍 Modale de visualisation plein écran */}
                 {selectedImageIndex !== null && (
                     <ImageModal
                         images={pictures.map((p) => `${API_URL}${p.path}`)}

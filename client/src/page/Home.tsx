@@ -27,7 +27,7 @@ import { getEnvApiUrl } from "../utils/getEnvApiUrl";
 
 // Interface TypeScript représentant un book
 interface Book {
-    id: number;
+    id: string;
     name: string;
 }
 
@@ -42,6 +42,8 @@ export default function Home() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [bookToDelete, setBookToDelete] = useState<Book | null>(null);
     const [errorMessage, setErrorMessage] = useState("");
+    const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
+    const API_URL = getEnvApiUrl(); // Récupération de l'URL de l'API
 
     // 📦 Récupération des books au montage
     useEffect(() => {
@@ -67,8 +69,9 @@ export default function Home() {
                 if (!response.ok)
                     throw new Error(`Erreur HTTP ${response.status}`);
 
-                const data = await response.json();
-                setBooks(data);
+                const { books } = await response.json();
+                books;
+                setBooks(books);
             } catch (error) {
                 console.error("❌ Erreur récupération books :", error);
             } finally {
@@ -120,20 +123,15 @@ export default function Home() {
     };
 
     // ❌ Supprimer un book
-    const handleDeleteBook = async (bookId: number) => {
+    const handleDeleteBook = async (bookId: string) => {
         const token = localStorage.getItem("token");
         if (!token) return alert("Vous devez être connecté.");
 
         try {
-            const response = await fetch(
-                `${getEnvApiUrl()}/api/books/${bookId}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+            const response = await fetch(`${API_URL}/api/books/${bookId}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` },
+            });
 
             if (!response.ok) {
                 const err = await response.json();
@@ -141,8 +139,9 @@ export default function Home() {
             }
 
             setBooks((prev) => prev.filter((b) => b.id !== bookId));
+            if (selectedBookId === bookId) setSelectedBookId(null);
         } catch (error) {
-            console.error("❌ Erreur suppression :", error);
+            console.error("Erreur suppression :", error);
             alert("Erreur lors de la suppression du book.");
         }
     };

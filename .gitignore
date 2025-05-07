@@ -27,7 +27,7 @@ node_modules/
 
 # === UPLOADS ===
 # fichiers envoyés côté backend, souvent ignorés
-server/uploads/    
+**/uploads/**
 
 
 # === BUILD OUTPUT ===
