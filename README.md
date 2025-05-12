@@ -39,27 +39,25 @@ _Les versions exactes des dépendances sont indiquées dans les fichiers `packag
 ## Schéma de l'Architecture
 
 ```plaintext
-                        +-----------------+
-                        |     Vercel      |
-                        | (Frontend: React|
-                        |     & Vite)     |
-                        +--------+--------+
-                                 |
-                                 | Appels API (HTTP/HTTPS)
-                                 |
-                        +--------v--------+
-                        |    Railway      |
-                        | (Backend: Node/ |
-                        |    Express)     |
-                        +--------+--------+
-                                 |
-                                 | Connexion
-                                 |
-                        +--------v--------+
-                        |    Railway      |
-                        | (Base de données|
-                        |      MySQL)     |
-                        +-----------------+
+              +----------------+
+              |   Frontend     |
+              | (React & Vite) |
+              +----------------+
+                     |
+                     v
+              +----------------+
+              |   core_api     |
+              | (API Gateway)  |
+              +----------------+
+               |     |      |
+               |     |      |
+       +--------+    |    +----------+
+       |             |               |
+       v             v               v
++-------------+  +------------+  +-----------+
+| Mail_service|  |    BDD     |  | Upload Svc|
++-------------+  +------------+  +-----------+
+
 ```
 
 ## Déploiement
